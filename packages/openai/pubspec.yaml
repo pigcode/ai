@@ -1,7 +1,9 @@
 name: pigcode_ai_openai
-description: OpenAI wire adapter for the Pigcode AI provider contracts.
+description: OpenAI provider for Pigcode AI with Chat Completions, Responses, embeddings, images, audio, file and skill uploads, and realtime transcription.
 version: 0.0.1
 publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
 
 environment:
   sdk: ^3.6.0

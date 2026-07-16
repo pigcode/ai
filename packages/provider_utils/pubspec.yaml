@@ -1,7 +1,9 @@
 name: pigcode_ai_provider_utils
-description: Shared HTTP, SSE, media, JSON, and streaming utilities for Pigcode provider adapters.
+description: Shared HTTP, SSE, JSON validation, multipart, response handling, and streaming tool-call utilities for Pigcode AI providers.
 version: 0.0.1
 publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
 
 environment:
   sdk: ^3.6.0

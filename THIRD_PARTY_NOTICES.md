@@ -1,24 +1,48 @@
 # Third-Party Notices
 
-Pigcode AI uses the third-party software listed below. The versions shown were
-resolved locally on 2026-07-17; the constraints in the package `pubspec.yaml`
-files remain authoritative because this library workspace does not commit a
-lockfile.
+Pigcode AI uses the third-party software listed below. This inventory covers
+the direct runtime and development dependencies resolved on 2026-07-17. The
+constraints in the package `pubspec.yaml` files remain authoritative because
+this library workspace does not commit a lockfile; the audited versions are a
+point-in-time record of that resolution.
 
-This notice covers direct runtime dependencies of the source SDK.
-Development-only tooling (`melos`, `test`, and `lints`) is not bundled with or
-redistributed as part of Pigcode AI and is therefore not included. Products
-that vendor dependencies or distribute compiled artifacts must account for
-every direct and transitive dependency included in that artifact.
+Development-scope packages listed below are not bundled into SDK runtime
+artifacts. Products that vendor dependencies or distribute compiled artifacts
+must account for every direct and transitive dependency included in the
+distributed artifact. Resolved distributions must retain the complete license
+texts and copyright notices supplied with the dependencies they contain.
+Future dependency resolution requires a refreshed inventory and license audit.
+This notice records provenance and attribution information; it is not a legal
+guarantee.
 
-| Package | Constraint | Audited version | License | Upstream |
-| --- | --- | --- | --- | --- |
-| `equatable` | `^2.0.0` | 2.1.0 | MIT | <https://pub.dev/packages/equatable> |
-| `logging` | `^1.3.0` | 1.3.0 | BSD-3-Clause | <https://pub.dev/packages/logging> |
-| `http` | `^1.6.0` | 1.6.0 | BSD-3-Clause | <https://pub.dev/packages/http> |
-| `http_parser` | `^4.1.2` | 4.1.2 | BSD-3-Clause | <https://pub.dev/packages/http_parser> |
-| `web_socket_channel` | `^3.0.3` | 3.0.3 | BSD-3-Clause | <https://pub.dev/packages/web_socket_channel> |
-| `json_schema` | `^5.2.2` | 5.2.2 | Boost Software License 1.0 and embedded MIT notice | <https://pub.dev/packages/json_schema> |
+## Upstream design and adapted implementation material
+
+Parts of Pigcode AI's API design and implementation were informed by and
+adapted from the Vercel AI SDK, package `ai` 7.0.19, at pinned commit
+[`e40118c48b97026ac774392e5376a11d3287e9c1`](https://github.com/vercel/ai/commit/e40118c48b97026ac774392e5376a11d3287e9c1).
+
+Copyright 2023 Vercel, Inc.
+
+The adapted material is licensed under the Apache License, Version 2.0. The
+complete license text is available in
+[`third_party/licenses/Apache-2.0.txt`](third_party/licenses/Apache-2.0.txt).
+The repository copy follows the official Apache Software Foundation text at
+<https://www.apache.org/licenses/LICENSE-2.0.txt>.
+
+## Direct dependency inventory
+
+| Package | Constraint | Audited version | Scope | License | Upstream source |
+| --- | --- | --- | --- | --- | --- |
+| `equatable` | `^2.0.0` | 2.1.0 | runtime | MIT | <https://github.com/felangel/equatable> |
+| `http` | `^1.6.0` | 1.6.0 | runtime | BSD-3-Clause | <https://github.com/dart-lang/http/tree/master/pkgs/http> |
+| `http_parser` | `^4.1.2` | 4.1.2 | runtime | BSD-3-Clause | <https://github.com/dart-lang/http/tree/master/pkgs/http_parser> |
+| `json_schema` | `^5.2.2` | 5.2.2 | runtime | Boost Software License 1.0 (BSL-1.0) + embedded MIT notice | <https://github.com/workiva/json_schema> |
+| `logging` | `^1.3.0` | 1.3.0 | runtime | BSD-3-Clause | <https://github.com/dart-lang/core/tree/main/pkgs/logging> |
+| `web_socket_channel` | `^3.0.3` | 3.0.3 | runtime | BSD-3-Clause | <https://github.com/dart-lang/http/tree/master/pkgs/web_socket_channel> |
+| `lints` | `^5.0.0` | 5.1.1 | development | BSD-3-Clause | <https://github.com/dart-lang/core/tree/main/pkgs/lints> |
+| `melos` | `^8.0.0` | 8.2.2 | development | Apache-2.0 | <https://github.com/invertase/melos/tree/main/packages/melos> |
+| `test` | `^1.25.0` | 1.31.2 | development | BSD-3-Clause | <https://github.com/dart-lang/test/tree/master/pkgs/test> |
+| `yaml` | `^3.1.3` | 3.1.3 | development | MIT | <https://github.com/dart-lang/tools/tree/main/pkgs/yaml> |
 
 ## equatable 2.1.0
 
@@ -49,10 +73,13 @@ SOFTWARE.
 The following packages use the same BSD-3-Clause terms with their respective
 copyright notices:
 
-- `logging` 1.3.0 — Copyright 2013, the Dart project authors.
-- `http` 1.6.0 — Copyright 2014, the Dart project authors.
-- `http_parser` 4.1.2 — Copyright 2014, the Dart project authors.
-- `web_socket_channel` 3.0.3 — Copyright 2016, the Dart project authors.
+- `logging` 1.3.0 (runtime) — Copyright 2013, the Dart project authors.
+- `http` 1.6.0 (runtime) — Copyright 2014, the Dart project authors.
+- `http_parser` 4.1.2 (runtime) — Copyright 2014, the Dart project authors.
+- `web_socket_channel` 3.0.3 (runtime) — Copyright 2016, the Dart project
+  authors.
+- `lints` 5.1.1 (development) — Copyright 2021, the Dart project authors.
+- `test` 1.31.2 (development) — Copyright 2014, the Dart project authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -80,6 +107,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## json_schema 5.2.2
+
+In this inventory, `BSL-1.0` means the Boost Software License 1.0, not the
+Business Source License.
 
 Copyright 2013-2022 Workiva Inc.
 
@@ -118,3 +148,34 @@ Copyright (c) 2012 Julian Berman, which is licensed under the following terms:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
+
+## yaml 3.1.3 (development)
+
+Copyright (c) 2014, the Dart project authors.
+Copyright (c) 2006, Kirill Simonov.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## melos 8.2.2 (development)
+
+Copyright 2020 Invertase Limited
+
+Licensed under the Apache License, Version 2.0. The complete license text is
+available in
+[`third_party/licenses/Apache-2.0.txt`](third_party/licenses/Apache-2.0.txt).
