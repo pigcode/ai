@@ -84,7 +84,12 @@ Map<String, String> _withUserAgentSuffix(
   String suffix,
 ) {
   final result = Map<String, String>.of(headers);
-  final current = result['User-Agent'];
+  String? current;
+  for (final name in result.keys.toList()) {
+    if (name.toLowerCase() == 'user-agent') {
+      current = result.remove(name);
+    }
+  }
   result['User-Agent'] =
       (current == null || current.isEmpty) ? suffix : '$current $suffix';
   return result;

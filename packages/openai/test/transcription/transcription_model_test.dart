@@ -398,6 +398,7 @@ void main() {
           },
           includeRawChunks: true,
           headers: const {
+            'authorization': 'Bearer rotated-key',
             'OpenAI-Organization': 'org-1',
             'OpenAI-Project': 'proj-1',
           },
@@ -410,12 +411,12 @@ void main() {
       );
       expect(connector.protocols, [
         'realtime',
-        'openai-insecure-api-key.test-key',
+        'openai-insecure-api-key.rotated-key',
         'openai-organization.org-1',
         'openai-project.proj-1',
       ]);
       expect(connector.headers, {
-        'Authorization': 'Bearer test-key',
+        'Authorization': 'Bearer rotated-key',
         'OpenAI-Organization': 'org-1',
         'OpenAI-Project': 'proj-1',
       });

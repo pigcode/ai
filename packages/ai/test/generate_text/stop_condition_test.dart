@@ -52,10 +52,19 @@ void main() {
       expect(await condition(steps), isFalse);
     });
 
-    test('空步骤列表且 n 为 0 时返回 true', () async {
-      final condition = isStepCount(0);
-
-      expect(await condition(const []), isTrue);
+    test('非正数在创建条件时抛 ArgumentError', () {
+      for (final stepCount in [0, -1]) {
+        expect(
+          () => isStepCount(stepCount),
+          throwsA(
+            isA<ArgumentError>().having(
+              (error) => error.name,
+              'name',
+              'stepCount',
+            ),
+          ),
+        );
+      }
     });
   });
 

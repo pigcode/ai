@@ -105,7 +105,7 @@ void main() {
       // 因为 UA 拼接是"叠加"语义而非"替换"语义。
       final provider = createOpenAi(
         apiKey: 'sk-test',
-        headers: {'User-Agent': 'my-app/1.0'},
+        headers: {'user-agent': 'my-app/1.0'},
         client: client,
       );
       await triggerRequest(provider);

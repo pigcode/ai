@@ -10,22 +10,33 @@ import '../json/json.dart';
 ///
 /// - `headerMaps` 中的 `null` 元素直接跳过。
 /// - 每个 map 内部值为 `null` 的条目会被剔除(不会出现在结果中)。
-/// - 后面的 map 中同名 key 覆盖前面的值;若后面的 map 把某个 key 的值设为
-///   `null`,该 key 会被移除,即使更早的 map 里有非 null 值。
+/// - header 名称按 HTTP 语义大小写不敏感;后面的 map 中同名 key 覆盖前面的
+///   值,覆盖期间保留被覆盖 key 的 casing。
+/// - 若后面的 map 把某个 key 的值设为 `null`,该 key 会被移除,即使更早的
+///   map 里有非 null 值。
 Map<String, String> combineHeaders(
   List<Map<String, String?>?> headerMaps,
 ) {
   final combined = <String, String>{};
+  final actualNames = <String, String>{};
   for (final headers in headerMaps) {
     if (headers == null) {
       continue;
     }
     for (final entry in headers.entries) {
+      final normalizedName = entry.key.toLowerCase();
+      final actualName = actualNames[normalizedName];
       final value = entry.value;
       if (value == null) {
-        combined.remove(entry.key);
+        if (actualName != null) {
+          combined.remove(actualName);
+          actualNames.remove(normalizedName);
+        }
+      } else if (actualName != null) {
+        combined[actualName] = value;
       } else {
         combined[entry.key] = value;
+        actualNames[normalizedName] = entry.key;
       }
     }
   }

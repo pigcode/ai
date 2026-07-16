@@ -41,7 +41,7 @@ final class OpenAiFiles implements Files {
             http.MultipartFile.fromBytes(
               'file',
               fileBytes,
-              filename: options.filename,
+              filename: options.filename ?? 'blob',
               contentType: MediaType.parse(options.mediaType),
             ),
           );

@@ -123,7 +123,7 @@ void main() {
       final client = _minimalClient();
       final provider = createAnthropic(
         apiKey: 'k',
-        headers: {'User-Agent': 'my-app/1.0'},
+        headers: {'user-agent': 'my-app/1.0'},
         client: client,
       );
       await _triggerRequest(provider);

@@ -111,6 +111,7 @@ void main() {
       );
 
       expect(files.provider, 'azure-openai.files');
+      expect(client.lastRequest!.files.single.filename, 'blob');
       expect(result.providerReference, {'azure': 'file-abc'});
       expect(result.providerMetadata!.containsKey('openai'), isFalse);
       expect(result.providerMetadata!['azure'], isNotNull);

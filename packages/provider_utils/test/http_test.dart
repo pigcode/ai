@@ -39,11 +39,29 @@ void main() {
       expect(result, {'a': '3', 'b': '2'});
     });
 
+    test('later maps override header names case-insensitively', () {
+      final result = combineHeaders([
+        {'Authorization': 'Bearer stale'},
+        {'authorization': 'Bearer rotated'},
+      ]);
+
+      expect(result, {'Authorization': 'Bearer rotated'});
+    });
+
     test('a later null value for a key removes it even if set earlier', () {
       final result = combineHeaders([
         {'a': '1'},
         {'a': null},
       ]);
+      expect(result, <String, String>{});
+    });
+
+    test('a later null removes a differently-cased header name', () {
+      final result = combineHeaders([
+        {'Authorization': 'Bearer stale'},
+        {'authorization': null},
+      ]);
+
       expect(result, <String, String>{});
     });
 

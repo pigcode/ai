@@ -257,7 +257,7 @@ void main() {
       final provider = createOpenAiCompatible(
         name: 'mycustom',
         baseUrl: 'https://api.example.com/v1',
-        headers: {'User-Agent': 'my-app/1.0'},
+        headers: {'user-agent': 'my-app/1.0'},
         client: client,
       );
 

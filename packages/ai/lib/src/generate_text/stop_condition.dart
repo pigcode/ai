@@ -13,12 +13,20 @@ import 'step_result.dart';
 /// 单步**:第一步结束后即停止,不会进入多步工具循环。
 typedef StopCondition = FutureOr<bool> Function(List<StepResult> steps);
 
-/// 已完成步数等于 [stepCount] 时停止。
+/// 已完成步数等于 [stepCount] 时停止。[stepCount] 必须大于零。
 ///
 /// 常见用法:`isStepCount(1)` 令循环在第一步后立即截断;
 /// `isStepCount(20)` 之类的值可作为多步 agent 场景的安全上限。
-StopCondition isStepCount(int stepCount) =>
-    (steps) => steps.length == stepCount;
+StopCondition isStepCount(int stepCount) {
+  if (stepCount <= 0) {
+    throw ArgumentError.value(
+      stepCount,
+      'stepCount',
+      'must be greater than zero',
+    );
+  }
+  return (steps) => steps.length == stepCount;
+}
 
 /// 永不主动停止循环。
 ///
