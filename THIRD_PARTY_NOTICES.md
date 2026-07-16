@@ -26,6 +26,8 @@ Copyright 2023 Vercel, Inc.
 The adapted material is licensed under the Apache License, Version 2.0. The
 complete license text is available in
 [`third_party/licenses/Apache-2.0.txt`](third_party/licenses/Apache-2.0.txt).
+The repository copy follows the official Apache Software Foundation text at
+<https://www.apache.org/licenses/LICENSE-2.0.txt>.
 
 ## Direct dependency inventory
 

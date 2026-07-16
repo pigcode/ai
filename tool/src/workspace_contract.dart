@@ -12,7 +12,6 @@ const _expectedPackages = <String, String>{
 };
 
 const _requiredRootPaths = <String>{
-  '.gitattributes',
   '.gitignore',
   'CHANGELOG.md',
   'LICENSE',
@@ -24,10 +23,6 @@ const _requiredRootPaths = <String>{
   'tool/src/workspace_contract.dart',
   'tool/test/workspace_contract_test.dart',
 };
-
-const _gitattributesPath = '.gitattributes';
-const _expectedGitattributes =
-    'third_party/licenses/Apache-2.0.txt whitespace=-blank-at-eof\n';
 
 const _expectedWorkspaceMembers = <String>{
   'packages/provider',
@@ -64,7 +59,6 @@ List<WorkspaceViolation> validateWorkspace(
   final violations = <WorkspaceViolation>[];
 
   _validateTrackedPaths(root, trackedPaths, violations);
-  _validateGitattributes(root, trackedPaths, violations);
   _validatePackageDirectories(root, violations);
   final manifests = _loadTrackedManifests(root, trackedPaths, violations);
   _validateRootManifest(manifests['pubspec.yaml'], violations);
@@ -82,38 +76,6 @@ List<WorkspaceViolation> validateWorkspace(
 
   _validateDependencySources(manifests, violations);
   return violations;
-}
-
-void _validateGitattributes(
-  Directory root,
-  Set<String> trackedPaths,
-  List<WorkspaceViolation> violations,
-) {
-  if (_trackedFileState(root, trackedPaths, _gitattributesPath) !=
-      _TrackedFileState.regular) {
-    return;
-  }
-
-  try {
-    final contents = _containedFile(
-      root,
-      _gitattributesPath,
-    ).readAsStringSync();
-    if (contents == _expectedGitattributes) {
-      return;
-    }
-  } on FileSystemException {
-    // Report an invalid file below.
-  } on FormatException {
-    // Report an invalid file below.
-  }
-
-  violations.add(
-    const WorkspaceViolation(
-      'invalid_gitattributes',
-      'Expected exact public workspace attributes in .gitattributes',
-    ),
-  );
 }
 
 void _validateTrackedPaths(
