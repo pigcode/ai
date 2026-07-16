@@ -27,5 +27,5 @@ melos:
         command: dart test
         concurrency: 1
     format:
-      run: dart format --set-exit-if-changed .
-      description: Check Dart formatting
+      run: dart format --output=none --set-exit-if-changed .
+      description: Check Dart formatting without modifying files

@@ -22,11 +22,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: 3.12.2
       - name: Resolve workspace
         run: dart pub get
-      - name: Verify project identity
-        run: dart run tool/check_project_identity.dart
+      - name: Test workspace contract
+        run: dart run tool/test/workspace_contract_test.dart
+      - name: Verify workspace contract
+        run: dart run tool/check_workspace.dart
       - name: Check formatting
         run: dart run melos format
       - name: Analyze
