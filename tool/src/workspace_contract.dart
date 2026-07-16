@@ -87,13 +87,16 @@ void _validateTrackedPaths(
 
   final requiredPaths = _requiredRootPaths.toList()..sort();
   for (final path in requiredPaths) {
-    if (!_isTrackedFile(root, trackedPaths, path)) {
+    final state = _trackedFileState(root, trackedPaths, path);
+    if (state == _TrackedFileState.missing) {
       violations.add(
         WorkspaceViolation(
           'missing_required_path',
           'Required tracked workspace file is missing: $path',
         ),
       );
+    } else if (state == _TrackedFileState.nonRegular) {
+      _addNonRegularTrackedPath(path, violations);
     }
   }
 }
@@ -122,16 +125,24 @@ void _validatePackageDirectories(
   Directory root,
   List<WorkspaceViolation> violations,
 ) {
-  final packagesDirectory = _directory(root, 'packages');
-  final actualDirectories = packagesDirectory.existsSync()
-      ? packagesDirectory
+  final packagesPath = _appendPathComponent(root.absolute.path, 'packages');
+  final packagesType = FileSystemEntity.typeSync(
+    packagesPath,
+    followLinks: false,
+  );
+  final actualDirectories = packagesType == FileSystemEntityType.directory
+      ? Directory(packagesPath)
           .listSync(followLinks: false)
           .whereType<Directory>()
-          .map((directory) => directory.uri.pathSegments
-              .where((segment) => segment.isNotEmpty)
-              .last)
+          .map(
+            (directory) => directory.path.split(Platform.pathSeparator).last,
+          )
           .toSet()
       : <String>{};
+  if (packagesType != FileSystemEntityType.directory &&
+      packagesType != FileSystemEntityType.notFound) {
+    _addNonRegularTrackedPath('packages', violations);
+  }
   final expectedDirectories = _expectedPackages.keys.toSet();
 
   final missing = expectedDirectories.difference(actualDirectories).toList()
@@ -163,11 +174,12 @@ void _validateRootManifest(
   List<WorkspaceViolation> violations,
 ) {
   const path = 'pubspec.yaml';
-  if (!_isTrackedFile(root, trackedPaths, path)) {
+  if (_trackedFileState(root, trackedPaths, path) !=
+      _TrackedFileState.regular) {
     return;
   }
 
-  final contents = _file(root, path).readAsStringSync();
+  final contents = _containedFile(root, path).readAsStringSync();
   _expectScalar(
     contents,
     key: 'name',
@@ -224,15 +236,18 @@ void _validatePackage(
 }) {
   final packagePath = 'packages/$directoryName';
   final manifestPath = '$packagePath/pubspec.yaml';
-  if (!_isTrackedFile(root, trackedPaths, manifestPath)) {
+  final manifestState = _trackedFileState(root, trackedPaths, manifestPath);
+  if (manifestState == _TrackedFileState.missing) {
     violations.add(
       WorkspaceViolation(
         'missing_package_manifest',
         'Required package manifest is missing: $manifestPath',
       ),
     );
+  } else if (manifestState == _TrackedFileState.nonRegular) {
+    _addNonRegularTrackedPath(manifestPath, violations);
   } else {
-    final contents = _file(root, manifestPath).readAsStringSync();
+    final contents = _containedFile(root, manifestPath).readAsStringSync();
     _expectScalar(
       contents,
       key: 'name',
@@ -312,17 +327,23 @@ void _validateAllPubspecDependencies(
   List<WorkspaceViolation> violations,
 ) {
   final manifestPaths = trackedPaths
-      .where((path) => path == 'pubspec.yaml' || path.endsWith('/pubspec.yaml'))
+      .where(
+        (path) =>
+            _isAllowedTrackedPath(path) &&
+            (path == 'pubspec.yaml' || path.endsWith('/pubspec.yaml')),
+      )
       .toList()
     ..sort();
   for (final path in manifestPaths) {
-    final manifest = _file(root, path);
-    if (manifest.existsSync()) {
+    final state = _trackedFileState(root, trackedPaths, path);
+    if (state == _TrackedFileState.regular) {
       _validateDependencySources(
-        manifest.readAsStringSync(),
+        _containedFile(root, path).readAsStringSync(),
         path,
         violations,
       );
+    } else if (state == _TrackedFileState.nonRegular) {
+      _addNonRegularTrackedPath(path, violations);
     }
   }
 }
@@ -334,12 +355,31 @@ void _expectPackageFile(
   required String code,
   required List<WorkspaceViolation> violations,
 }) {
-  if (!_isTrackedFile(root, trackedPaths, path)) {
+  final state = _trackedFileState(root, trackedPaths, path);
+  if (state == _TrackedFileState.missing) {
     violations.add(
       WorkspaceViolation(
           code, 'Required tracked package file is missing: $path'),
     );
+  } else if (state == _TrackedFileState.nonRegular) {
+    _addNonRegularTrackedPath(path, violations);
   }
+}
+
+void _addNonRegularTrackedPath(
+  String path,
+  List<WorkspaceViolation> violations,
+) {
+  final message =
+      'Tracked path is not a regular file within the workspace root: $path';
+  if (violations.any(
+    (violation) =>
+        violation.code == 'non_regular_tracked_path' &&
+        violation.message == message,
+  )) {
+    return;
+  }
+  violations.add(WorkspaceViolation('non_regular_tracked_path', message));
 }
 
 void _expectScalar(
@@ -367,6 +407,14 @@ void _validateDependencySources(
   List<WorkspaceViolation> violations,
 ) {
   final sources = _dependencySources(contents);
+  if (sources.contains(_invalidDependencySyntaxMarker)) {
+    violations.add(
+      WorkspaceViolation(
+        'invalid_dependency_syntax',
+        'Dependency declarations could not be safely inspected in $path',
+      ),
+    );
+  }
   if (sources.contains('path')) {
     violations.add(
       WorkspaceViolation(
@@ -402,16 +450,31 @@ Set<String> _dependencySources(String contents) {
       continue;
     }
     if (header.value.isNotEmpty) {
+      final flowMapping = _collectFlowMapping(
+        lines,
+        startIndex: index,
+        initialValue: header.value,
+      );
+      index = flowMapping.endIndex;
+      if (!flowMapping.isValid) {
+        sources.add(_invalidDependencySyntaxMarker);
+        continue;
+      }
       sources.addAll(
-        _inlineDependencySources(header.value, sourceKeyDepth: 2),
+        _inlineDependencySources(flowMapping.value, sourceKeyDepth: 2),
       );
       continue;
     }
 
     final block = <_YamlLine>[];
     for (index += 1; index < lines.length; index += 1) {
+      final sourceLine = _stripYamlComment(lines[index]);
+      if (sourceLine.trim().isEmpty) {
+        continue;
+      }
       final line = _parsedLine(lines[index]);
       if (line == null) {
+        sources.add(_invalidDependencySyntaxMarker);
         continue;
       }
       if (line.indent == 0) {
@@ -442,6 +505,102 @@ Set<String> _dependencySources(String contents) {
   }
 
   return sources;
+}
+
+({String value, int endIndex, bool isValid}) _collectFlowMapping(
+  List<String> lines, {
+  required int startIndex,
+  required String initialValue,
+}) {
+  if (!initialValue.startsWith('{')) {
+    return (value: initialValue, endIndex: startIndex, isValid: false);
+  }
+
+  var value = initialValue;
+  var endIndex = startIndex;
+  while (true) {
+    switch (_flowMappingState(value)) {
+      case _FlowMappingState.complete:
+        return (value: value, endIndex: endIndex, isValid: true);
+      case _FlowMappingState.invalid:
+        return (value: value, endIndex: endIndex, isValid: false);
+      case _FlowMappingState.incomplete:
+        endIndex += 1;
+        if (endIndex >= lines.length) {
+          return (
+            value: value,
+            endIndex: lines.length - 1,
+            isValid: false,
+          );
+        }
+        value = '$value\n${_stripYamlComment(lines[endIndex])}';
+    }
+  }
+}
+
+_FlowMappingState _flowMappingState(String value) {
+  if (!value.trimLeft().startsWith('{')) {
+    return _FlowMappingState.invalid;
+  }
+
+  var depth = 0;
+  var inSingleQuote = false;
+  var inDoubleQuote = false;
+  var outerMappingClosed = false;
+  for (var index = 0; index < value.length; index += 1) {
+    final character = value[index];
+    if (inSingleQuote) {
+      if (character == "'") {
+        if (index + 1 < value.length && value[index + 1] == "'") {
+          index += 1;
+        } else {
+          inSingleQuote = false;
+        }
+      }
+      continue;
+    }
+    if (inDoubleQuote) {
+      if (character == '"' && !_isEscaped(value, index)) {
+        inDoubleQuote = false;
+      }
+      continue;
+    }
+    if (character == "'") {
+      inSingleQuote = true;
+    } else if (character == '"') {
+      inDoubleQuote = true;
+    } else if (character == '{') {
+      if (outerMappingClosed) {
+        return _FlowMappingState.invalid;
+      }
+      depth += 1;
+    } else if (character == '}') {
+      depth -= 1;
+      if (depth < 0) {
+        return _FlowMappingState.invalid;
+      }
+      if (depth == 0) {
+        outerMappingClosed = true;
+      }
+    } else if (outerMappingClosed && character.trim().isNotEmpty) {
+      return _FlowMappingState.invalid;
+    }
+  }
+
+  if (outerMappingClosed && depth == 0 && !inSingleQuote && !inDoubleQuote) {
+    return _FlowMappingState.complete;
+  }
+  return _FlowMappingState.incomplete;
+}
+
+bool _isEscaped(String value, int index) {
+  var backslashes = 0;
+  for (var current = index - 1;
+      current >= 0 && value[current] == r'\';
+      current -= 1) {
+    backslashes += 1;
+  }
+  return backslashes.isOdd;
 }
 
 Set<String> _inlineDependencySources(
@@ -623,17 +782,60 @@ String _unquote(String value) {
   return value;
 }
 
-bool _isTrackedFile(
+_TrackedFileState _trackedFileState(
   Directory root,
   Set<String> trackedPaths,
   String path,
-) =>
-    trackedPaths.contains(path) && _file(root, path).existsSync();
+) {
+  if (!trackedPaths.contains(path)) {
+    return _TrackedFileState.missing;
+  }
+  if (!_isAllowedTrackedPath(path)) {
+    return _TrackedFileState.nonRegular;
+  }
 
-File _file(Directory root, String path) => File.fromUri(root.uri.resolve(path));
+  var currentPath = root.absolute.path;
+  final segments = path.split('/');
+  for (var index = 0; index < segments.length; index += 1) {
+    currentPath = _appendPathComponent(currentPath, segments[index]);
+    final type = FileSystemEntity.typeSync(currentPath, followLinks: false);
+    if (type == FileSystemEntityType.notFound) {
+      return _TrackedFileState.missing;
+    }
+    final isLast = index == segments.length - 1;
+    if (isLast) {
+      return type == FileSystemEntityType.file
+          ? _TrackedFileState.regular
+          : _TrackedFileState.nonRegular;
+    }
+    if (type != FileSystemEntityType.directory) {
+      return _TrackedFileState.nonRegular;
+    }
+  }
+  return _TrackedFileState.nonRegular;
+}
 
-Directory _directory(Directory root, String path) =>
-    Directory.fromUri(root.uri.resolve('$path/'));
+File _containedFile(Directory root, String path) {
+  if (!_isAllowedTrackedPath(path)) {
+    throw ArgumentError.value(path, 'path', 'Path is outside the allowlist');
+  }
+  var absolutePath = root.absolute.path;
+  for (final segment in path.split('/')) {
+    absolutePath = _appendPathComponent(absolutePath, segment);
+  }
+  return File(absolutePath);
+}
+
+String _appendPathComponent(String parent, String component) =>
+    parent.endsWith(Platform.pathSeparator)
+        ? '$parent$component'
+        : '$parent${Platform.pathSeparator}$component';
+
+const _invalidDependencySyntaxMarker = '<invalid-dependency-syntax>';
+
+enum _TrackedFileState { regular, missing, nonRegular }
+
+enum _FlowMappingState { complete, incomplete, invalid }
 
 final class _YamlLine {
   const _YamlLine(this.indent, this.key, this.value);

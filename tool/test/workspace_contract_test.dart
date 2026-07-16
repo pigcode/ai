@@ -66,6 +66,64 @@ void main() {
         );
       });
     },
+    'does not read an absolute tracked pubspec outside the root': () {
+      final outsideDirectory = Directory.systemTemp.createTempSync(
+        'workspace_contract_outside_',
+      );
+      try {
+        final outsideManifest = File.fromUri(
+          outsideDirectory.uri.resolve('pubspec.yaml'),
+        )..writeAsStringSync('''
+dependencies:
+  local_package:
+    path: ../local_package
+''');
+
+        _withFixture((fixture) {
+          fixture.trackedPaths.add(outsideManifest.absolute.path);
+
+          final violations = validateWorkspace(
+            fixture.root,
+            fixture.trackedPaths,
+          );
+
+          _expect(
+            violations.length == 1 &&
+                violations.single.code == 'unexpected_tracked_path' &&
+                violations.single.message.contains(
+                  outsideManifest.absolute.path,
+                ),
+            'Expected only an unexpected path violation, got '
+            '${_describe(violations)}',
+          );
+        });
+      } finally {
+        outsideDirectory.deleteSync(recursive: true);
+      }
+    },
+    'rejects a required manifest symlink outside the root': () {
+      final outsideDirectory = Directory.systemTemp.createTempSync(
+        'workspace_contract_outside_',
+      );
+      try {
+        final outsideManifest = File.fromUri(
+          outsideDirectory.uri.resolve('pubspec.yaml'),
+        )..writeAsStringSync(_packageManifest('pigcode_ai_provider'));
+
+        _withFixture((fixture) {
+          const manifestPath = 'packages/provider/pubspec.yaml';
+          fixture.replaceWithSymlink(manifestPath, outsideManifest.path);
+
+          _expectViolation(
+            validateWorkspace(fixture.root, fixture.trackedPaths),
+            code: 'non_regular_tracked_path',
+            messageFragment: manifestPath,
+          );
+        });
+      } finally {
+        outsideDirectory.deleteSync(recursive: true);
+      }
+    },
     'reports a missing package directory': () {
       _withFixture((fixture) {
         fixture.removeDirectory('packages/provider');
@@ -234,6 +292,82 @@ dev_dependencies:
         );
       });
     },
+    'rejects a path source in a multiline flow mapping': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          '''
+dependencies: {
+  local_package: {
+    path: ../local_package
+  }
+}
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'path_dependency',
+          messageFragment: manifestPath,
+        );
+      });
+    },
+    'rejects a git source in a multiline flow mapping': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          '''
+dependencies: {
+  remote_package: {
+    git: https://example.invalid/remote.git
+  }
+}
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'git_dependency',
+          messageFragment: manifestPath,
+        );
+      });
+    },
+    'fails closed on an unclosed flow dependency mapping': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          '''
+dependencies: {
+  local_package: {
+    hosted: https://example.invalid
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'invalid_dependency_syntax',
+          messageFragment: manifestPath,
+        );
+      });
+    },
+    'fails closed on an unsupported dependency collection': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          'dependencies: [local_package]\n',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'invalid_dependency_syntax',
+          messageFragment: manifestPath,
+        );
+      });
+    },
     'allows path and git as inline dependency package names': () {
       _withFixture((fixture) {
         const manifestPath = 'packages/ai/example/pubspec.yaml';
@@ -378,6 +512,12 @@ final class _WorkspaceFixture {
     final contents = file.readAsStringSync();
     _expect(contents.contains(from), 'Fixture text not found in $path: $from');
     file.writeAsStringSync(contents.replaceFirst(from, to));
+  }
+
+  void replaceWithSymlink(String path, String target) {
+    final file = _file(path);
+    file.deleteSync();
+    Link(file.path).createSync(target);
   }
 
   void removeTracked(String path) {
