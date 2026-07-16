@@ -136,6 +136,111 @@ dependencies:
         );
       });
     },
+    'rejects credential patterns in ordinary tracked files': () {
+      _withFixture((fixture) {
+        final credentialSamples = <String, String>{
+          'private_key': <String>['-----BEGIN ', 'PRIVATE KEY-----'].join(),
+          'github_pat': <String>[
+            'github',
+            '_pat_',
+            'aaaaaaaaaaaaaaaaaaaa',
+          ].join(),
+          'github_token': <String>[
+            'gh',
+            'p_',
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234',
+          ].join(),
+          'anthropic': <String>[
+            'sk',
+            '-ant-',
+            'abcdefghijklmnopqrst',
+          ].join(),
+          'openai': <String>[
+            'sk',
+            '-',
+            'abcdefghijklmnopqrstuvwx',
+          ].join(),
+          'aws': <String>['AK', 'IA', 'ABCDEFGHIJKLMNOP'].join(),
+        };
+
+        for (final entry in credentialSamples.entries) {
+          fixture.writeTracked(
+            'packages/ai/lib/src/${entry.key}.dart',
+            "const credential = '${entry.value}';\n",
+          );
+        }
+
+        final violations = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final name in credentialSamples.keys) {
+          _expectViolation(
+            violations,
+            code: 'possible_secret',
+            messageFragment: 'packages/ai/lib/src/$name.dart',
+          );
+        }
+      });
+    },
+    'rejects ordinary tracked symlinks without reading targets': () {
+      final outsideDirectory = Directory.systemTemp.createTempSync(
+        'workspace_contract_outside_',
+      );
+      try {
+        final outsideFile = File.fromUri(
+          outsideDirectory.uri.resolve('source.dart'),
+        )..writeAsStringSync(
+            "const credential = '${<String>[
+              'sk',
+              '-',
+              'abcdefghijklmnopqrstuvwx'
+            ].join()}';\n",
+          );
+
+        _withFixture((fixture) {
+          const sourcePath = 'packages/ai/lib/src/source.dart';
+          fixture
+            ..writeTracked(sourcePath, 'const safe = true;\n')
+            ..replaceWithSymlink(sourcePath, outsideFile.path);
+
+          final violations = validateWorkspace(
+            fixture.root,
+            fixture.trackedPaths,
+          );
+          _expectViolation(
+            violations,
+            code: 'non_regular_tracked_path',
+            messageFragment: sourcePath,
+          );
+          _expect(
+            !violations.any(
+              (violation) =>
+                  violation.code == 'possible_secret' &&
+                  violation.message.contains(sourcePath),
+            ),
+            'Expected the symlink target not to be read, got '
+            '${_describe(violations)}',
+          );
+        });
+      } finally {
+        outsideDirectory.deleteSync(recursive: true);
+      }
+    },
+    'rejects an ordinary tracked file missing from the worktree': () {
+      _withFixture((fixture) {
+        const sourcePath = 'packages/ai/lib/src/source.dart';
+        fixture
+          ..writeTracked(sourcePath, 'const safe = true;\n')
+          ..removeFileKeepingTracked(sourcePath);
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_tracked_path',
+          messageFragment: sourcePath,
+        );
+      });
+    },
     'reports a missing package directory': () {
       _withFixture((fixture) {
         fixture.removeDirectory('packages/provider');
@@ -607,6 +712,10 @@ final class _WorkspaceFixture {
       file.deleteSync();
     }
     trackedPaths.remove(path);
+  }
+
+  void removeFileKeepingTracked(String path) {
+    _file(path).deleteSync();
   }
 
   void removeDirectory(String path) {

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:yaml/yaml.dart';
@@ -42,6 +43,15 @@ const _dependencySections = <String>{
 const _expectedRepository = 'https://github.com/pigcode/ai';
 const _expectedIssueTracker = 'https://github.com/pigcode/ai/issues';
 
+final _secretPatterns = <RegExp>[
+  RegExp(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'),
+  RegExp(r'github_pat_[A-Za-z0-9_]{20,}'),
+  RegExp(r'gh[pousr]_[A-Za-z0-9]{30,}'),
+  RegExp(r'sk-ant-[A-Za-z0-9_-]{20,}'),
+  RegExp(r'sk-[A-Za-z0-9_-]{24,}'),
+  RegExp(r'AKIA[0-9A-Z]{16}'),
+];
+
 final class WorkspaceViolation {
   const WorkspaceViolation(this.code, this.message);
 
@@ -59,6 +69,7 @@ List<WorkspaceViolation> validateWorkspace(
   final violations = <WorkspaceViolation>[];
 
   _validateTrackedPaths(root, trackedPaths, violations);
+  _validateTrackedFileContents(root, trackedPaths, violations);
   _validatePackageDirectories(root, violations);
   final manifests = _loadTrackedManifests(root, trackedPaths, violations);
   _validateRootManifest(manifests['pubspec.yaml'], violations);
@@ -76,6 +87,43 @@ List<WorkspaceViolation> validateWorkspace(
 
   _validateDependencySources(manifests, violations);
   return violations;
+}
+
+void _validateTrackedFileContents(
+  Directory root,
+  Set<String> trackedPaths,
+  List<WorkspaceViolation> violations,
+) {
+  final paths = trackedPaths.where(_isAllowedTrackedPath).toList()..sort();
+  for (final path in paths) {
+    final state = _trackedFileState(root, trackedPaths, path);
+    if (state == _TrackedFileState.missing) {
+      violations.add(
+        WorkspaceViolation(
+          'missing_tracked_path',
+          'Tracked file is missing from the workspace: $path',
+        ),
+      );
+      continue;
+    }
+    if (state == _TrackedFileState.nonRegular) {
+      _addNonRegularTrackedPath(path, violations);
+      continue;
+    }
+
+    final contents = utf8.decode(
+      _containedFile(root, path).readAsBytesSync(),
+      allowMalformed: true,
+    );
+    if (_secretPatterns.any((pattern) => pattern.hasMatch(contents))) {
+      violations.add(
+        WorkspaceViolation(
+          'possible_secret',
+          'Possible credential pattern found in tracked file: $path',
+        ),
+      );
+    }
+  }
 }
 
 void _validateTrackedPaths(
