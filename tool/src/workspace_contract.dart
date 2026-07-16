@@ -204,20 +204,39 @@ Map<String, YamlMap> _loadTrackedManifests(
       continue;
     }
 
-    final contents = _containedFile(root, path).readAsStringSync();
-    try {
-      final Object? document = loadYaml(contents);
-      if (document is YamlMap) {
-        manifests[path] = document;
-      } else {
-        _addInvalidYaml(path, violations);
-      }
-    } on YamlException {
-      _addInvalidYaml(path, violations);
+    final manifest = _readManifest(root, path, violations);
+    if (manifest != null) {
+      manifests[path] = manifest;
     }
   }
 
   return manifests;
+}
+
+YamlMap? _readManifest(
+  Directory root,
+  String path,
+  List<WorkspaceViolation> violations,
+) {
+  try {
+    final contents = _containedFile(root, path).readAsStringSync();
+    final Object? document = loadYaml(contents);
+    if (document is YamlMap) {
+      return document;
+    }
+  } on YamlException {
+    _addInvalidYaml(path, violations);
+    return null;
+  } on FileSystemException {
+    _addInvalidYaml(path, violations);
+    return null;
+  } on FormatException {
+    _addInvalidYaml(path, violations);
+    return null;
+  }
+
+  _addInvalidYaml(path, violations);
+  return null;
 }
 
 void _addInvalidYaml(
@@ -458,12 +477,26 @@ void _validateDependencySources(
         continue;
       }
 
-      for (final dependency in section.values) {
-        if (dependency is! YamlMap) {
+      for (final dependencyEntry in section.entries) {
+        final dependency = dependencyEntry.value;
+        if (dependency is YamlMap) {
+          hasPathDependency =
+              hasPathDependency || dependency.containsKey('path');
+          hasGitDependency = hasGitDependency || dependency.containsKey('git');
           continue;
         }
-        hasPathDependency = hasPathDependency || dependency.containsKey('path');
-        hasGitDependency = hasGitDependency || dependency.containsKey('git');
+        if (dependency is YamlList ||
+            dependency is Map<Object?, Object?> ||
+            dependency is List<Object?>) {
+          _addViolationOnce(
+            violations,
+            WorkspaceViolation(
+              'invalid_dependency_entry',
+              'Expected dependency ${dependencyEntry.key} to be a scalar, '
+                  'null, or map in ${manifestEntry.key}',
+            ),
+          );
+        }
       }
     }
 

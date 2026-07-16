@@ -124,6 +124,18 @@ dependencies:
         outsideDirectory.deleteSync(recursive: true);
       }
     },
+    'fails closed when a tracked manifest is not UTF-8': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/provider/pubspec.yaml';
+        fixture.writeTrackedBytes(manifestPath, const <int>[0xff]);
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'invalid_yaml',
+          messageFragment: manifestPath,
+        );
+      });
+    },
     'reports a missing package directory': () {
       _withFixture((fixture) {
         fixture.removeDirectory('packages/provider');
@@ -402,6 +414,34 @@ dependencies: {
         );
       });
     },
+    'fails closed when a dependency entry is a collection': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          '''
+dependencies:
+  foo:
+    - path: ../local
+''',
+        );
+
+        final violations = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        _expectViolation(
+          violations,
+          code: 'invalid_dependency_entry',
+          messageFragment: manifestPath,
+        );
+        _expectViolation(
+          violations,
+          code: 'invalid_dependency_entry',
+          messageFragment: 'foo',
+        );
+      });
+    },
     'allows path and git as inline dependency package names': () {
       _withFixture((fixture) {
         const manifestPath = 'packages/ai/example/pubspec.yaml';
@@ -534,6 +574,13 @@ final class _WorkspaceFixture {
     final file = _file(path);
     file.parent.createSync(recursive: true);
     file.writeAsStringSync(contents);
+    trackedPaths.add(path);
+  }
+
+  void writeTrackedBytes(String path, List<int> bytes) {
+    final file = _file(path);
+    file.parent.createSync(recursive: true);
+    file.writeAsBytesSync(bytes);
     trackedPaths.add(path);
   }
 
