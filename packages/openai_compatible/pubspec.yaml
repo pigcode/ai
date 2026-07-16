@@ -1,0 +1,18 @@
+name: pigcode_ai_openai_compatible
+description: Configurable OpenAI-compatible wire adapter for the Pigcode AI provider contracts.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_provider: ^0.0.1
+  pigcode_ai_provider_utils: ^0.0.1
+  equatable: ^2.0.0
+  http: ^1.6.0
+
+dev_dependencies:
+  test: ^1.25.0

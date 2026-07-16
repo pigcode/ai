@@ -1,0 +1,21 @@
+# Dart / Pub
+.dart_tool/
+.packages
+build/
+# libraries: do not commit lockfile
+pubspec.lock
+.pub-cache/
+.pub/
+# Melos
+.melos_tool/
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+# Local orchestration state and secrets
+.omc/
+CLAUDE.local.md
+.superpowers/
+.env
+.cursor

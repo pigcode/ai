@@ -1,0 +1,30 @@
+name: pigcode_ai_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+workspace:
+  - packages/provider
+  - packages/ai
+  - packages/provider_utils
+  - packages/openai
+  - packages/openai_compatible
+  - packages/anthropic
+
+dev_dependencies:
+  melos: ^8.0.0
+
+melos:
+  scripts:
+    analyze:
+      run: dart analyze .
+      description: Analyze the workspace
+    test:
+      description: Test every package
+      exec:
+        command: dart test
+        concurrency: 1
+    format:
+      run: dart format --set-exit-if-changed .
+      description: Check Dart formatting

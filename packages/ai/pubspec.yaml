@@ -1,0 +1,19 @@
+name: pigcode_ai
+description: High-level generation, streaming, tool-loop, middleware, structured-output, and telemetry APIs for Pigcode AI.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_provider: ^0.0.1
+  pigcode_ai_provider_utils: ^0.0.1
+  equatable: ^2.0.0
+  logging: ^1.3.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0
