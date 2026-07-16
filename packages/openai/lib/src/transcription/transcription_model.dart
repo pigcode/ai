@@ -420,9 +420,12 @@ Stream<TranscriptionModelStreamPart> _createRealtimeTranscriptionStream({
       }
 
       if (!finished) {
-        finished = true;
-        await cleanup();
-        await controller.close();
+        await finishWithError(
+          StateError(
+            'OpenAI realtime transcription connection closed before '
+            'completion',
+          ),
+        );
       }
     } catch (error) {
       await finishWithError(error);

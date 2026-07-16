@@ -526,6 +526,43 @@ void main() {
       );
     });
 
+    test('gpt-realtime-whisper reports an early WebSocket close', () async {
+      final client =
+          _RecordingClient((request) async => _jsonResponse(_successBody()));
+      final connector = _FakeOpenAiWebSocketConnector();
+      final model = OpenAiTranscriptionModel(
+        'gpt-realtime-whisper',
+        config: _config(client, webSocketConnector: connector.call),
+      );
+
+      final result = await model.doStream(
+        const TranscriptionModelStreamOptions(
+          audio: Stream<TranscriptionAudio>.empty(),
+          inputAudioFormat: TranscriptionInputAudioFormat(
+            type: 'audio/pcm',
+          ),
+        ),
+      );
+
+      final partsFuture = result.stream.toList();
+      await connector.connection.waitForClientMessages(2);
+      await connector.connection.serverClose();
+
+      final parts = await partsFuture;
+      expect(parts, hasLength(2));
+      expect(parts.first, const TranscriptionStreamStart([]));
+      expect(
+        parts.last,
+        isA<TranscriptionStreamError>().having(
+          (part) => part.error.toString(),
+          'error',
+          'Bad state: OpenAI realtime transcription connection closed before '
+              'completion',
+        ),
+      );
+      expect(connector.connection.closed, isTrue);
+    });
+
     test('non-realtime transcription models reject streaming calls', () async {
       final client =
           _RecordingClient((request) async => _jsonResponse(_successBody()));
@@ -750,6 +787,8 @@ final class _FakeOpenAiWebSocketConnection
   void serverAdd(Object? data) {
     _incoming.add(data);
   }
+
+  Future<void> serverClose() => _incoming.close();
 
   Future<void> waitForClientMessages(int count) async {
     while (clientMessages.length < count) {
