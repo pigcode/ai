@@ -1,7 +1,9 @@
 name: pigcode_ai_openai_compatible
-description: Configurable OpenAI-compatible wire adapter for the Pigcode AI provider contracts.
+description: Configurable OpenAI-compatible Chat Completions and embeddings provider foundation for Pigcode AI.
 version: 0.0.1
 publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
 
 environment:
   sdk: ^3.6.0
