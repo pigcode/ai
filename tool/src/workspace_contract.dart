@@ -98,10 +98,25 @@ void _validateTrackedPaths(
   }
 }
 
-bool _isAllowedTrackedPath(String path) =>
-    _requiredRootPaths.contains(path) ||
-    path.startsWith('.github/') ||
-    path.startsWith('packages/');
+bool _isAllowedTrackedPath(String path) {
+  if (!_isCanonicalTrackedPath(path)) {
+    return false;
+  }
+  return _requiredRootPaths.contains(path) ||
+      path.startsWith('.github/') ||
+      path.startsWith('packages/');
+}
+
+bool _isCanonicalTrackedPath(String path) {
+  if (path.isEmpty ||
+      path.startsWith('/') ||
+      path.endsWith('/') ||
+      path.contains(r'\')) {
+    return false;
+  }
+  return path.split('/').every(
+      (segment) => segment.isNotEmpty && segment != '.' && segment != '..');
+}
 
 void _validatePackageDirectories(
   Directory root,
@@ -387,7 +402,9 @@ Set<String> _dependencySources(String contents) {
       continue;
     }
     if (header.value.isNotEmpty) {
-      sources.addAll(_inlineDependencySources(header.value));
+      sources.addAll(
+        _inlineDependencySources(header.value, sourceKeyDepth: 2),
+      );
       continue;
     }
 
@@ -416,25 +433,57 @@ Set<String> _dependencySources(String contents) {
           (line.key == 'path' || line.key == 'git')) {
         sources.add(line.key);
       }
-      sources.addAll(_inlineDependencySources(line.value));
+      if (line.indent == dependencyIndent) {
+        sources.addAll(
+          _inlineDependencySources(line.value, sourceKeyDepth: 1),
+        );
+      }
     }
   }
 
   return sources;
 }
 
-Set<String> _inlineDependencySources(String value) {
+Set<String> _inlineDependencySources(
+  String value, {
+  required int sourceKeyDepth,
+}) {
   final sources = <String>{};
   final matches = RegExp(
     r'''(?:^|[{,])\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+))\s*:''',
   ).allMatches(value);
   for (final match in matches) {
     final key = match.group(1) ?? match.group(2) ?? match.group(3);
-    if (key == 'path' || key == 'git') {
+    if ((key == 'path' || key == 'git') &&
+        _mappingKeyDepth(value, match.start) == sourceKeyDepth) {
       sources.add(key!);
     }
   }
   return sources;
+}
+
+int? _mappingKeyDepth(String value, int matchStart) {
+  var depth = 0;
+  var inSingleQuote = false;
+  var inDoubleQuote = false;
+  for (var index = 0; index < matchStart; index += 1) {
+    final character = value[index];
+    if (character == "'" && !inDoubleQuote) {
+      inSingleQuote = !inSingleQuote;
+    } else if (character == '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+    } else if (!inSingleQuote && !inDoubleQuote) {
+      if (character == '{') {
+        depth += 1;
+      } else if (character == '}') {
+        depth -= 1;
+      }
+    }
+  }
+  if (inSingleQuote || inDoubleQuote) {
+    return null;
+  }
+  return value[matchStart] == '{' ? depth + 1 : depth;
 }
 
 String? _topLevelScalar(String contents, String key) {

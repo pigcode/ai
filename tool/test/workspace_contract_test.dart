@@ -39,6 +39,33 @@ void main() {
         );
       });
     },
+    'rejects non-canonical tracked paths before applying the allowlist': () {
+      _withFixture((fixture) {
+        const unsafePaths = <String>{
+          '',
+          '/packages/ai/pubspec.yaml',
+          'packages/ai/',
+          r'packages\ai\pubspec.yaml',
+          'packages//ai/pubspec.yaml',
+          'packages/./ai/pubspec.yaml',
+          'packages/../notes.txt',
+          '.github/../notes.txt',
+        };
+        fixture.trackedPaths.addAll(unsafePaths);
+
+        final unexpectedPathViolations = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        ).where((violation) => violation.code == 'unexpected_tracked_path');
+
+        _expect(
+          unexpectedPathViolations.length == unsafePaths.length,
+          'Expected every non-canonical path to be rejected, got '
+          '${unexpectedPathViolations.length} of ${unsafePaths.length}: '
+          '${unexpectedPathViolations.map((violation) => violation.message).join('; ')}',
+        );
+      });
+    },
     'reports a missing package directory': () {
       _withFixture((fixture) {
         fixture.removeDirectory('packages/provider');
@@ -204,6 +231,31 @@ dev_dependencies:
           validateWorkspace(fixture.root, fixture.trackedPaths),
           code: 'path_dependency',
           messageFragment: 'packages/ai/example/pubspec.yaml',
+        );
+      });
+    },
+    'allows path and git as inline dependency package names': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          'dependencies: {path: ^1.9.0, git: ^2.3.0}\n',
+        );
+
+        final sourceViolations = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        ).where(
+          (violation) =>
+              (violation.code == 'path_dependency' ||
+                  violation.code == 'git_dependency') &&
+              violation.message.contains(manifestPath),
+        );
+
+        _expect(
+          sourceViolations.isEmpty,
+          'Expected legal dependency package names, got '
+          '${sourceViolations.map((violation) => violation.message).join('; ')}',
         );
       });
     },
