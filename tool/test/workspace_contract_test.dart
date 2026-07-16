@@ -28,6 +28,31 @@ void main() {
         );
       });
     },
+    'requires tracked .gitattributes': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('.gitattributes');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: '.gitattributes',
+        );
+      });
+    },
+    'rejects invalid .gitattributes': () {
+      _withFixture((fixture) {
+        fixture.writeTracked(
+          '.gitattributes',
+          '* whitespace=-blank-at-eof\n',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'invalid_gitattributes',
+          messageFragment: '.gitattributes',
+        );
+      });
+    },
     'rejects an unexpected tracked root path': () {
       _withFixture((fixture) {
         fixture.writeTracked('notes.txt', 'private notes\n');
@@ -534,6 +559,10 @@ final class _WorkspaceFixture {
     );
 
     fixture
+      ..writeTracked(
+        '.gitattributes',
+        'third_party/licenses/Apache-2.0.txt whitespace=-blank-at-eof\n',
+      )
       ..writeTracked('.gitignore', '.dart_tool/\n')
       ..writeTracked('CHANGELOG.md', '# Changelog\n')
       ..writeTracked('LICENSE', 'License text\n')
