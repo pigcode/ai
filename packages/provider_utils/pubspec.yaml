@@ -1,0 +1,19 @@
+name: pigcode_ai_provider_utils
+description: Shared HTTP, SSE, media, JSON, and streaming utilities for Pigcode provider adapters.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_provider: ^0.0.1
+  equatable: ^2.0.0
+  http: ^1.6.0
+  json_schema: ^5.2.2
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0

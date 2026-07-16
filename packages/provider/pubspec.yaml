@@ -1,0 +1,16 @@
+name: pigcode_ai_provider
+description: Neutral model and provider contracts for the Pigcode pure-Dart AI SDK.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  equatable: ^2.0.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0
