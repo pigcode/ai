@@ -278,6 +278,40 @@ dev_dependencies:
         );
       });
     },
+    'rejects an escaped path source key in a dependency block': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/ai/pubspec.yaml',
+          r'''
+dependencies:
+  local_package:
+    "pa\u0074h": ../local_package
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'path_dependency',
+          messageFragment: 'packages/ai/pubspec.yaml',
+        );
+      });
+    },
+    'rejects an escaped git source key in a flow mapping': () {
+      _withFixture((fixture) {
+        const manifestPath = 'packages/ai/example/pubspec.yaml';
+        fixture.writeTracked(
+          manifestPath,
+          r'''dependencies: {remote_package: {"g\u0069t": https://example.invalid/remote.git}}
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'git_dependency',
+          messageFragment: manifestPath,
+        );
+      });
+    },
     'checks inline sources in every tracked pubspec': () {
       _withFixture((fixture) {
         fixture.writeTracked(
@@ -348,12 +382,12 @@ dependencies: {
 
         _expectViolation(
           validateWorkspace(fixture.root, fixture.trackedPaths),
-          code: 'invalid_dependency_syntax',
+          code: 'invalid_yaml',
           messageFragment: manifestPath,
         );
       });
     },
-    'fails closed on an unsupported dependency collection': () {
+    'fails closed when a dependency section is not a map': () {
       _withFixture((fixture) {
         const manifestPath = 'packages/ai/example/pubspec.yaml';
         fixture.writeTracked(
@@ -363,7 +397,7 @@ dependencies: {
 
         _expectViolation(
           validateWorkspace(fixture.root, fixture.trackedPaths),
-          code: 'invalid_dependency_syntax',
+          code: 'invalid_dependency_section',
           messageFragment: manifestPath,
         );
       });

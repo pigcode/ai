@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:yaml/yaml.dart';
+
 const _expectedPackages = <String, String>{
   'provider': 'pigcode_ai_provider',
   'provider_utils': 'pigcode_ai_provider_utils',
@@ -31,6 +33,12 @@ const _expectedWorkspaceMembers = <String>{
   'packages/anthropic',
 };
 
+const _dependencySections = <String>{
+  'dependencies',
+  'dev_dependencies',
+  'dependency_overrides',
+};
+
 const _expectedRepository = 'https://github.com/pigcode/ai';
 const _expectedIssueTracker = 'https://github.com/pigcode/ai/issues';
 
@@ -52,19 +60,21 @@ List<WorkspaceViolation> validateWorkspace(
 
   _validateTrackedPaths(root, trackedPaths, violations);
   _validatePackageDirectories(root, violations);
-  _validateRootManifest(root, trackedPaths, violations);
+  final manifests = _loadTrackedManifests(root, trackedPaths, violations);
+  _validateRootManifest(manifests['pubspec.yaml'], violations);
 
   for (final entry in _expectedPackages.entries) {
     _validatePackage(
       root,
       trackedPaths,
+      manifests,
       directoryName: entry.key,
       packageName: entry.value,
       violations: violations,
     );
   }
-  _validateAllPubspecDependencies(root, trackedPaths, violations);
 
+  _validateDependencySources(manifests, violations);
   return violations;
 }
 
@@ -118,7 +128,8 @@ bool _isCanonicalTrackedPath(String path) {
     return false;
   }
   return path.split('/').every(
-      (segment) => segment.isNotEmpty && segment != '.' && segment != '..');
+        (segment) => segment.isNotEmpty && segment != '.' && segment != '..',
+      );
 }
 
 void _validatePackageDirectories(
@@ -143,8 +154,8 @@ void _validatePackageDirectories(
       packagesType != FileSystemEntityType.notFound) {
     _addNonRegularTrackedPath('packages', violations);
   }
-  final expectedDirectories = _expectedPackages.keys.toSet();
 
+  final expectedDirectories = _expectedPackages.keys.toSet();
   final missing = expectedDirectories.difference(actualDirectories).toList()
     ..sort();
   for (final directoryName in missing) {
@@ -168,46 +179,98 @@ void _validatePackageDirectories(
   }
 }
 
-void _validateRootManifest(
+Map<String, YamlMap> _loadTrackedManifests(
   Directory root,
   Set<String> trackedPaths,
   List<WorkspaceViolation> violations,
 ) {
-  const path = 'pubspec.yaml';
-  if (_trackedFileState(root, trackedPaths, path) !=
-      _TrackedFileState.regular) {
+  final manifests = <String, YamlMap>{};
+  final manifestPaths = trackedPaths
+      .where(
+        (path) =>
+            _isAllowedTrackedPath(path) &&
+            (path == 'pubspec.yaml' || path.endsWith('/pubspec.yaml')),
+      )
+      .toList()
+    ..sort();
+
+  for (final path in manifestPaths) {
+    final state = _trackedFileState(root, trackedPaths, path);
+    if (state == _TrackedFileState.nonRegular) {
+      _addNonRegularTrackedPath(path, violations);
+      continue;
+    }
+    if (state == _TrackedFileState.missing) {
+      continue;
+    }
+
+    final contents = _containedFile(root, path).readAsStringSync();
+    try {
+      final Object? document = loadYaml(contents);
+      if (document is YamlMap) {
+        manifests[path] = document;
+      } else {
+        _addInvalidYaml(path, violations);
+      }
+    } on YamlException {
+      _addInvalidYaml(path, violations);
+    }
+  }
+
+  return manifests;
+}
+
+void _addInvalidYaml(
+  String path,
+  List<WorkspaceViolation> violations,
+) {
+  _addViolationOnce(
+    violations,
+    WorkspaceViolation(
+      'invalid_yaml',
+      'Expected a valid YAML mapping in $path',
+    ),
+  );
+}
+
+void _validateRootManifest(
+  YamlMap? manifest,
+  List<WorkspaceViolation> violations,
+) {
+  if (manifest == null) {
     return;
   }
 
-  final contents = _containedFile(root, path).readAsStringSync();
   _expectScalar(
-    contents,
+    manifest,
     key: 'name',
     expected: 'pigcode_ai_workspace',
-    path: path,
+    path: 'pubspec.yaml',
     code: 'invalid_root_name',
     violations: violations,
   );
   _expectScalar(
-    contents,
+    manifest,
     key: 'publish_to',
     expected: 'none',
-    path: path,
+    path: 'pubspec.yaml',
     code: 'invalid_root_publish_to',
     violations: violations,
   );
 
-  final sdk = _nestedScalar(contents, parentKey: 'environment', key: 'sdk');
+  final environment = manifest['environment'];
+  final Object? sdk = environment is YamlMap ? environment['sdk'] : null;
   if (sdk != '^3.6.0') {
     violations.add(
       WorkspaceViolation(
         'invalid_root_sdk',
-        'Expected environment sdk ^3.6.0 in $path, found ${sdk ?? 'missing'}',
+        'Expected environment sdk ^3.6.0 in pubspec.yaml, '
+            'found ${sdk ?? 'missing'}',
       ),
     );
   }
 
-  final workspaceMembers = _topLevelSequence(contents, 'workspace');
+  final workspaceMembers = _stringList(manifest['workspace']);
   if (workspaceMembers == null ||
       workspaceMembers.length != _expectedWorkspaceMembers.length ||
       workspaceMembers.toSet().length != workspaceMembers.length ||
@@ -227,9 +290,24 @@ void _validateRootManifest(
   }
 }
 
+List<String>? _stringList(Object? value) {
+  if (value is! YamlList) {
+    return null;
+  }
+  final result = <String>[];
+  for (final item in value) {
+    if (item is! String) {
+      return null;
+    }
+    result.add(item);
+  }
+  return result;
+}
+
 void _validatePackage(
   Directory root,
-  Set<String> trackedPaths, {
+  Set<String> trackedPaths,
+  Map<String, YamlMap> manifests, {
   required String directoryName,
   required String packageName,
   required List<WorkspaceViolation> violations,
@@ -247,55 +325,15 @@ void _validatePackage(
   } else if (manifestState == _TrackedFileState.nonRegular) {
     _addNonRegularTrackedPath(manifestPath, violations);
   } else {
-    final contents = _containedFile(root, manifestPath).readAsStringSync();
-    _expectScalar(
-      contents,
-      key: 'name',
-      expected: packageName,
-      path: manifestPath,
-      code: 'invalid_package_name',
-      violations: violations,
-    );
-    _expectScalar(
-      contents,
-      key: 'version',
-      expected: '0.0.1',
-      path: manifestPath,
-      code: 'invalid_package_version',
-      violations: violations,
-    );
-    _expectScalar(
-      contents,
-      key: 'publish_to',
-      expected: 'none',
-      path: manifestPath,
-      code: 'invalid_package_publish_to',
-      violations: violations,
-    );
-    _expectScalar(
-      contents,
-      key: 'resolution',
-      expected: 'workspace',
-      path: manifestPath,
-      code: 'invalid_package_resolution',
-      violations: violations,
-    );
-    _expectScalar(
-      contents,
-      key: 'repository',
-      expected: _expectedRepository,
-      path: manifestPath,
-      code: 'invalid_package_repository',
-      violations: violations,
-    );
-    _expectScalar(
-      contents,
-      key: 'issue_tracker',
-      expected: _expectedIssueTracker,
-      path: manifestPath,
-      code: 'invalid_package_issue_tracker',
-      violations: violations,
-    );
+    final manifest = manifests[manifestPath];
+    if (manifest != null) {
+      _validatePackageScalars(
+        manifest,
+        manifestPath,
+        packageName,
+        violations,
+      );
+    }
   }
 
   _expectPackageFile(
@@ -321,29 +359,129 @@ void _validatePackage(
   );
 }
 
-void _validateAllPubspecDependencies(
-  Directory root,
-  Set<String> trackedPaths,
+void _validatePackageScalars(
+  YamlMap manifest,
+  String manifestPath,
+  String packageName,
   List<WorkspaceViolation> violations,
 ) {
-  final manifestPaths = trackedPaths
-      .where(
-        (path) =>
-            _isAllowedTrackedPath(path) &&
-            (path == 'pubspec.yaml' || path.endsWith('/pubspec.yaml')),
-      )
-      .toList()
-    ..sort();
-  for (final path in manifestPaths) {
-    final state = _trackedFileState(root, trackedPaths, path);
-    if (state == _TrackedFileState.regular) {
-      _validateDependencySources(
-        _containedFile(root, path).readAsStringSync(),
-        path,
-        violations,
+  _expectScalar(
+    manifest,
+    key: 'name',
+    expected: packageName,
+    path: manifestPath,
+    code: 'invalid_package_name',
+    violations: violations,
+  );
+  _expectScalar(
+    manifest,
+    key: 'version',
+    expected: '0.0.1',
+    path: manifestPath,
+    code: 'invalid_package_version',
+    violations: violations,
+  );
+  _expectScalar(
+    manifest,
+    key: 'publish_to',
+    expected: 'none',
+    path: manifestPath,
+    code: 'invalid_package_publish_to',
+    violations: violations,
+  );
+  _expectScalar(
+    manifest,
+    key: 'resolution',
+    expected: 'workspace',
+    path: manifestPath,
+    code: 'invalid_package_resolution',
+    violations: violations,
+  );
+  _expectScalar(
+    manifest,
+    key: 'repository',
+    expected: _expectedRepository,
+    path: manifestPath,
+    code: 'invalid_package_repository',
+    violations: violations,
+  );
+  _expectScalar(
+    manifest,
+    key: 'issue_tracker',
+    expected: _expectedIssueTracker,
+    path: manifestPath,
+    code: 'invalid_package_issue_tracker',
+    violations: violations,
+  );
+}
+
+void _expectScalar(
+  YamlMap manifest, {
+  required String key,
+  required String expected,
+  required String path,
+  required String code,
+  required List<WorkspaceViolation> violations,
+}) {
+  final Object? actual = manifest[key];
+  if (actual != expected) {
+    violations.add(
+      WorkspaceViolation(
+        code,
+        'Expected $key: $expected in $path, found ${actual ?? 'missing'}',
+      ),
+    );
+  }
+}
+
+void _validateDependencySources(
+  Map<String, YamlMap> manifests,
+  List<WorkspaceViolation> violations,
+) {
+  for (final manifestEntry in manifests.entries) {
+    var hasPathDependency = false;
+    var hasGitDependency = false;
+
+    for (final sectionName in _dependencySections) {
+      final Object? section = manifestEntry.value[sectionName];
+      if (section == null) {
+        continue;
+      }
+      if (section is! YamlMap) {
+        _addViolationOnce(
+          violations,
+          WorkspaceViolation(
+            'invalid_dependency_section',
+            'Expected $sectionName to be a map in ${manifestEntry.key}',
+          ),
+        );
+        continue;
+      }
+
+      for (final dependency in section.values) {
+        if (dependency is! YamlMap) {
+          continue;
+        }
+        hasPathDependency = hasPathDependency || dependency.containsKey('path');
+        hasGitDependency = hasGitDependency || dependency.containsKey('git');
+      }
+    }
+
+    if (hasPathDependency) {
+      violations.add(
+        WorkspaceViolation(
+          'path_dependency',
+          'Path dependencies are not allowed in ${manifestEntry.key}',
+        ),
       );
-    } else if (state == _TrackedFileState.nonRegular) {
-      _addNonRegularTrackedPath(path, violations);
+    }
+    if (hasGitDependency) {
+      violations.add(
+        WorkspaceViolation(
+          'git_dependency',
+          'Git dependencies are not allowed in ${manifestEntry.key}',
+        ),
+      );
     }
   }
 }
@@ -359,7 +497,9 @@ void _expectPackageFile(
   if (state == _TrackedFileState.missing) {
     violations.add(
       WorkspaceViolation(
-          code, 'Required tracked package file is missing: $path'),
+        code,
+        'Required tracked package file is missing: $path',
+      ),
     );
   } else if (state == _TrackedFileState.nonRegular) {
     _addNonRegularTrackedPath(path, violations);
@@ -370,416 +510,27 @@ void _addNonRegularTrackedPath(
   String path,
   List<WorkspaceViolation> violations,
 ) {
-  final message =
-      'Tracked path is not a regular file within the workspace root: $path';
-  if (violations.any(
-    (violation) =>
-        violation.code == 'non_regular_tracked_path' &&
-        violation.message == message,
-  )) {
-    return;
-  }
-  violations.add(WorkspaceViolation('non_regular_tracked_path', message));
-}
-
-void _expectScalar(
-  String contents, {
-  required String key,
-  required String expected,
-  required String path,
-  required String code,
-  required List<WorkspaceViolation> violations,
-}) {
-  final actual = _topLevelScalar(contents, key);
-  if (actual != expected) {
-    violations.add(
-      WorkspaceViolation(
-        code,
-        'Expected $key: $expected in $path, found ${actual ?? 'missing'}',
-      ),
-    );
-  }
-}
-
-void _validateDependencySources(
-  String contents,
-  String path,
-  List<WorkspaceViolation> violations,
-) {
-  final sources = _dependencySources(contents);
-  if (sources.contains(_invalidDependencySyntaxMarker)) {
-    violations.add(
-      WorkspaceViolation(
-        'invalid_dependency_syntax',
-        'Dependency declarations could not be safely inspected in $path',
-      ),
-    );
-  }
-  if (sources.contains('path')) {
-    violations.add(
-      WorkspaceViolation(
-        'path_dependency',
-        'Path dependencies are not allowed in $path',
-      ),
-    );
-  }
-  if (sources.contains('git')) {
-    violations.add(
-      WorkspaceViolation(
-        'git_dependency',
-        'Git dependencies are not allowed in $path',
-      ),
-    );
-  }
-}
-
-Set<String> _dependencySources(String contents) {
-  const dependencySections = <String>{
-    'dependencies',
-    'dev_dependencies',
-    'dependency_overrides',
-  };
-  final sources = <String>{};
-  final lines = contents.split('\n');
-
-  for (var index = 0; index < lines.length; index += 1) {
-    final header = _parsedLine(lines[index]);
-    if (header == null ||
-        header.indent != 0 ||
-        !dependencySections.contains(header.key)) {
-      continue;
-    }
-    if (header.value.isNotEmpty) {
-      final flowMapping = _collectFlowMapping(
-        lines,
-        startIndex: index,
-        initialValue: header.value,
-      );
-      index = flowMapping.endIndex;
-      if (!flowMapping.isValid) {
-        sources.add(_invalidDependencySyntaxMarker);
-        continue;
-      }
-      sources.addAll(
-        _inlineDependencySources(flowMapping.value, sourceKeyDepth: 2),
-      );
-      continue;
-    }
-
-    final block = <_YamlLine>[];
-    for (index += 1; index < lines.length; index += 1) {
-      final sourceLine = _stripYamlComment(lines[index]);
-      if (sourceLine.trim().isEmpty) {
-        continue;
-      }
-      final line = _parsedLine(lines[index]);
-      if (line == null) {
-        sources.add(_invalidDependencySyntaxMarker);
-        continue;
-      }
-      if (line.indent == 0) {
-        index -= 1;
-        break;
-      }
-      block.add(line);
-    }
-
-    if (block.isEmpty) {
-      continue;
-    }
-    final dependencyIndent = block
-        .map((line) => line.indent)
-        .reduce((left, right) => left < right ? left : right);
-
-    for (final line in block) {
-      if (line.indent > dependencyIndent &&
-          (line.key == 'path' || line.key == 'git')) {
-        sources.add(line.key);
-      }
-      if (line.indent == dependencyIndent) {
-        sources.addAll(
-          _inlineDependencySources(line.value, sourceKeyDepth: 1),
-        );
-      }
-    }
-  }
-
-  return sources;
-}
-
-({String value, int endIndex, bool isValid}) _collectFlowMapping(
-  List<String> lines, {
-  required int startIndex,
-  required String initialValue,
-}) {
-  if (!initialValue.startsWith('{')) {
-    return (value: initialValue, endIndex: startIndex, isValid: false);
-  }
-
-  var value = initialValue;
-  var endIndex = startIndex;
-  while (true) {
-    switch (_flowMappingState(value)) {
-      case _FlowMappingState.complete:
-        return (value: value, endIndex: endIndex, isValid: true);
-      case _FlowMappingState.invalid:
-        return (value: value, endIndex: endIndex, isValid: false);
-      case _FlowMappingState.incomplete:
-        endIndex += 1;
-        if (endIndex >= lines.length) {
-          return (
-            value: value,
-            endIndex: lines.length - 1,
-            isValid: false,
-          );
-        }
-        value = '$value\n${_stripYamlComment(lines[endIndex])}';
-    }
-  }
-}
-
-_FlowMappingState _flowMappingState(String value) {
-  if (!value.trimLeft().startsWith('{')) {
-    return _FlowMappingState.invalid;
-  }
-
-  var depth = 0;
-  var inSingleQuote = false;
-  var inDoubleQuote = false;
-  var outerMappingClosed = false;
-  for (var index = 0; index < value.length; index += 1) {
-    final character = value[index];
-    if (inSingleQuote) {
-      if (character == "'") {
-        if (index + 1 < value.length && value[index + 1] == "'") {
-          index += 1;
-        } else {
-          inSingleQuote = false;
-        }
-      }
-      continue;
-    }
-    if (inDoubleQuote) {
-      if (character == '"' && !_isEscaped(value, index)) {
-        inDoubleQuote = false;
-      }
-      continue;
-    }
-    if (character == "'") {
-      inSingleQuote = true;
-    } else if (character == '"') {
-      inDoubleQuote = true;
-    } else if (character == '{') {
-      if (outerMappingClosed) {
-        return _FlowMappingState.invalid;
-      }
-      depth += 1;
-    } else if (character == '}') {
-      depth -= 1;
-      if (depth < 0) {
-        return _FlowMappingState.invalid;
-      }
-      if (depth == 0) {
-        outerMappingClosed = true;
-      }
-    } else if (outerMappingClosed && character.trim().isNotEmpty) {
-      return _FlowMappingState.invalid;
-    }
-  }
-
-  if (outerMappingClosed && depth == 0 && !inSingleQuote && !inDoubleQuote) {
-    return _FlowMappingState.complete;
-  }
-  return _FlowMappingState.incomplete;
-}
-
-bool _isEscaped(String value, int index) {
-  var backslashes = 0;
-  for (var current = index - 1;
-      current >= 0 && value[current] == r'\';
-      current -= 1) {
-    backslashes += 1;
-  }
-  return backslashes.isOdd;
-}
-
-Set<String> _inlineDependencySources(
-  String value, {
-  required int sourceKeyDepth,
-}) {
-  final sources = <String>{};
-  final matches = RegExp(
-    r'''(?:^|[{,])\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+))\s*:''',
-  ).allMatches(value);
-  for (final match in matches) {
-    final key = match.group(1) ?? match.group(2) ?? match.group(3);
-    if ((key == 'path' || key == 'git') &&
-        _mappingKeyDepth(value, match.start) == sourceKeyDepth) {
-      sources.add(key!);
-    }
-  }
-  return sources;
-}
-
-int? _mappingKeyDepth(String value, int matchStart) {
-  var depth = 0;
-  var inSingleQuote = false;
-  var inDoubleQuote = false;
-  for (var index = 0; index < matchStart; index += 1) {
-    final character = value[index];
-    if (character == "'" && !inDoubleQuote) {
-      inSingleQuote = !inSingleQuote;
-    } else if (character == '"' && !inSingleQuote) {
-      inDoubleQuote = !inDoubleQuote;
-    } else if (!inSingleQuote && !inDoubleQuote) {
-      if (character == '{') {
-        depth += 1;
-      } else if (character == '}') {
-        depth -= 1;
-      }
-    }
-  }
-  if (inSingleQuote || inDoubleQuote) {
-    return null;
-  }
-  return value[matchStart] == '{' ? depth + 1 : depth;
-}
-
-String? _topLevelScalar(String contents, String key) {
-  for (final sourceLine in contents.split('\n')) {
-    final line = _parsedLine(sourceLine);
-    if (line != null && line.indent == 0 && line.key == key) {
-      return line.value.isEmpty ? null : _unquote(line.value);
-    }
-  }
-  return null;
-}
-
-String? _nestedScalar(
-  String contents, {
-  required String parentKey,
-  required String key,
-}) {
-  final lines = contents.split('\n');
-  for (var index = 0; index < lines.length; index += 1) {
-    final parent = _parsedLine(lines[index]);
-    if (parent == null ||
-        parent.indent != 0 ||
-        parent.key != parentKey ||
-        parent.value.isNotEmpty) {
-      continue;
-    }
-    for (index += 1; index < lines.length; index += 1) {
-      final line = _parsedLine(lines[index]);
-      if (line == null) {
-        continue;
-      }
-      if (line.indent == 0) {
-        return null;
-      }
-      if (line.key == key) {
-        return line.value.isEmpty ? null : _unquote(line.value);
-      }
-    }
-  }
-  return null;
-}
-
-List<String>? _topLevelSequence(String contents, String key) {
-  final lines = contents.split('\n');
-  for (var index = 0; index < lines.length; index += 1) {
-    final line = _parsedLine(lines[index]);
-    if (line == null || line.indent != 0 || line.key != key) {
-      continue;
-    }
-
-    if (line.value.startsWith('[') && line.value.endsWith(']')) {
-      final inner = line.value.substring(1, line.value.length - 1).trim();
-      if (inner.isEmpty) {
-        return <String>[];
-      }
-      return inner.split(',').map((value) => _unquote(value.trim())).toList();
-    }
-    if (line.value.isNotEmpty) {
-      return null;
-    }
-
-    final values = <String>[];
-    for (index += 1; index < lines.length; index += 1) {
-      final sourceLine = _stripYamlComment(lines[index]);
-      if (sourceLine.trim().isEmpty) {
-        continue;
-      }
-      final indent = _indentOf(sourceLine);
-      if (indent == 0) {
-        break;
-      }
-      final trimmed = sourceLine.trim();
-      if (!trimmed.startsWith('-')) {
-        return null;
-      }
-      final value = trimmed.substring(1).trim();
-      if (value.isEmpty) {
-        return null;
-      }
-      values.add(_unquote(value));
-    }
-    return values;
-  }
-  return null;
-}
-
-_YamlLine? _parsedLine(String sourceLine) {
-  final withoutComment = _stripYamlComment(sourceLine);
-  if (withoutComment.trim().isEmpty) {
-    return null;
-  }
-  final indent = _indentOf(withoutComment);
-  final trimmed = withoutComment.trim();
-  final match = RegExp(
-    r'''^(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+))\s*:\s*(.*)$''',
-  ).firstMatch(trimmed);
-  if (match == null) {
-    return null;
-  }
-  return _YamlLine(
-    indent,
-    match.group(1) ?? match.group(2) ?? match.group(3)!,
-    match.group(4)!.trim(),
+  _addViolationOnce(
+    violations,
+    WorkspaceViolation(
+      'non_regular_tracked_path',
+      'Tracked path is not a regular file within the workspace root: $path',
+    ),
   );
 }
 
-String _stripYamlComment(String line) {
-  var inSingleQuote = false;
-  var inDoubleQuote = false;
-  for (var index = 0; index < line.length; index += 1) {
-    final character = line[index];
-    if (character == "'" && !inDoubleQuote) {
-      inSingleQuote = !inSingleQuote;
-    } else if (character == '"' && !inSingleQuote) {
-      inDoubleQuote = !inDoubleQuote;
-    } else if (character == '#' && !inSingleQuote && !inDoubleQuote) {
-      return line.substring(0, index);
-    }
+void _addViolationOnce(
+  List<WorkspaceViolation> violations,
+  WorkspaceViolation violation,
+) {
+  if (violations.any(
+    (existing) =>
+        existing.code == violation.code &&
+        existing.message == violation.message,
+  )) {
+    return;
   }
-  return line;
-}
-
-int _indentOf(String line) {
-  var indent = 0;
-  while (indent < line.length && line[indent] == ' ') {
-    indent += 1;
-  }
-  return indent;
-}
-
-String _unquote(String value) {
-  if (value.length >= 2 &&
-      ((value.startsWith("'") && value.endsWith("'")) ||
-          (value.startsWith('"') && value.endsWith('"')))) {
-    return value.substring(1, value.length - 1);
-  }
-  return value;
+  violations.add(violation);
 }
 
 _TrackedFileState _trackedFileState(
@@ -831,16 +582,4 @@ String _appendPathComponent(String parent, String component) =>
         ? '$parent$component'
         : '$parent${Platform.pathSeparator}$component';
 
-const _invalidDependencySyntaxMarker = '<invalid-dependency-syntax>';
-
 enum _TrackedFileState { regular, missing, nonRegular }
-
-enum _FlowMappingState { complete, incomplete, invalid }
-
-final class _YamlLine {
-  const _YamlLine(this.indent, this.key, this.value);
-
-  final int indent;
-  final String key;
-  final String value;
-}
