@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:pigcode_ai/pigcode_ai.dart';
@@ -384,6 +385,61 @@ void main() {
       await expectLater(result.text, throwsA(same(error)));
     });
 
+    test('consumeStream 消费公开流并等待最终结果', () async {
+      final model = _ScriptedStreamableTranscriptionModel(
+        result: contracts.TranscriptionModelStreamResult(
+          stream: Stream<contracts.TranscriptionModelStreamPart>.fromIterable(
+            const <contracts.TranscriptionModelStreamPart>[
+              contracts.TranscriptionDelta(delta: 'hel'),
+              contracts.TranscriptionFinish(
+                text: 'hello',
+                segments: <contracts.TranscriptionSegment>[],
+              ),
+            ],
+          ),
+        ),
+      );
+      final result = streamTranscribe(
+        model: model,
+        audio: const Stream<DataContent>.empty(),
+        inputAudioFormat: const contracts.TranscriptionInputAudioFormat(
+          type: 'audio/pcm',
+        ),
+      );
+
+      await result.consumeStream();
+
+      expect(await result.text, 'hello');
+      expect(await result.segments, isEmpty);
+    });
+
+    test('cancellation interrupts a provider stream that ignores the signal',
+        () async {
+      final streamStarted = Completer<void>();
+      final model = _IdleStreamableTranscriptionModel(streamStarted);
+      final cancellation = contracts.CancellationController();
+      final reason = StateError('transcription cancelled');
+      final result = streamTranscribe(
+        model: model,
+        audio: const Stream<DataContent>.empty(),
+        inputAudioFormat: const contracts.TranscriptionInputAudioFormat(
+          type: 'audio/pcm',
+        ),
+        cancellation: cancellation.signal,
+      );
+      final partsFuture = result.stream.toList();
+      await streamStarted.future;
+
+      cancellation.cancel(reason);
+      final parts = await partsFuture;
+
+      expect(parts, <TranscriptionStreamPart>[
+        TranscriptionErrorPart(reason),
+      ]);
+      await expectLater(result.text, throwsA(same(reason)));
+      expect(model.receivedCancellation, same(cancellation.signal));
+    });
+
     test('doStream 抛错会作为终端错误分块发出', () async {
       final error = StateError('doStream failed');
       final model = _ThrowingStreamableTranscriptionModel(error);
@@ -518,5 +574,47 @@ final class _ThrowingStreamableTranscriptionModel
     contracts.TranscriptionModelStreamOptions options,
   ) async {
     throw error;
+  }
+}
+
+final class _IdleStreamableTranscriptionModel
+    implements contracts.StreamableTranscriptionModel {
+  _IdleStreamableTranscriptionModel(this.streamStarted);
+
+  final Completer<void> streamStarted;
+  contracts.CancellationSignal? receivedCancellation;
+
+  @override
+  String get specificationVersion => 'v4';
+
+  @override
+  String get provider => 'test.transcription';
+
+  @override
+  String get modelId => 'test-idle-stream-transcription-model';
+
+  @override
+  Future<contracts.TranscriptionModelResult> doGenerate(
+    contracts.TranscriptionModelCallOptions options,
+  ) async =>
+      const contracts.TranscriptionModelResult(
+        text: 'unused',
+        segments: <contracts.TranscriptionSegment>[],
+        warnings: <contracts.Warning>[],
+      );
+
+  @override
+  Future<contracts.TranscriptionModelStreamResult> doStream(
+    contracts.TranscriptionModelStreamOptions options,
+  ) async {
+    receivedCancellation = options.cancellation;
+    Stream<contracts.TranscriptionModelStreamPart> idle() async* {
+      streamStarted.complete();
+      await Completer<void>().future;
+    }
+
+    return contracts.TranscriptionModelStreamResult(
+      stream: idle(),
+    );
   }
 }

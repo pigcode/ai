@@ -10,10 +10,23 @@ Stream<UiMessage> readUiMessageStream({
   UiMessage? message,
   bool terminateOnError = false,
   void Function(Object error)? onError,
+  void Function(DataUiMessageChunk data)? onData,
 }) async* {
   final state = _UiMessageReadState(message);
 
   await for (final chunk in stream) {
+    if (chunk case DataUiMessageChunk(transient: true)) {
+      try {
+        onData?.call(chunk);
+      } catch (error) {
+        onError?.call(error);
+        if (terminateOnError) {
+          rethrow;
+        }
+      }
+      continue;
+    }
+
     if (chunk is ErrorUiMessageChunk) {
       try {
         state.apply(chunk);
@@ -38,6 +51,9 @@ Stream<UiMessage> readUiMessageStream({
 
     try {
       state.apply(chunk);
+      if (chunk is DataUiMessageChunk) {
+        onData?.call(chunk);
+      }
       yield state.snapshot();
     } catch (error) {
       onError?.call(error);
@@ -117,6 +133,8 @@ final class _UiMessageReadState {
         _mergeMetadata(chunk.messageMetadata);
       case MessageMetadataUiMessageChunk(:final messageMetadata):
         _mergeMetadata(messageMetadata);
+      case DataUiMessageChunk():
+        _applyData(chunk);
       case StartStepUiMessageChunk():
         _failIfActiveToolInput();
         _resetStepToolScope();
@@ -198,6 +216,29 @@ final class _UiMessageReadState {
     if (value != null) {
       metadata.addAll(value);
     }
+  }
+
+  void _applyData(DataUiMessageChunk chunk) {
+    final id = chunk.id;
+    if (id != null) {
+      final index = parts.indexWhere(
+        (part) =>
+            part is DataUiPart && part.type == chunk.type && part.id == id,
+      );
+      if (index >= 0) {
+        parts[index] = DataUiPart(
+          type: chunk.type,
+          id: id,
+          data: chunk.data,
+        );
+        return;
+      }
+    }
+    parts.add(DataUiPart(
+      type: chunk.type,
+      id: id,
+      data: chunk.data,
+    ));
   }
 
   void _markActiveTextDone() {

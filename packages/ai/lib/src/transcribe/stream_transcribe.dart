@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:pigcode_ai_provider/pigcode_ai_provider.dart' as provider;
 import 'package:equatable/equatable.dart';
 
+import '../generate_text/request_timeout.dart';
 import '../generate_text/request_options_snapshot.dart';
 import '../logger/log_warnings.dart';
 import '../prompt/content_part.dart';
@@ -179,6 +180,15 @@ final class StreamTranscriptionResult {
 
   /// provider 私有元数据。
   final Future<provider.ProviderMetadata> providerMetadata;
+
+  /// 消费完整转写流并等待最终 transcript 就绪。
+  ///
+  /// [stream] 是单订阅流，因此调用方应在直接读取 [stream] 与调用本方法之间
+  /// 二选一。
+  Future<void> consumeStream() async {
+    await stream.drain<void>();
+    await text;
+  }
 }
 
 /// 用支持 streaming transcription 的 [model] 转写音频分块流。
@@ -270,19 +280,23 @@ StreamTranscriptionResult streamTranscribe({
 
   Future<void> run() async {
     try {
-      final result = await model.doStream(
-        provider.TranscriptionModelStreamOptions(
-          audio: audio.map(_toTranscriptionAudio),
-          inputAudioFormat: inputAudioFormat,
-          headers: headersSnapshot,
-          providerOptions: providerOptionsSnapshot,
-          includeRawChunks: include?.rawChunks,
-          cancellation: cancellation,
+      final result = await interruptFutureOnCancellation(
+        model.doStream(
+          provider.TranscriptionModelStreamOptions(
+            audio: audio.map(_toTranscriptionAudio),
+            inputAudioFormat: inputAudioFormat,
+            headers: headersSnapshot,
+            providerOptions: providerOptionsSnapshot,
+            includeRawChunks: include?.rawChunks,
+            cancellation: cancellation,
+          ),
         ),
+        cancellation,
       );
       response = result.response;
 
-      await for (final part in result.stream) {
+      await for (final part
+          in interruptOnCancellation(result.stream, cancellation)) {
         switch (part) {
           case provider.TranscriptionStreamStart(:final warnings):
             if (!warningsCompleter.isCompleted) {

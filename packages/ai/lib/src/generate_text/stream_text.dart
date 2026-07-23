@@ -402,6 +402,12 @@ final class StreamTextResult<Complete, Partial, Element> {
           // 调用方主动取消与 provider/解析/工具错误是不同的终端状态。
           // 保留首次取消原因；AbortPart 后不再追加 FinishPart。
           emit(AbortPart(reason: cancellation?.reason?.toString()));
+          if (dispatcher.isActive) {
+            await dispatcher.dispatchAbort(GenerateTextAbortEvent(
+              steps: List<StepResult>.unmodifiable(capturedSteps),
+              reason: cancellation?.reason,
+            ));
+          }
         } else {
           emit(ErrorPart(error));
           onError?.call(error);

@@ -2,6 +2,25 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart' as provider;
 import 'package:equatable/equatable.dart';
 
 import '../prompt/model_message.dart';
+import '../generate_text/step_result.dart';
+
+/// 流式文本生成在完成前被调用方主动取消时的 telemetry 事件。
+final class GenerateTextAbortEvent extends Equatable {
+  /// 创建取消事件。
+  GenerateTextAbortEvent({
+    required List<StepResult> steps,
+    this.reason,
+  }) : steps = List<StepResult>.unmodifiable(steps);
+
+  /// 取消前已经完整结束的步骤。
+  final List<StepResult> steps;
+
+  /// 调用方取消信号携带的原始原因。
+  final Object? reason;
+
+  @override
+  List<Object?> get props => <Object?>[steps, reason];
+}
 
 /// 模型调用开始事件(telemetry)。在 provider `doGenerate` / `doStream` 之前触发,
 /// 仅覆盖 model 侧,不含后续本地工具执行。

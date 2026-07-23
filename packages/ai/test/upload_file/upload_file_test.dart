@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 import '../support/logging.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-16
   group('uploadFile', () {
     test('passes file data and options through to Files.uploadFile', () async {
       final records = captureWarningLogs();

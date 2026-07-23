@@ -125,6 +125,15 @@ sealed class UiMessageChunk extends Equatable {
         );
     }
 
+    if (type.startsWith('data-')) {
+      return DataUiMessageChunk(
+        type: type,
+        id: _optionalString(json, 'id'),
+        data: _jsonValue(json, 'data'),
+        transient: _optionalBool(json, 'transient'),
+      );
+    }
+
     throw provider.InvalidArgumentError(
       argument: 'type',
       message: 'Unsupported UI message chunk type: $type.',
@@ -262,6 +271,50 @@ final class MessageMetadataUiMessageChunk extends UiMessageChunk {
 
   @override
   List<Object?> get props => <Object?>[messageMetadata];
+}
+
+/// Carries an application-defined JSON data part.
+///
+/// [type] must start with `data-`. Transient chunks are delivered to the
+/// reader's data callback but are not stored in the resulting [DataUiPart].
+final class DataUiMessageChunk extends UiMessageChunk {
+  /// Creates an application-defined data chunk.
+  DataUiMessageChunk({
+    required this.type,
+    required provider.JsonValue data,
+    this.id,
+    this.transient,
+  }) : data = _snapshotJsonValue(data, 'data') {
+    if (!type.startsWith('data-')) {
+      throw provider.InvalidArgumentError(
+        argument: 'type',
+        message: 'UI data chunk type must start with "data-".',
+      );
+    }
+  }
+
+  /// Application-defined chunk type, prefixed with `data-`.
+  final String type;
+
+  /// Optional stable id used to update an existing data part.
+  final String? id;
+
+  /// JSON payload.
+  final provider.JsonValue data;
+
+  /// Whether this chunk should bypass persisted UI message state.
+  final bool? transient;
+
+  @override
+  provider.JsonObject toJson() => _withoutNulls(<String, Object?>{
+        'type': type,
+        'id': id,
+        'data': data,
+        'transient': transient,
+      });
+
+  @override
+  List<Object?> get props => <Object?>[type, id, data, transient];
 }
 
 /// Marks the start of an assistant step.

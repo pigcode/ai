@@ -185,6 +185,17 @@ final class TelemetryDispatcher {
     await _fan((i) => i.onEnd(view, _metadata));
   }
 
+  /// 派发调用方主动取消。已完成步骤走与 onEnd 相同的输出脱敏和 context
+  /// 白名单过滤；取消原因按上游契约原样传递。
+  Future<void> dispatchAbort(GenerateTextAbortEvent e) async {
+    if (!isActive) return;
+    final view = GenerateTextAbortEvent(
+      steps: e.steps.map(_sanitizeStep).toList(growable: false),
+      reason: e.reason,
+    );
+    await _fan((i) => i.onAbort(view, _metadata));
+  }
+
   /// 派发错误。错误对象总体原样传递(对齐上游 onError;通用错误脱敏是集成方
   /// 责任,已文档化);唯一例外:契约层 [provider.InvalidPromptError] 的 `prompt`
   /// 字段携带调用方原始输入,`recordInputs=false` 时重建为 prompt=null 的副本

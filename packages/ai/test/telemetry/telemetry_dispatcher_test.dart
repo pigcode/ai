@@ -24,6 +24,7 @@ final class _Recorder with Telemetry {
   GenerateTextStepStartEvent? stepStart;
   StepResult? stepEnd;
   GenerateTextEndEvent? end;
+  GenerateTextAbortEvent? abort;
   TelemetryMetadata? meta;
 
   @override
@@ -70,6 +71,12 @@ final class _Recorder with Telemetry {
   void onEnd(GenerateTextEndEvent e, TelemetryMetadata m) {
     calls.add('${tag}end');
     end = e;
+  }
+
+  @override
+  void onAbort(GenerateTextAbortEvent e, TelemetryMetadata m) {
+    calls.add('${tag}abort');
+    abort = e;
   }
 
   @override
@@ -236,6 +243,41 @@ void main() {
     // onEnd 内嵌 steps 也脱敏:
     expect(r.end!.steps.single.content, isEmpty);
     expect(r.end!.usage.outputTokens.total, 5); // 聚合 getter 仍工作
+  });
+
+  test('abort preserves reason and sanitizes all completed steps', () async {
+    final r = _Recorder();
+    final d = TelemetryDispatcher(
+      TelemetrySettings(
+        recordOutputs: false,
+        includeRuntimeContext: const <String, bool>{'userId': true},
+        integrations: <Telemetry>[r],
+      ),
+    );
+    final reason = StateError('manual abort');
+    final step = _step(
+      content: const <provider.LanguageModelContent>[
+        provider.TextContent('secret output'),
+      ],
+      runtimeContext: const <String, Object?>{
+        'userId': 'u1',
+        'secret': 'hidden',
+      },
+    );
+
+    await d.dispatchAbort(GenerateTextAbortEvent(
+      steps: <StepResult>[step],
+      reason: reason,
+    ));
+
+    expect(r.calls, const <String>['abort']);
+    expect(r.abort!.reason, same(reason));
+    expect(r.abort!.steps.single.content, isEmpty);
+    expect(r.abort!.steps.single.runtimeContext, const {'userId': 'u1'});
+    expect(
+      () => r.abort!.steps.add(step),
+      throwsUnsupportedError,
+    );
   });
 
   test(

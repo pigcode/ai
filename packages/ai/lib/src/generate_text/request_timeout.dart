@@ -87,8 +87,12 @@ final class CancellationScope {
     required String label,
     bool locallyCancellable = false,
   }) {
-    if (parent == null && timeout == null && !locallyCancellable) {
-      signal = null;
+    // A scope that adds neither a timeout nor local cancellation behavior has
+    // no reason to wrap its parent. Reusing the signal preserves the public
+    // pass-through identity contract while timed/local scopes still get an
+    // independently cancellable child.
+    if (timeout == null && !locallyCancellable) {
+      signal = parent;
       return;
     }
 
