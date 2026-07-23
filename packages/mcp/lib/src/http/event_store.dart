@@ -9,7 +9,7 @@ final class McpHttpEventCursor {
   });
 
   final String streamKey;
-  final String lastEventId;
+  final String? lastEventId;
   final Duration? retry;
 }
 

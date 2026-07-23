@@ -359,6 +359,15 @@ final class McpHttpClientTransport
   }) async {
     final decoder = SseDecoder(limits: limits);
     var terminalResponseSeen = false;
+    if (eventStore.read(streamKey) == null) {
+      eventStore.write(
+        McpHttpEventCursor(
+          streamKey: streamKey,
+          lastEventId: null,
+          retry: null,
+        ),
+      );
+    }
     try {
       await for (final bytes in body) {
         for (final event in decoder.add(bytes)) {

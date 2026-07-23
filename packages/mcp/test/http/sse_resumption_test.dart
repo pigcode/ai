@@ -7,6 +7,49 @@ import 'package:test/test.dart';
 import 'support.dart';
 
 void main() {
+  test('POST SSE reconnects when closed before its first event ID', () async {
+    final clock = RecordingClock();
+    final reconnected = Completer<void>();
+    final http = ScriptedHttpClient(<McpHttpResponder>[
+      (request) {
+        expect(request.method, 'POST');
+        return sseResponse('');
+      },
+      (request) {
+        expect(request.method, 'GET');
+        expect(request.headers, isNot(contains('last-event-id')));
+        reconnected.complete();
+        return sseResponse(
+          'id: post-stream:1\n'
+          'data: {"jsonrpc":"2.0","id":8,"result":{"tools":[]}}\n'
+          '\n',
+        );
+      },
+    ]);
+    final store = McpMemoryHttpEventStore(maxStreams: 4);
+    final transport = McpHttpClientTransport(
+      httpClient: http,
+      endpoint: Uri.parse('https://mcp.example.test/rpc'),
+      eventStore: store,
+      clock: clock,
+    );
+    final response = transport.incomingMessages.first;
+
+    await transport.sendMessage(
+      JsonRpcRequest(
+        id: JsonRpcIntegerId(8),
+        method: 'tools/list',
+        params: const <String, Object?>{},
+      ),
+    );
+    await reconnected.future;
+    expect(await response, isA<JsonRpcSuccessResponse>());
+    await _waitFor(() => store.length == 0);
+    expect(clock.delays, <Duration>[Duration.zero]);
+    expect(http.requests, hasLength(2));
+    await transport.close();
+  });
+
   test('POST SSE resumes via GET with Last-Event-ID and retry', () async {
     final clock = RecordingClock();
     final resumed = Completer<void>();
