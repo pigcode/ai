@@ -160,6 +160,70 @@ void main() {
     expect(parts.whereType<ToolInputEndPart>(), hasLength(1));
     expect(parts.whereType<ToolCallStreamPart>(), hasLength(1));
   });
+
+  test('P1-CORE-05 stream callbacks run for an unframed complete tool call',
+      () async {
+    final events = <String>[];
+    final model = ScriptedModel(
+      turns: const <ScriptedTurn>[
+        ScriptedTurn(
+          content: <lm.LanguageModelContent>[
+            lm.ToolCall(
+              toolCallId: 'call-unframed',
+              toolName: 'lookup',
+              input: '{"city":"Shanghai"}',
+            ),
+          ],
+          finishReason: lm.LanguageModelFinishReason(
+            lm.FinishReasonType.toolCalls,
+          ),
+          usage: lm.LanguageModelUsage(
+            inputTokens: lm.InputTokens(total: 2),
+            outputTokens: lm.OutputTokens(total: 1),
+          ),
+        ),
+      ],
+    );
+
+    final parts = await streamText(
+      model: model,
+      prompt: 'weather',
+      tools: <String, Tool>{
+        'lookup': Tool(
+          inputSchema: const lm.JsonSchema(<String, Object?>{
+            'type': 'object',
+            'properties': <String, Object?>{
+              'city': <String, Object?>{'type': 'string'},
+            },
+            'required': <Object?>['city'],
+          }),
+          onInputStart: (options) {
+            events.add('start:${options.toolCallId}');
+          },
+          onInputAvailable: (options) {
+            events.add(
+              'available:${(options.input as Map<String, Object?>)['city']}',
+            );
+          },
+          execute: (input, options) {
+            events.add('execute:${options.toolCallId}');
+            return 'sunny';
+          },
+        ),
+      },
+    ).stream.toList();
+
+    expect(
+      events,
+      <String>[
+        'start:call-unframed',
+        'available:Shanghai',
+        'execute:call-unframed',
+      ],
+    );
+    expect(parts.whereType<ToolInputStartPart>(), isEmpty);
+    expect(parts.whereType<ToolCallStreamPart>(), hasLength(1));
+  });
 }
 
 final class _ToolInputStreamModel implements lm.LanguageModel {

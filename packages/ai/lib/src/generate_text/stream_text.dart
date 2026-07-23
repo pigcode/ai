@@ -1193,24 +1193,40 @@ Future<bool> _runToolLoopStream({
             }
             content.add(toolCall);
             emit(ToolCallStreamPart(toolCall));
-            final callbackToolName = ongoingToolCallNames.remove(
+            final framedCallbackToolName = ongoingToolCallNames.remove(
                   part.toolCallId,
                 ) ??
                 ongoingToolCallNames.remove(toolCall.toolCallId);
-            if (callbackToolName != null) {
-              final callbackTool = stepTools?[callbackToolName];
-              if (callbackTool?.onInputAvailable != null) {
-                final callbackCall = parsedToolCallsById[toolCall.toolCallId] ??
-                    parseToolCall(
-                      toolCall: toolCall,
-                      tools: stepTools,
-                    );
-                parsedToolCallsById[toolCall.toolCallId] = callbackCall;
-                final callbackContext = _validateToolContext(
-                  toolName: callbackToolName,
-                  tool: callbackTool!,
-                  toolsContext: currentToolsContext,
+            final callbackToolName =
+                framedCallbackToolName ?? toolCall.toolName;
+            final callbackTool = stepTools?[callbackToolName];
+            if (callbackTool != null &&
+                (callbackTool.onInputStart != null ||
+                    callbackTool.onInputAvailable != null)) {
+              final callbackCall = parsedToolCallsById[toolCall.toolCallId] ??
+                  parseToolCall(
+                    toolCall: toolCall,
+                    tools: stepTools,
+                  );
+              parsedToolCallsById[toolCall.toolCallId] = callbackCall;
+              final callbackContext = _validateToolContext(
+                toolName: callbackToolName,
+                tool: callbackTool,
+                toolsContext: currentToolsContext,
+              );
+              if (framedCallbackToolName == null &&
+                  callbackTool.onInputStart != null) {
+                await interruptFutureOnCancellation(
+                  callbackTool.onInputStart!(ToolInputStartOptions(
+                    toolCallId: callbackCall.toolCall.toolCallId,
+                    messages: toolCallbackMessages,
+                    context: callbackContext,
+                    cancellation: stepCancellation,
+                  )),
+                  stepCancellation,
                 );
+              }
+              if (callbackTool.onInputAvailable != null) {
                 await interruptFutureOnCancellation(
                   callbackTool.onInputAvailable!(
                     ToolInputAvailableOptions(
