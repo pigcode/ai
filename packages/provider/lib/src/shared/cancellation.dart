@@ -8,6 +8,9 @@ abstract interface class CancellationSignal {
   /// 是否已被取消。
   bool get isCancelled;
 
+  /// 首次触发取消时提供的原因；无显式原因时为 null。
+  Object? get reason;
+
   /// 取消时完成的 future；正常收尾后不再触发副作用。
   Future<void> get whenCancelled;
 }
@@ -19,6 +22,7 @@ abstract interface class CancellationSignal {
 final class CancellationController {
   final Completer<void> _completer = Completer<void>();
   late final CancellationSignal _signal = _CancellationSignal(this);
+  Object? _reason;
 
   /// 该控制器暴露的只读信号（同一实例，多次读取一致）。
   CancellationSignal get signal => _signal;
@@ -26,13 +30,15 @@ final class CancellationController {
   /// 是否已取消。
   bool get isCancelled => _completer.isCompleted;
 
-  /// 触发取消：翻转 [isCancelled] 并完成 [signal.whenCancelled]。
+  /// 触发取消：保存首次 [reason]、翻转 [isCancelled] 并完成
+  /// [signal.whenCancelled]。
   ///
-  /// 幂等：已取消时再次调用为无操作，不抛异常。
-  void cancel() {
+  /// 幂等：已取消时再次调用为无操作，不替换首次原因，也不抛异常。
+  void cancel([Object? reason]) {
     if (_completer.isCompleted) {
       return;
     }
+    _reason = reason;
     _completer.complete();
   }
 }
@@ -45,6 +51,9 @@ final class _CancellationSignal implements CancellationSignal {
 
   @override
   bool get isCancelled => _controller.isCancelled;
+
+  @override
+  Object? get reason => _controller._reason;
 
   @override
   Future<void> get whenCancelled => _controller._completer.future;
