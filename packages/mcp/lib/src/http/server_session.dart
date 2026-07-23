@@ -9,6 +9,9 @@ typedef McpHttpServerFactory = McpServer Function(
   ProtocolMessageTransport<JsonRpcMessage> transport,
 );
 
+/// Stable error code used when a session cannot accept another live stream.
+const mcpHttpStreamLimitErrorCode = 'mcp_http_stream_limit';
+
 final class McpHttpServerEvent {
   const McpHttpServerEvent({
     required this.id,
@@ -271,12 +274,11 @@ final class McpHttpServerSession {
   }
 
   McpHttpServerStream _createStream({required bool isSideChannel}) {
-    if (_streams.length == maxStreams) {
-      final oldestKey = _streams.keys.first;
-      final oldest = _streams.remove(oldestKey)!;
-      _sideChannels.remove(oldest);
-      eventStore.removeStream(oldestKey);
-      unawaited(oldest._close());
+    if (_streams.length >= maxStreams) {
+      throw const ProtocolTransportException(
+        mcpHttpStreamLimitErrorCode,
+        'MCP HTTP session stream limit has been reached.',
+      );
     }
     final stream = McpHttpServerStream._(
       streamKey: '$id-stream-${_nextStreamId++}',

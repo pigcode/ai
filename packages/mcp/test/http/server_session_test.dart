@@ -278,6 +278,93 @@ void main() {
       503,
     );
   });
+
+  test('stream limit rejects a new request without evicting the live one',
+      () async {
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    final endpoint = McpHttpEndpoint(
+      path: '/mcp',
+      allowedHosts: const <String>['mcp.test'],
+      createSessionId: () => 'bounded-session',
+      maxStreamsPerSession: 1,
+      serverFactory: (transport) => McpServer(
+        transport: transport,
+        capabilities: McpServerCapabilities(tools: true),
+        handlers: McpHandlerSet(
+          requests: <String, McpRequestHandler>{
+            'tools/list': (_) async {
+              if (!entered.isCompleted) {
+                entered.complete();
+              }
+              await release.future;
+              return const <String, Object?>{'tools': <Object?>[]};
+            },
+            'tools/call': (_) => const <String, Object?>{
+                  'content': <Object?>[],
+                },
+          },
+        ),
+        serverInfo: const <String, Object?>{
+          'name': 'bounded-server',
+          'version': '1.0.0',
+        },
+      ),
+    );
+    final sessionId = await _initialize(endpoint);
+    final firstFuture = endpoint.handle(
+      endpointRequest(
+        method: 'POST',
+        headers: initializedHeaders(sessionId),
+        json: const <String, Object?>{
+          'jsonrpc': '2.0',
+          'id': 2,
+          'method': 'tools/list',
+          'params': <String, Object?>{},
+        },
+      ),
+    );
+    await entered.future;
+
+    final rejected = await endpoint.handle(
+      endpointRequest(
+        method: 'POST',
+        headers: initializedHeaders(sessionId),
+        json: const <String, Object?>{
+          'jsonrpc': '2.0',
+          'id': 3,
+          'method': 'tools/list',
+          'params': <String, Object?>{},
+        },
+      ),
+    );
+    expect(rejected.statusCode, 429);
+
+    release.complete();
+    final first = await firstFuture;
+    expect(first.statusCode, 200);
+    expect(
+      jsonDecode(await responseText(first)),
+      containsPair('id', 2),
+    );
+    await endpoint.close();
+  });
+
+  test('stream limit rejects an extra GET side channel', () async {
+    final endpoint = _endpoint(
+      createSessionId: () => 'bounded-get-session',
+      onServer: (_) {},
+      maxStreamsPerSession: 1,
+    );
+    final sessionId = await _initialize(endpoint);
+
+    final first = await _openGet(endpoint, sessionId);
+    expect(first.statusCode, 200);
+    final rejected = await _openGet(endpoint, sessionId);
+    expect(rejected.statusCode, 429);
+
+    await endpoint.close();
+  });
 }
 
 McpHttpEndpoint _endpoint({
@@ -285,6 +372,7 @@ McpHttpEndpoint _endpoint({
   required void Function(McpServer server) onServer,
   int maxEventsPerSession = 16,
   int maxSseEventsPerResponse = 0,
+  int maxStreamsPerSession = 16,
 }) =>
     McpHttpEndpoint(
       path: '/mcp',
@@ -292,6 +380,7 @@ McpHttpEndpoint _endpoint({
       createSessionId: createSessionId,
       maxEventsPerSession: maxEventsPerSession,
       maxSseEventsPerResponse: maxSseEventsPerResponse,
+      maxStreamsPerSession: maxStreamsPerSession,
       serverFactory: (transport) {
         final server = McpServer(
           transport: transport,

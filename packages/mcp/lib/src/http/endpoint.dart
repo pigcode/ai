@@ -246,6 +246,14 @@ final class McpHttpEndpoint {
         },
         body: _sseBody(stream),
       );
+    } on ProtocolException catch (error) {
+      if (isInitialize) {
+        _sessions.remove(session.id);
+        await session.close();
+      }
+      return _empty(
+        error.code == mcpHttpStreamLimitErrorCode ? 429 : 500,
+      );
     } on Object {
       if (isInitialize) {
         _sessions.remove(session.id);
@@ -271,16 +279,22 @@ final class McpHttpEndpoint {
     final lastEventId = request.header('last-event-id');
     late final McpHttpServerStream stream;
     var afterSequence = 0;
-    if (lastEventId == null) {
-      stream = session.openSideChannel();
-    } else {
-      final event = session.eventForId(lastEventId);
-      final resumed = session.streamForEvent(lastEventId);
-      if (event == null || resumed == null) {
-        return _empty(400);
+    try {
+      if (lastEventId == null) {
+        stream = session.openSideChannel();
+      } else {
+        final event = session.eventForId(lastEventId);
+        final resumed = session.streamForEvent(lastEventId);
+        if (event == null || resumed == null) {
+          return _empty(400);
+        }
+        stream = resumed;
+        afterSequence = event.sequence;
       }
-      stream = resumed;
-      afterSequence = event.sequence;
+    } on ProtocolException catch (error) {
+      return _empty(
+        error.code == mcpHttpStreamLimitErrorCode ? 429 : 500,
+      );
     }
     return McpHttpEndpointResponse(
       statusCode: 200,
