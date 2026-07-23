@@ -74,6 +74,31 @@ void main() {
     expect((output as ToolResultErrorText).value, 'invalid input');
   });
 
+  test('preserves result metadata for a successful text-only result', () {
+    final output = mapMcpToolResult(
+      McpCallToolResult.fromJson(
+        const <String, Object?>{
+          'content': <Object?>[
+            <String, Object?>{
+              'type': 'text',
+              'text': 'cached',
+              'annotations': <String, Object?>{
+                'audience': <String>['user']
+              },
+            },
+          ],
+          '_meta': <String, Object?>{'cacheHit': true},
+        },
+      ),
+    );
+
+    expect(output, isA<ToolResultText>());
+    final metadata = (output as ToolResultText).providerOptions!['mcp']!;
+    expect(metadata['contentType'], 'text');
+    expect(metadata['annotations'], isNotNull);
+    expect(metadata['_meta'], <String, Object?>{'cacheHit': true});
+  });
+
   test('uses structured JSON when no unstructured content exists', () {
     final output = mapMcpToolResult(
       McpCallToolResult.fromJson(

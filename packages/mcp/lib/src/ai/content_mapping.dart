@@ -35,17 +35,18 @@ ToolResultOutput mapMcpToolResult(McpCallToolResult result) {
       content.single is ToolResultTextItem &&
       structured == null) {
     final textItem = content.single as ToolResultTextItem;
+    final providerOptions = mcpProviderOptions(<String, Object?>{
+      ...?textItem.providerOptions?['mcp'],
+      ...resultMeta,
+    });
     return isError
         ? ToolResultErrorText(
             textItem.text,
-            providerOptions: mcpProviderOptions(<String, Object?>{
-              ...?textItem.providerOptions?['mcp'],
-              ...resultMeta,
-            }),
+            providerOptions: providerOptions,
           )
         : ToolResultText(
             textItem.text,
-            providerOptions: textItem.providerOptions,
+            providerOptions: providerOptions,
           );
   }
 
