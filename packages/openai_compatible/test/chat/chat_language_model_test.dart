@@ -69,6 +69,7 @@ String _basicResponse({String content = 'ok'}) {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-COMPAT-02
   group('OpenAiCompatibleChatLanguageModel.doGenerate', () {
     test('provider/modelId/请求 URL 与基础字段', () async {
       final client = _RecordingClient(

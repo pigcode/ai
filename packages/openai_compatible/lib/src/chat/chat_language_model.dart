@@ -551,16 +551,21 @@ final class OpenAiCompatibleChatLanguageModel implements LanguageModel {
         // 错误帧检测:走可插拔 errorStructure 的 validator,而非硬编码
         // `value['error'] != null`(errorStructure 可自定义错误体形状,
         // 必须经 validator 才能正确识别;相对 raw `'error' in chunk.value`
-        // 的主动泛化,计划裁决)。命中即 ErrorPart 终态,不再补发
+        // 的主动泛化,计划裁决)。默认 OpenAI 错误信封只去掉外层 `error`
+        // 键,保留其 message/code/type 等结构化字段(3.0.11 目标行为);
+        // 自定义无信封结构则保留整个已校验值。命中即 ErrorPart 终态,不再补发
         // TextEnd/FinishPart——与 pigcode_ai_openai chat 一致的终态语义;
         // finishReason 赋值仅为对齐 raw 的内部记录,实际不会再被读取。
         final errorValidation = _errorStructure.validator.validate(rawValue);
         if (errorValidation is ValidationSuccess) {
           finishReason =
               const LanguageModelFinishReason(FinishReasonType.error);
-          yield ErrorPart(
-            _errorStructure.errorToMessage(errorValidation.value),
-          );
+          final validatedError = errorValidation.value;
+          final structuredError = validatedError is JsonObject &&
+                  validatedError['error'] is JsonObject
+              ? validatedError['error']
+              : validatedError;
+          yield ErrorPart(structuredError);
           return;
         }
 

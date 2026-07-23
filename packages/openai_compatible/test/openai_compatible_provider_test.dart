@@ -53,7 +53,23 @@ const _prompt = LanguageModelCallOptions(
 );
 
 void main() {
+  // Compatibility fixture (unit): P1-COMPAT-01
   group('createOpenAiCompatible 构造与模型分派', () {
+    test('空 baseUrl 在构造 provider 时立即拒绝', () {
+      expect(
+        () => createOpenAiCompatible(name: 'mycustom', baseUrl: ''),
+        throwsA(
+          isA<InvalidArgumentError>()
+              .having((error) => error.argument, 'argument', 'baseUrl')
+              .having(
+                (error) => error.message,
+                'message',
+                'baseUrl must be a non-empty string.',
+              ),
+        ),
+      );
+    });
+
     test(
         'chatModel/languageModel 的 provider 均为 <name>.chat,'
         'baseUrl 尾斜杠被去除', () async {
