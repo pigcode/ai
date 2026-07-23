@@ -6,7 +6,23 @@ import 'package:test/test.dart';
 import 'support/fake_http_client.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-01
   group('createOpenAi — baseUrl 与 Authorization', () {
+    test('空 baseUrl 在构造 provider 时立即拒绝', () {
+      expect(
+        () => createOpenAi(apiKey: 'sk-test', baseUrl: ''),
+        throwsA(
+          isA<InvalidArgumentError>()
+              .having((error) => error.argument, 'argument', 'baseUrl')
+              .having(
+                (error) => error.message,
+                'message',
+                'baseUrl must be a non-empty string.',
+              ),
+        ),
+      );
+    });
+
     test('默认 baseUrl 为官方地址,自定义 baseUrl 去除尾部斜杠', () async {
       final defaultProvider = createOpenAi(apiKey: 'sk-test');
       final customProvider = createOpenAi(

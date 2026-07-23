@@ -6,6 +6,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-04
   group('convertToOpenAiResponsesInput — system message modes', () {
     test('system mode maps to role:system', () {
       final result = convertToOpenAiResponsesInput(
@@ -874,6 +875,120 @@ void main() {
             {'type': 'function', 'name': 'get_weather'},
           ],
         },
+      ]);
+      expect(result.warnings, isEmpty);
+    });
+
+    test('computer call and screenshot result map to native Responses items',
+        () {
+      final result = convertToOpenAiResponsesInput(
+        prompt: [
+          const AssistantMessage([
+            ToolCallPart(
+              toolCallId: 'computer_call_123',
+              toolName: 'computer',
+              input: {
+                'actions': [
+                  {
+                    'type': 'scroll',
+                    'x': 10,
+                    'y': 20,
+                    'scrollX': 0,
+                    'scrollY': 100,
+                  },
+                ],
+                'pendingSafetyChecks': [
+                  {'id': 'safety_123', 'code': 'confirm_action'},
+                ],
+                'status': 'completed',
+              },
+              providerOptions: {
+                'openai': {'itemId': 'computer_item_123'},
+              },
+            ),
+          ]),
+          const ToolMessage([
+            ToolResultPart(
+              toolCallId: 'computer_call_123',
+              toolName: 'computer',
+              output: ToolResultJson({
+                'output': {
+                  'type': 'computer_screenshot',
+                  'imageUrl': 'data:image/png;base64,c2NyZWVuc2hvdA==',
+                  'detail': 'original',
+                },
+                'acknowledgedSafetyChecks': [
+                  {'id': 'safety_123', 'code': 'confirm_action'},
+                ],
+              }),
+            ),
+          ]),
+        ],
+        systemMessageMode: SystemMessageMode.system,
+        store: false,
+        tools: [openAiTools.computer()],
+      );
+
+      expect(result.input, [
+        {
+          'type': 'computer_call',
+          'id': 'computer_item_123',
+          'call_id': 'computer_call_123',
+          'status': 'completed',
+          'actions': [
+            {
+              'type': 'scroll',
+              'x': 10,
+              'y': 20,
+              'scroll_x': 0,
+              'scroll_y': 100,
+            },
+          ],
+          'pending_safety_checks': [
+            {'id': 'safety_123', 'code': 'confirm_action'},
+          ],
+        },
+        {
+          'type': 'computer_call_output',
+          'call_id': 'computer_call_123',
+          'output': {
+            'type': 'computer_screenshot',
+            'image_url': 'data:image/png;base64,c2NyZWVuc2hvdA==',
+            'detail': 'original',
+          },
+          'acknowledged_safety_checks': [
+            {'id': 'safety_123', 'code': 'confirm_action'},
+          ],
+        },
+      ]);
+      expect(result.warnings, isEmpty);
+    });
+
+    test('stored tool-search output reuses provider metadata item id', () {
+      final result = convertToOpenAiResponsesInput(
+        prompt: [
+          const AssistantMessage([
+            ToolResultPart(
+              toolCallId: 'call_tool_search',
+              toolName: 'tool_search',
+              output: ToolResultJson({
+                'tools': [
+                  {'type': 'function', 'name': 'get_weather'},
+                ],
+              }),
+              providerOptions: {
+                'openai': {'itemId': 'tso_123'},
+              },
+            ),
+          ]),
+        ],
+        systemMessageMode: SystemMessageMode.system,
+        store: true,
+        tools: [openAiTools.toolSearch(execution: 'client')],
+      );
+
+      expect(result.input, [
+        {'type': 'item_reference', 'id': 'tso_123'},
       ]);
       expect(result.warnings, isEmpty);
     });

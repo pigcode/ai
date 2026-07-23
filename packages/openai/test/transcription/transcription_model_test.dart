@@ -82,6 +82,7 @@ String _successBody() {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-08
   group('OpenAiTranscriptionModel — 基础字段', () {
     test('provider/modelId/specificationVersion', () {
       final client =

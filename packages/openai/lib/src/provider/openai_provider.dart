@@ -44,6 +44,12 @@ OpenAiProvider createOpenAi({
   String name = 'openai',
   http.Client? client,
 }) {
+  if (baseUrl != null && baseUrl.isEmpty) {
+    throw const InvalidArgumentError(
+      argument: 'baseUrl',
+      message: 'baseUrl must be a non-empty string.',
+    );
+  }
   final resolvedBaseUrl = withoutTrailingSlash(baseUrl) ?? _defaultBaseUrl;
 
   Map<String, String> getHeaders() {

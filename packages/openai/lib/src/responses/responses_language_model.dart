@@ -52,6 +52,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
     String providerOptionsName,
     bool logprobsRequested,
     String? codeInterpreterToolName,
+    String? computerToolName,
     String? fileSearchToolName,
     String? imageGenerationToolName,
     String? webSearchToolName,
@@ -160,6 +161,10 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
     final codeInterpreterToolName = _providerToolName(
       tools: options.tools,
       id: 'openai.code_interpreter',
+    );
+    final computerToolName = _providerToolName(
+      tools: options.tools,
+      id: 'openai.computer',
     );
     final fileSearchToolName = _providerToolName(
       tools: options.tools,
@@ -369,6 +374,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
       logprobsRequested:
           openaiOptions.logprobs != null && openaiOptions.logprobs != false,
       codeInterpreterToolName: codeInterpreterToolName,
+      computerToolName: computerToolName,
       fileSearchToolName: fileSearchToolName,
       imageGenerationToolName: imageGenerationToolName,
       webSearchToolName: webSearchToolName,
@@ -420,11 +426,19 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
       // 2xx 响应但 body 缺合法 `output` 数组(如误配 baseUrl 打到了
       // Chat Completions 端点,拿到 `{"choices": [...]}` 形状的响应):
       // 不再静默 fallback 成空 content + `finishReason: stop`,而是显式
-      // 报错,避免调用方误以为模型正常返回了空结果。
-      throw InvalidResponseDataError(
-        data: response,
+      // 报错,避免调用方误以为模型正常返回了空结果。这里保留完整的 HTTP
+      // 诊断字段,因此使用 ApiCallError 而不是只携带解析数据的
+      // InvalidResponseDataError。
+      throw ApiCallError(
         message:
             "response is not a valid Responses API payload (missing 'output' array)",
+        url: url.toString(),
+        requestBody: built.args,
+        statusCode: 200,
+        responseHeaders: responseHeaders,
+        responseBody: jsonEncode(response),
+        data: response,
+        isRetryable: false,
       );
     }
 
@@ -521,6 +535,29 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
               },
             ),
           );
+
+        case 'computer_call':
+          final call = _mapComputerToolCall(
+            item,
+            built.providerOptionsName,
+            built.computerToolName,
+          );
+          if (call.providerExecuted != true) {
+            hasFunctionCall = true;
+          }
+          content.add(call);
+          if (call.providerExecuted == true) {
+            content.add(
+              ToolResult(
+                toolCallId: call.toolCallId,
+                toolName: call.toolName,
+                result: <String, Object?>{
+                  'type': 'computer_use_tool_result',
+                  'status': item['status'],
+                },
+              ),
+            );
+          }
 
         case 'file_search_call':
           final toolName = built.fileSearchToolName ?? 'file_search';
@@ -883,6 +920,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
         providerOptionsName: built.providerOptionsName,
         logprobsRequested: built.logprobsRequested,
         codeInterpreterToolName: built.codeInterpreterToolName,
+        computerToolName: built.computerToolName,
         fileSearchToolName: built.fileSearchToolName,
         imageGenerationToolName: built.imageGenerationToolName,
         webSearchToolName: built.webSearchToolName,
@@ -921,6 +959,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
     required String providerOptionsName,
     required bool logprobsRequested,
     required String? codeInterpreterToolName,
+    required String? computerToolName,
     required String? fileSearchToolName,
     required String? imageGenerationToolName,
     required String? webSearchToolName,
@@ -977,6 +1016,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
               state,
               providerOptionsName,
               codeInterpreterToolName,
+              computerToolName,
               fileSearchToolName,
               imageGenerationToolName,
               webSearchToolName,
@@ -990,6 +1030,7 @@ final class OpenAiResponsesLanguageModel implements LanguageModel {
               state,
               providerOptionsName,
               codeInterpreterToolName,
+              computerToolName,
               fileSearchToolName,
               imageGenerationToolName,
               webSearchToolName,
@@ -1402,6 +1443,109 @@ ToolCall _mapToolSearchToolCall(
   );
 }
 
+ToolCall _mapComputerToolCall(
+  JsonObject item,
+  String providerOptionsName,
+  String? computerToolName,
+) {
+  final itemId = item['id']! as String;
+  final callId = item['call_id'] as String?;
+  if (callId == null) {
+    return ToolCall(
+      toolCallId: itemId,
+      toolName: 'computer_use',
+      input: '',
+      providerExecuted: true,
+    );
+  }
+
+  return ToolCall(
+    toolCallId: callId,
+    toolName: computerToolName ?? 'computer',
+    input: jsonEncode(_mapComputerCallInput(item)),
+    providerMetadata: {
+      providerOptionsName: {'itemId': itemId},
+    },
+  );
+}
+
+JsonObject _mapComputerCallInput(JsonObject item) {
+  final rawActions = switch (item['actions']) {
+    List<Object?> actions => actions,
+    _ when item['action'] != null => <Object?>[item['action']],
+    _ => const <Object?>[],
+  };
+  final actions = <JsonObject>[];
+  for (final rawAction in rawActions) {
+    if (rawAction is JsonObject) {
+      actions.add(_mapComputerAction(rawAction));
+    }
+  }
+
+  final pendingSafetyChecks = <JsonObject>[];
+  final rawSafetyChecks = item['pending_safety_checks'];
+  if (rawSafetyChecks is List<Object?>) {
+    for (final rawCheck in rawSafetyChecks) {
+      if (rawCheck is JsonObject && rawCheck['id'] is String) {
+        pendingSafetyChecks.add(<String, Object?>{
+          'id': rawCheck['id'],
+          'code': rawCheck['code'],
+          'message': rawCheck['message'],
+        }..removeWhere((_, value) => value == null));
+      }
+    }
+  }
+
+  return <String, Object?>{
+    'actions': actions,
+    'pendingSafetyChecks': pendingSafetyChecks,
+    'status': item['status'],
+  };
+}
+
+JsonObject _mapComputerAction(JsonObject action) {
+  final type = action['type'];
+  final mapped = switch (type) {
+    'click' => <String, Object?>{
+        'type': type,
+        'button': action['button'],
+        'x': action['x'],
+        'y': action['y'],
+        'keys': action['keys'],
+      },
+    'double_click' || 'move' => <String, Object?>{
+        'type': type,
+        'x': action['x'],
+        'y': action['y'],
+        'keys': action['keys'],
+      },
+    'drag' => <String, Object?>{
+        'type': type,
+        'path': action['path'],
+        'keys': action['keys'],
+      },
+    'keypress' => <String, Object?>{
+        'type': type,
+        'keys': action['keys'],
+      },
+    'screenshot' || 'wait' => <String, Object?>{'type': type},
+    'scroll' => <String, Object?>{
+        'type': type,
+        'x': action['x'],
+        'y': action['y'],
+        'scrollX': action['scroll_x'],
+        'scrollY': action['scroll_y'],
+        'keys': action['keys'],
+      },
+    'type' => <String, Object?>{
+        'type': type,
+        'text': action['text'],
+      },
+    _ => Map<String, Object?>.of(action),
+  };
+  return mapped..removeWhere((_, value) => value == null);
+}
+
 ToolResult _mapToolSearchToolResult(
   JsonObject item,
   String providerOptionsName,
@@ -1539,6 +1683,7 @@ List<LanguageModelStreamPart> _handleOutputItemAdded(
   _ResponsesStreamState state,
   String providerOptionsName,
   String? codeInterpreterToolName,
+  String? computerToolName,
   String? fileSearchToolName,
   String? imageGenerationToolName,
   String? webSearchToolName,
@@ -1572,6 +1717,17 @@ List<LanguageModelStreamPart> _handleOutputItemAdded(
         ToolInputDelta(
           itemId,
           '{"containerId":${jsonEncode(containerId)},"code":"',
+        ),
+      ];
+
+    case 'computer_call':
+      final itemId = item['id']! as String;
+      final toolCallId = (item['call_id'] as String?) ?? itemId;
+      return [
+        ToolInputStart(
+          id: toolCallId,
+          toolName: computerToolName ?? 'computer',
+          providerExecuted: item['call_id'] == null ? true : null,
         ),
       ];
 
@@ -1660,6 +1816,7 @@ List<LanguageModelStreamPart> _handleOutputItemDone(
   _ResponsesStreamState state,
   String providerOptionsName,
   String? codeInterpreterToolName,
+  String? computerToolName,
   String? fileSearchToolName,
   String? imageGenerationToolName,
   String? webSearchToolName,
@@ -1702,6 +1859,33 @@ List<LanguageModelStreamPart> _handleOutputItemDone(
             'outputs': item['outputs'],
           },
         ),
+      ];
+
+    case 'computer_call':
+      final call = _mapComputerToolCall(
+        item,
+        providerOptionsName,
+        computerToolName,
+      );
+      if (call.providerExecuted == true) {
+        return [
+          ToolInputEnd(call.toolCallId),
+          call,
+          ToolResult(
+            toolCallId: call.toolCallId,
+            toolName: call.toolName,
+            result: <String, Object?>{
+              'type': 'computer_use_tool_result',
+              'status': item['status'],
+            },
+          ),
+        ];
+      }
+      state.hasFunctionCall = true;
+      return [
+        ToolInputDelta(call.toolCallId, call.input),
+        ToolInputEnd(call.toolCallId),
+        call,
       ];
 
     case 'file_search_call':
