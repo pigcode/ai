@@ -2,7 +2,7 @@
   "$schema": "./schema/protocol-foundation-compatibility.schema.json",
   "formatVersion": 1,
   "phase": "phase-2a-protocol-foundation",
-  "implementationCommit": "pending-main-merge",
+  "implementationCommit": "b286630a5870830141394a415144c93c500598f1",
   "dartSdkConstraint": "^3.6.0",
   "sources": [
     {
@@ -539,7 +539,7 @@
         "sha256": "41c92194de01817ef11a51b342de511f892bdd7d48cba550c033a0a099b0e328"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "protocol utility codec test",
         "path": "packages/protocol_utils/test/json_rpc/codec_test.dart",
@@ -566,7 +566,7 @@
         "sha256": "56162c95f11ce2fb072a90160d3e46586d17c3b0d4591a391ae064f38f1c790f"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "SSE framing test",
         "path": "packages/protocol_utils/test/framing/sse_test.dart",
@@ -593,7 +593,7 @@
         "sha256": "25f6a3d75276bc464feab52e00189696f4579ac432956ccf5562677b14ee5a89"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "JSON-RPC peer race test",
         "path": "packages/protocol_utils/test/json_rpc/peer_race_test.dart",
@@ -620,7 +620,7 @@
         "sha256": "8ee45fb9c558b192b6bcb5f45c336d89c1228efaece8178a6c66d15352458bf5"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP inventory test",
         "path": "packages/acp/test/schema/inventory_test.dart",
@@ -649,7 +649,7 @@
         "sha256": "a6d743e0330a5a37fa6dabe9ab95c9c3b167ac4fed86ac5c4ad57eaf9f5b2d8d"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP codec golden test",
         "path": "packages/acp/test/schema/codec_golden_test.dart",
@@ -676,7 +676,7 @@
         "sha256": "b9f99cb85a58b559419febaaf5ea51f6fb88ba730de1a21a2349d6ee197dd185"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP initialize test",
         "path": "packages/acp/test/initialize_test.dart",
@@ -703,7 +703,7 @@
         "sha256": "6d0b6fef097322f14938c8cfc3c3c9337ae13a36dd3be4c2717b99f76d3836e7"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP session lifecycle test",
         "path": "packages/acp/test/session_lifecycle_test.dart",
@@ -730,7 +730,7 @@
         "sha256": "4f32f0df08152df9760057883b67842e8318f9dfbd993380da517cdbdc7aa109"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP prompt update test",
         "path": "packages/acp/test/prompt_update_test.dart",
@@ -757,7 +757,7 @@
         "sha256": "54a56573a508227b9b7b97f8007ff8b96b5c1fccc75389c64d9aa2a3b2c3c2de"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP reverse request test",
         "path": "packages/acp/test/reverse_request_test.dart",
@@ -784,7 +784,7 @@
         "sha256": "eee0f8fec4523922d2fa096f1f66323ffb219da801a998b2b236019f9a82be02"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP cancellation test",
         "path": "packages/acp/test/cancellation_test.dart",
@@ -811,7 +811,7 @@
         "sha256": "bfbf241b77c5e219ef1ea9b262ea9016b78ca50ec0bf111058d2114c919efee7"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP history test",
         "path": "packages/acp/test/history_test.dart",
@@ -838,7 +838,7 @@
         "sha256": "ca987886e01ee2a8220ec301330f9b3e2813ba2c671ff76e3a33d384bd074b44"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP scripted peer test",
         "path": "packages/acp/test/scripted_peer_test.dart",
@@ -865,7 +865,7 @@
         "sha256": "3ff16dbbf1dd6a53a8913b36483f62f73bdc7769a02e7f4582ce32ef8ca596b4"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "ACP fixed peer matrix runner",
         "path": "tool/run_acp_peer_matrix.dart",
@@ -897,7 +897,7 @@
         "sha256": "6bc78de7f9d03a076a0fe7807fa0eab35f676a738f26a34a5313d5d0f36e3a08"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP inventory test",
         "path": "packages/mcp/test/schema/inventory_test.dart",
@@ -925,7 +925,7 @@
         "sha256": "1ab8f7f22d8c7adc290c7a7327c85f80e641f6115cbf057556cd03bd99731675"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP codec golden test",
         "path": "packages/mcp/test/schema/codec_golden_test.dart",
@@ -952,7 +952,7 @@
         "sha256": "337e37454c9a7b9ebff41aa40e5b0251ed8b0f5a680837b90db33eceb4f610f0"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP initialize test",
         "path": "packages/mcp/test/initialize_test.dart",
@@ -979,7 +979,7 @@
         "sha256": "45624a9e66609d8995ae45d79c1e2443a8b8e06938dd9f39b1406eb2dce5ac91"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP tools test",
         "path": "packages/mcp/test/tools_test.dart",
@@ -1006,7 +1006,7 @@
         "sha256": "cb234bbad3c1f2e9665ec21db6411f9a144b97a26fea96bf3e73fa7cebaf15cd"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP reverse request test",
         "path": "packages/mcp/test/reverse_requests_test.dart",
@@ -1033,7 +1033,7 @@
         "sha256": "fd684cead066024b1f249d1b987d17c00ad8fefd0411b0442d682a6b40b7dc4a"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP task race test",
         "path": "packages/mcp/test/task_race_test.dart",
@@ -1060,7 +1060,7 @@
         "sha256": "ca243c948f5cdc2632f26e8ba296ba11fe2d9f80cabccb325728ea8894d0d847"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP stdio transport test",
         "path": "packages/mcp/test/stdio_transport_test.dart",
@@ -1087,7 +1087,7 @@
         "sha256": "e2e0c369d7e8f5bf43b7972d6b131b4db17329a9be02846471e94c9cb787d208"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP HTTP endpoint test",
         "path": "packages/mcp/test/http/endpoint_test.dart",
@@ -1114,7 +1114,7 @@
         "sha256": "fdbd3ecae28a803fea71ff1a676a96108f4211b83a3f5b2a73ae53b2df2784ab"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP OAuth authorization-code test",
         "path": "packages/mcp/test/auth/authorization_code_test.dart",
@@ -1141,7 +1141,7 @@
         "sha256": "f67196e83291d1e745ab25d20cab2f3d0e5f3f1d00233d29b9fd9cac8c09c81c"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP tool mapping test",
         "path": "packages/mcp/test/ai/tool_mapping_test.dart",
@@ -1168,7 +1168,7 @@
         "sha256": "ae8e2436ca655aa5377fe61fd806bdf52e8c4f466cbd77496e8cfeb9688b5714"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP resource mapping test",
         "path": "packages/mcp/test/ai/resource_mapping_test.dart",
@@ -1195,7 +1195,7 @@
         "sha256": "56c2dcd557dea24f26ea1271e9fe801d1f24b711fb33b18c29b9d285e3c59ff1"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP record/replay test",
         "path": "packages/mcp/test/record_replay_test.dart",
@@ -1222,7 +1222,7 @@
         "sha256": "5e4e28ad732a49f108fbaa9185a2d8cc04ac9ab7497e73d1af310b15b0d8f562"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP stdio cross-process test",
         "path": "tool/test/mcp_stdio_cross_process_test.dart",
@@ -1249,7 +1249,7 @@
         "sha256": "c8b8fefc968743a6581719033e9ce9ae57472376b5d7f7c204dc8f00569fe245"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "Pigcode MCP conformance client",
         "path": "tool/fixtures/mcp_conformance_client.dart",
@@ -1304,7 +1304,7 @@
         "sha256": "baeac8624dab183b05b1466c9247417833beecf39057d76e420b6e471b3b7e3c"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "Pigcode MCP conformance server",
         "path": "tool/fixtures/mcp_conformance_server.dart",
@@ -1373,7 +1373,7 @@
         "sha256": "cde6c43fc8b7ad9d3d405c3a6f459f9312314b9415c3028e5fcd711e7df46ac1"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "MCP portable compile smoke",
         "path": "packages/mcp/test/portable_compile_smoke.dart",
@@ -1400,7 +1400,7 @@
         "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace contract test",
         "path": "tool/test/workspace_contract_test.dart",
@@ -1427,7 +1427,7 @@
         "sha256": "93086b7c3152815dfd80abc2c5f19e595f1b506e0e83c37305062a760de53f1b"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "protocol codegen test",
         "path": "tool/test/protocol_codegen_test.dart",
@@ -1454,7 +1454,7 @@
         "sha256": "4606ad91dc94e69032cf7a8898d0c61ae5da4b70c4d57fea2adf0577bd146667"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "protocol compatibility checker",
         "path": "tool/check_protocol_compatibility.dart",
@@ -1481,7 +1481,7 @@
         "sha256": "1b7452d9e2445a441824b31cde7343d1a2aad7522cc603f3260db38da5f94408"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "protocol support matrix",
         "path": "docs/protocol-support.md",
@@ -1508,7 +1508,7 @@
         "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
       },
       "dartSdkConstraint": "^3.6.0",
-      "evidenceCommit": "pending-main-merge",
+      "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace CI workflow",
         "path": ".github/workflows/ci.yml",
