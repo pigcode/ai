@@ -18,10 +18,16 @@ const _requiredRootPaths = <String>{
   'LICENSE',
   'README.md',
   'THIRD_PARTY_NOTICES.md',
+  'compatibility/schema/ai-core-compatibility.schema.json',
   'pubspec.yaml',
   'third_party/licenses/Apache-2.0.txt',
+  'tool/check_compatibility.dart',
   'tool/check_workspace.dart',
+  'tool/fixtures/ai_core_peer.dart',
+  'tool/src/compatibility_manifest.dart',
   'tool/src/workspace_contract.dart',
+  'tool/test/ai_core_peer_test.dart',
+  'tool/test/compatibility_manifest_test.dart',
   'tool/test/workspace_contract_test.dart',
 };
 

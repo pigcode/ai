@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/compatibility/schema/ai-core-compatibility.schema.json",
+  "title": "Pigcode AI Core compatibility manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "claims",
+    "notApplicable"
+  ],
+  "properties": {
+    "manifestVersion": {
+      "const": 1
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "notApplicable": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/notApplicable"
+      }
+    }
+  },
+  "$defs": {
+    "fixtureId": {
+      "type": "string",
+      "enum": [
+        "P1-ANTHROPIC-01",
+        "P1-ANTHROPIC-02",
+        "P1-ANTHROPIC-03",
+        "P1-ANTHROPIC-04",
+        "P1-ANTHROPIC-05",
+        "P1-ANTHROPIC-06",
+        "P1-ANTHROPIC-07",
+        "P1-ANTHROPIC-08",
+        "P1-COMPAT-01",
+        "P1-COMPAT-02",
+        "P1-COMPAT-03",
+        "P1-COMPAT-04",
+        "P1-CORE-01",
+        "P1-CORE-02",
+        "P1-CORE-03",
+        "P1-CORE-04",
+        "P1-CORE-05",
+        "P1-CORE-06",
+        "P1-CORE-07",
+        "P1-CORE-08",
+        "P1-CORE-09",
+        "P1-CORE-10",
+        "P1-CORE-11",
+        "P1-CORE-12",
+        "P1-CORE-13",
+        "P1-CORE-14",
+        "P1-CORE-15",
+        "P1-CORE-16",
+        "P1-CROSS-01",
+        "P1-CROSS-02",
+        "P1-CROSS-03",
+        "P1-CROSS-04",
+        "P1-CROSS-05",
+        "P1-OPENAI-01",
+        "P1-OPENAI-02",
+        "P1-OPENAI-03",
+        "P1-OPENAI-04",
+        "P1-OPENAI-05",
+        "P1-OPENAI-06",
+        "P1-OPENAI-07",
+        "P1-OPENAI-08",
+        "P1-PROVIDER-01",
+        "P1-PROVIDER-02",
+        "P1-PROVIDER-03",
+        "P1-PROVIDER-04",
+        "P1-PROVIDER-05",
+        "P1-PROVIDER-06",
+        "P1-PROVIDER-07",
+        "P1-PROVIDER-08",
+        "P1-UTIL-01",
+        "P1-UTIL-02",
+        "P1-UTIL-03",
+        "P1-UTIL-04",
+        "P1-UTIL-05",
+        "P1-UTIL-06",
+        "P1-UTIL-07",
+        "P1-UTIL-08"
+      ]
+    },
+    "fixtureIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/fixtureId"
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "tag",
+        "commit",
+        "package",
+        "packageVersion",
+        "tree"
+      ],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/vercel/ai"
+        },
+        "tag": {
+          "const": "ai@7.0.35"
+        },
+        "commit": {
+          "const": "799faf71e05a7d580914ad94d943d28c0400554c"
+        },
+        "package": {
+          "enum": [
+            "@ai-sdk/provider",
+            "@ai-sdk/provider-utils",
+            "ai",
+            "@ai-sdk/openai",
+            "@ai-sdk/openai-compatible",
+            "@ai-sdk/anthropic"
+          ]
+        },
+        "packageVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        }
+      }
+    },
+    "upstreamRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "path",
+        "fixtureIds"
+      ],
+      "properties": {
+        "commit": {
+          "const": "799faf71e05a7d580914ad94d943d28c0400554c"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^packages/[^/]+/.+"
+        },
+        "fixtureIds": {
+          "$ref": "#/$defs/fixtureIds"
+        }
+      }
+    },
+    "dartTestRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "fixtureIds"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(packages/[^/]+/test/|tool/test/).+_test\\.dart$"
+        },
+        "fixtureIds": {
+          "$ref": "#/$defs/fixtureIds"
+        }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "fixtureIds",
+        "role",
+        "transport",
+        "version",
+        "capabilityProfile",
+        "platform",
+        "peer",
+        "peerBinaryHash",
+        "dartSdkConstraint",
+        "evidenceCommit"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(packages/[^/]+/test/|tool/test/).+_test\\.dart$"
+        },
+        "fixtureIds": {
+          "$ref": "#/$defs/fixtureIds"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transport": {
+          "enum": [
+            "in-process",
+            "stdio",
+            "loopback-http",
+            "loopback-sse",
+            "loopback-websocket"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilityProfile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "peer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "peerBinaryHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "dartSdkConstraint": {
+          "const": "^3.6.0"
+        },
+        "evidenceCommit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimId",
+        "package",
+        "surface",
+        "status",
+        "source",
+        "fixtureIds",
+        "upstreamRefs",
+        "dartTests",
+        "scriptedPeerTests",
+        "realProcessTests",
+        "notes"
+      ],
+      "properties": {
+        "claimId": {
+          "type": "string",
+          "pattern": "^P1-[A-Z]+-CLAIM-[0-9]{2}$"
+        },
+        "package": {
+          "enum": [
+            "pigcode_ai_provider",
+            "pigcode_ai_provider_utils",
+            "pigcode_ai",
+            "pigcode_ai_openai",
+            "pigcode_ai_openai_compatible",
+            "pigcode_ai_anthropic",
+            "workspace"
+          ]
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "implemented",
+            "verified"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "fixtureIds": {
+          "$ref": "#/$defs/fixtureIds"
+        },
+        "upstreamRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/upstreamRef"
+          }
+        },
+        "dartTests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/dartTestRef"
+          }
+        },
+        "scriptedPeerTests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceRef"
+          }
+        },
+        "realProcessTests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceRef"
+          }
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "notApplicable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "boundary",
+        "upstreamCommit",
+        "upstreamPath",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "P1-NA-01",
+            "P1-NA-02",
+            "P1-NA-03",
+            "P1-NA-04"
+          ]
+        },
+        "boundary": {
+          "enum": [
+            "javascript-callable-object",
+            "node-express-server-response",
+            "typescript-zod-ecosystem",
+            "typescript-type-system"
+          ]
+        },
+        "upstreamCommit": {
+          "const": "799faf71e05a7d580914ad94d943d28c0400554c"
+        },
+        "upstreamPath": {
+          "type": "string",
+          "pattern": "^packages/[^/]+/.+"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
