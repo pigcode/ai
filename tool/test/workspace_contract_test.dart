@@ -674,6 +674,18 @@ final class _WorkspaceFixture {
         '// Peer fixture\n',
       )
       ..writeTracked(
+        'tool/fixtures/anthropic_peer.dart',
+        '// Anthropic peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/openai_compatible_peer.dart',
+        '// OpenAI-compatible peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/openai_peer.dart',
+        '// OpenAI peer fixture\n',
+      )
+      ..writeTracked(
         'tool/generate_upstream_path_inventory.dart',
         '// Inventory generator fixture\n',
       )
@@ -688,6 +700,14 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/test/ai_core_peer_test.dart',
         '// Peer test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/ai_core_cross_process_test.dart',
+        '// Cross-process test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/ai_core_cross_scripted_peer_test.dart',
+        '// Cross-package scripted test fixture\n',
       )
       ..writeTracked(
         'tool/test/compatibility_manifest_test.dart',
