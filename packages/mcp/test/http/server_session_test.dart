@@ -405,6 +405,34 @@ void main() {
 
     await endpoint.close();
   });
+
+  test('next GET attaches to a side channel queued by a notification',
+      () async {
+    late McpServer server;
+    final endpoint = _endpoint(
+      createSessionId: () => 'queued-side-session',
+      onServer: (value) => server = value,
+      maxStreamsPerSession: 1,
+    );
+    final sessionId = await _initialize(endpoint);
+
+    await server.notifyClient(
+      'notifications/progress',
+      const <String, Object?>{
+        'progressToken': 'queued',
+        'progress': 1,
+      },
+    );
+
+    final response = await _openGet(endpoint, sessionId);
+    expect(response.statusCode, 200);
+    final iterator = StreamIterator<List<int>>(response.body);
+    expect(await iterator.moveNext(), isTrue);
+    expect(_progressToken(iterator.current), 'queued');
+
+    await iterator.cancel();
+    await endpoint.close();
+  });
 }
 
 McpHttpEndpoint _endpoint({

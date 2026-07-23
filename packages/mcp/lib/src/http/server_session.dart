@@ -209,6 +209,7 @@ final class McpHttpServerSession {
   final LinkedHashMap<String, McpHttpServerStream> _streams =
       LinkedHashMap<String, McpHttpServerStream>();
   final List<McpHttpServerStream> _sideChannels = <McpHttpServerStream>[];
+  McpHttpServerStream? _pendingSideChannel;
   var _nextStreamId = 1;
   var _sideIndex = 0;
   var _closed = false;
@@ -234,6 +235,11 @@ final class McpHttpServerSession {
 
   McpHttpServerStream openSideChannel() {
     _ensureOpen();
+    final pending = _pendingSideChannel;
+    if (pending != null) {
+      _pendingSideChannel = null;
+      return pending;
+    }
     final stream = _createStream(isSideChannel: true);
     _sideChannels.add(stream);
     return stream;
@@ -256,6 +262,9 @@ final class McpHttpServerSession {
   void discardJsonStream(McpHttpServerStream stream) {
     _streams.remove(stream.streamKey);
     _sideChannels.remove(stream);
+    if (identical(_pendingSideChannel, stream)) {
+      _pendingSideChannel = null;
+    }
     eventStore.removeStream(stream.streamKey);
   }
 
@@ -271,6 +280,7 @@ final class McpHttpServerSession {
     _streams.clear();
     _requestStreams.clear();
     _sideChannels.clear();
+    _pendingSideChannel = null;
     eventStore.clear();
   }
 
@@ -320,6 +330,7 @@ final class McpHttpServerSession {
     }
     if (_sideChannels.isEmpty) {
       final stream = openSideChannel();
+      _pendingSideChannel = stream;
       stream._add(message, terminal: false);
       return;
     }
@@ -330,6 +341,9 @@ final class McpHttpServerSession {
   }
 
   void _activateSideChannel(McpHttpServerStream stream) {
+    if (identical(_pendingSideChannel, stream)) {
+      _pendingSideChannel = null;
+    }
     if (!_sideChannels.contains(stream)) {
       _sideChannels.add(stream);
     }
