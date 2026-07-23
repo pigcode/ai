@@ -1,0 +1,108 @@
+{
+  "formatVersion": 1,
+  "generator": {
+    "identity": "pigcode-protocol-codegen",
+    "formatVersion": 1
+  },
+  "sources": [
+    {
+      "sourceId": "acp-v1",
+      "protocol": "acp",
+      "repository": "https://github.com/agentclientprotocol/agent-client-protocol",
+      "release": "schema-v1.20.0",
+      "revision": "5e89c71497fe07dd4ae633c181a17224f4a8956d",
+      "releaseDate": "2026-07-21",
+      "wireVersion": "1",
+      "schemaDialect": "https://json-schema.org/draft/2020-12/schema",
+      "entryRefs": [
+        "Agent",
+        "Client",
+        "ProtocolLevel"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "acp-schema-v1",
+          "path": "tool/upstream/protocols/acp/schema-v1.20.0/schema.json",
+          "size": 198609,
+          "sha256": "92c1dfcda10dd47e99127500a3763da2b471f9ac61e12b9bf0430c32cf953796"
+        },
+        {
+          "artifactId": "acp-meta-v1",
+          "path": "tool/upstream/protocols/acp/schema-v1.20.0/meta.json",
+          "size": 1059,
+          "sha256": "e0bf36f8123b2544b499174197fdc371ec49a1b4572a35114513d56492741599"
+        },
+        {
+          "artifactId": "acp-license",
+          "path": "tool/upstream/protocols/acp/LICENSE",
+          "size": 10782,
+          "sha256": "f250d08cee4549b22b3b4aaaf3a743473336fd280316df5d0340717e5127a221"
+        }
+      ]
+    },
+    {
+      "sourceId": "mcp-2025-11-25",
+      "protocol": "mcp",
+      "repository": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+      "release": "2025-11-25",
+      "revision": "38c84e9f93ad191d9eb26d92b945d17bd0efcaf3",
+      "releaseDate": "2025-11-25",
+      "wireVersion": "2025-11-25",
+      "schemaDialect": "https://json-schema.org/draft/2020-12/schema",
+      "entryRefs": [
+        "#/$defs/JSONRPCMessage",
+        "#/$defs/ClientRequest",
+        "#/$defs/ServerRequest",
+        "#/$defs/ClientNotification",
+        "#/$defs/ServerNotification",
+        "#/$defs/ClientResult",
+        "#/$defs/ServerResult"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "mcp-schema-2025-11-25",
+          "path": "tool/upstream/protocols/mcp/2025-11-25/schema.json",
+          "size": 174246,
+          "sha256": "1ffe4c5577974012f5fa02af14ea88df4b7146679df1abaaad497c8d9230ca8a"
+        },
+        {
+          "artifactId": "mcp-license",
+          "path": "tool/upstream/protocols/mcp/LICENSE",
+          "size": 1095,
+          "sha256": "346e57dc40801e3d58165e97f64d45b42c4571a68a76ecb10c3c12858acecb3f"
+        }
+      ]
+    },
+    {
+      "sourceId": "mcp-conformance-v0.1.16",
+      "protocol": "mcp",
+      "repository": "https://github.com/modelcontextprotocol/conformance",
+      "release": "v0.1.16",
+      "revision": "21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0",
+      "releaseDate": "2026-03-27",
+      "wireVersion": "2025-11-25",
+      "schemaDialect": null,
+      "entryRefs": [],
+      "artifacts": [
+        {
+          "artifactId": "mcp-conformance-package",
+          "path": "tool/upstream/protocols/mcp-conformance/v0.1.16/package.json",
+          "size": 1779,
+          "sha256": "2d99f94129bcaa84b8613dfd5ac50f1885cd8e01b72965da57e66ea848b4d0ab"
+        },
+        {
+          "artifactId": "mcp-conformance-scenarios",
+          "path": "tool/upstream/protocols/mcp-conformance/v0.1.16/scenarios.json",
+          "size": 1885,
+          "sha256": "f589ee5e926838cf66ce06330b1baf156062444f9faf99603869a2fea79f1a08"
+        },
+        {
+          "artifactId": "mcp-conformance-license",
+          "path": "tool/upstream/protocols/mcp-conformance/LICENSE",
+          "size": 12227,
+          "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+        }
+      ]
+    }
+  ]
+}

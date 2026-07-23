@@ -1,0 +1,963 @@
+{
+  "formatVersion": 1,
+  "acp": {
+    "schemaRelease": "schema-v1.20.0",
+    "wireVersion": "1",
+    "definitionCount": 142,
+    "definitions": [
+      "AgentAuthCapabilities",
+      "AgentCapabilities",
+      "AgentNotification",
+      "AgentRequest",
+      "AgentResponse",
+      "Annotations",
+      "AudioContent",
+      "AuthMethod",
+      "AuthMethodAgent",
+      "AuthMethodId",
+      "AuthenticateRequest",
+      "AuthenticateResponse",
+      "AvailableCommand",
+      "AvailableCommandInput",
+      "AvailableCommandsUpdate",
+      "BlobResourceContents",
+      "BooleanConfigOptionCapabilities",
+      "CancelNotification",
+      "CancelRequestNotification",
+      "ClientCapabilities",
+      "ClientNotification",
+      "ClientRequest",
+      "ClientResponse",
+      "ClientSessionCapabilities",
+      "CloseSessionRequest",
+      "CloseSessionResponse",
+      "ConfigOptionUpdate",
+      "Content",
+      "ContentBlock",
+      "ContentChunk",
+      "Cost",
+      "CreateTerminalRequest",
+      "CreateTerminalResponse",
+      "CurrentModeUpdate",
+      "DeleteSessionRequest",
+      "DeleteSessionResponse",
+      "Diff",
+      "EmbeddedResource",
+      "EmbeddedResourceResource",
+      "EnvVariable",
+      "Error",
+      "ErrorCode",
+      "ExtNotification",
+      "ExtRequest",
+      "ExtResponse",
+      "FileSystemCapabilities",
+      "HttpHeader",
+      "ImageContent",
+      "Implementation",
+      "InitializeRequest",
+      "InitializeResponse",
+      "KillTerminalRequest",
+      "KillTerminalResponse",
+      "ListSessionsRequest",
+      "ListSessionsResponse",
+      "LoadSessionRequest",
+      "LoadSessionResponse",
+      "LogoutCapabilities",
+      "LogoutRequest",
+      "LogoutResponse",
+      "McpCapabilities",
+      "McpServer",
+      "McpServerHttp",
+      "McpServerSse",
+      "McpServerStdio",
+      "MessageId",
+      "NewSessionRequest",
+      "NewSessionResponse",
+      "PermissionOption",
+      "PermissionOptionId",
+      "PermissionOptionKind",
+      "Plan",
+      "PlanEntry",
+      "PlanEntryPriority",
+      "PlanEntryStatus",
+      "PromptCapabilities",
+      "PromptRequest",
+      "PromptResponse",
+      "ProtocolVersion",
+      "ReadTextFileRequest",
+      "ReadTextFileResponse",
+      "ReleaseTerminalRequest",
+      "ReleaseTerminalResponse",
+      "RequestId",
+      "RequestPermissionOutcome",
+      "RequestPermissionRequest",
+      "RequestPermissionResponse",
+      "ResourceLink",
+      "ResumeSessionRequest",
+      "ResumeSessionResponse",
+      "Role",
+      "SelectedPermissionOutcome",
+      "SessionAdditionalDirectoriesCapabilities",
+      "SessionCapabilities",
+      "SessionCloseCapabilities",
+      "SessionConfigBoolean",
+      "SessionConfigGroupId",
+      "SessionConfigId",
+      "SessionConfigOption",
+      "SessionConfigOptionCategory",
+      "SessionConfigOptionsCapabilities",
+      "SessionConfigSelect",
+      "SessionConfigSelectGroup",
+      "SessionConfigSelectOption",
+      "SessionConfigSelectOptions",
+      "SessionConfigValueId",
+      "SessionDeleteCapabilities",
+      "SessionId",
+      "SessionInfo",
+      "SessionInfoUpdate",
+      "SessionListCapabilities",
+      "SessionMode",
+      "SessionModeId",
+      "SessionModeState",
+      "SessionNotification",
+      "SessionResumeCapabilities",
+      "SessionUpdate",
+      "SetSessionConfigOptionRequest",
+      "SetSessionConfigOptionResponse",
+      "SetSessionModeRequest",
+      "SetSessionModeResponse",
+      "StopReason",
+      "Terminal",
+      "TerminalExitStatus",
+      "TerminalId",
+      "TerminalOutputRequest",
+      "TerminalOutputResponse",
+      "TextContent",
+      "TextResourceContents",
+      "ToolCall",
+      "ToolCallContent",
+      "ToolCallId",
+      "ToolCallLocation",
+      "ToolCallStatus",
+      "ToolCallUpdate",
+      "ToolKind",
+      "UnstructuredCommandInput",
+      "UsageUpdate",
+      "WaitForTerminalExitRequest",
+      "WaitForTerminalExitResponse",
+      "WriteTextFileRequest",
+      "WriteTextFileResponse"
+    ],
+    "methodCount": 23,
+    "methods": [
+      "$/cancel_request",
+      "authenticate",
+      "fs/read_text_file",
+      "fs/write_text_file",
+      "initialize",
+      "logout",
+      "session/cancel",
+      "session/close",
+      "session/delete",
+      "session/list",
+      "session/load",
+      "session/new",
+      "session/prompt",
+      "session/request_permission",
+      "session/resume",
+      "session/set_config_option",
+      "session/set_mode",
+      "session/update",
+      "terminal/create",
+      "terminal/kill",
+      "terminal/output",
+      "terminal/release",
+      "terminal/wait_for_exit"
+    ],
+    "messageRoots": [
+      "Agent",
+      "Client",
+      "ProtocolLevel"
+    ],
+    "methodBindings": [
+      {
+        "method": "$/cancel_request",
+        "side": "protocol",
+        "definition": "CancelRequestNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "authenticate",
+        "side": "agent",
+        "definition": "AuthenticateRequest",
+        "kind": "request"
+      },
+      {
+        "method": "authenticate",
+        "side": "agent",
+        "definition": "AuthenticateResponse",
+        "kind": "response"
+      },
+      {
+        "method": "fs/read_text_file",
+        "side": "client",
+        "definition": "ReadTextFileRequest",
+        "kind": "request"
+      },
+      {
+        "method": "fs/read_text_file",
+        "side": "client",
+        "definition": "ReadTextFileResponse",
+        "kind": "response"
+      },
+      {
+        "method": "fs/write_text_file",
+        "side": "client",
+        "definition": "WriteTextFileRequest",
+        "kind": "request"
+      },
+      {
+        "method": "fs/write_text_file",
+        "side": "client",
+        "definition": "WriteTextFileResponse",
+        "kind": "response"
+      },
+      {
+        "method": "initialize",
+        "side": "agent",
+        "definition": "InitializeRequest",
+        "kind": "request"
+      },
+      {
+        "method": "initialize",
+        "side": "agent",
+        "definition": "InitializeResponse",
+        "kind": "response"
+      },
+      {
+        "method": "logout",
+        "side": "agent",
+        "definition": "LogoutRequest",
+        "kind": "request"
+      },
+      {
+        "method": "logout",
+        "side": "agent",
+        "definition": "LogoutResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/cancel",
+        "side": "agent",
+        "definition": "CancelNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "session/close",
+        "side": "agent",
+        "definition": "CloseSessionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/close",
+        "side": "agent",
+        "definition": "CloseSessionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/delete",
+        "side": "agent",
+        "definition": "DeleteSessionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/delete",
+        "side": "agent",
+        "definition": "DeleteSessionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/list",
+        "side": "agent",
+        "definition": "ListSessionsRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/list",
+        "side": "agent",
+        "definition": "ListSessionsResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/load",
+        "side": "agent",
+        "definition": "LoadSessionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/load",
+        "side": "agent",
+        "definition": "LoadSessionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/new",
+        "side": "agent",
+        "definition": "NewSessionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/new",
+        "side": "agent",
+        "definition": "NewSessionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/prompt",
+        "side": "agent",
+        "definition": "PromptRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/prompt",
+        "side": "agent",
+        "definition": "PromptResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/request_permission",
+        "side": "client",
+        "definition": "RequestPermissionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/request_permission",
+        "side": "client",
+        "definition": "RequestPermissionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/resume",
+        "side": "agent",
+        "definition": "ResumeSessionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/resume",
+        "side": "agent",
+        "definition": "ResumeSessionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/set_config_option",
+        "side": "agent",
+        "definition": "SetSessionConfigOptionRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/set_config_option",
+        "side": "agent",
+        "definition": "SetSessionConfigOptionResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/set_mode",
+        "side": "agent",
+        "definition": "SetSessionModeRequest",
+        "kind": "request"
+      },
+      {
+        "method": "session/set_mode",
+        "side": "agent",
+        "definition": "SetSessionModeResponse",
+        "kind": "response"
+      },
+      {
+        "method": "session/update",
+        "side": "client",
+        "definition": "SessionNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "terminal/create",
+        "side": "client",
+        "definition": "CreateTerminalRequest",
+        "kind": "request"
+      },
+      {
+        "method": "terminal/create",
+        "side": "client",
+        "definition": "CreateTerminalResponse",
+        "kind": "response"
+      },
+      {
+        "method": "terminal/kill",
+        "side": "client",
+        "definition": "KillTerminalRequest",
+        "kind": "request"
+      },
+      {
+        "method": "terminal/kill",
+        "side": "client",
+        "definition": "KillTerminalResponse",
+        "kind": "response"
+      },
+      {
+        "method": "terminal/output",
+        "side": "client",
+        "definition": "TerminalOutputRequest",
+        "kind": "request"
+      },
+      {
+        "method": "terminal/output",
+        "side": "client",
+        "definition": "TerminalOutputResponse",
+        "kind": "response"
+      },
+      {
+        "method": "terminal/release",
+        "side": "client",
+        "definition": "ReleaseTerminalRequest",
+        "kind": "request"
+      },
+      {
+        "method": "terminal/release",
+        "side": "client",
+        "definition": "ReleaseTerminalResponse",
+        "kind": "response"
+      },
+      {
+        "method": "terminal/wait_for_exit",
+        "side": "client",
+        "definition": "WaitForTerminalExitRequest",
+        "kind": "request"
+      },
+      {
+        "method": "terminal/wait_for_exit",
+        "side": "client",
+        "definition": "WaitForTerminalExitResponse",
+        "kind": "response"
+      }
+    ]
+  },
+  "mcp": {
+    "specificationVersion": "2025-11-25",
+    "definitionCount": 145,
+    "definitions": [
+      "Annotations",
+      "AudioContent",
+      "BaseMetadata",
+      "BlobResourceContents",
+      "BooleanSchema",
+      "CallToolRequest",
+      "CallToolRequestParams",
+      "CallToolResult",
+      "CancelTaskRequest",
+      "CancelTaskResult",
+      "CancelledNotification",
+      "CancelledNotificationParams",
+      "ClientCapabilities",
+      "ClientNotification",
+      "ClientRequest",
+      "ClientResult",
+      "CompleteRequest",
+      "CompleteRequestParams",
+      "CompleteResult",
+      "ContentBlock",
+      "CreateMessageRequest",
+      "CreateMessageRequestParams",
+      "CreateMessageResult",
+      "CreateTaskResult",
+      "Cursor",
+      "ElicitRequest",
+      "ElicitRequestFormParams",
+      "ElicitRequestParams",
+      "ElicitRequestURLParams",
+      "ElicitResult",
+      "ElicitationCompleteNotification",
+      "EmbeddedResource",
+      "EmptyResult",
+      "EnumSchema",
+      "Error",
+      "GetPromptRequest",
+      "GetPromptRequestParams",
+      "GetPromptResult",
+      "GetTaskPayloadRequest",
+      "GetTaskPayloadResult",
+      "GetTaskRequest",
+      "GetTaskResult",
+      "Icon",
+      "Icons",
+      "ImageContent",
+      "Implementation",
+      "InitializeRequest",
+      "InitializeRequestParams",
+      "InitializeResult",
+      "InitializedNotification",
+      "JSONRPCErrorResponse",
+      "JSONRPCMessage",
+      "JSONRPCNotification",
+      "JSONRPCRequest",
+      "JSONRPCResponse",
+      "JSONRPCResultResponse",
+      "LegacyTitledEnumSchema",
+      "ListPromptsRequest",
+      "ListPromptsResult",
+      "ListResourceTemplatesRequest",
+      "ListResourceTemplatesResult",
+      "ListResourcesRequest",
+      "ListResourcesResult",
+      "ListRootsRequest",
+      "ListRootsResult",
+      "ListTasksRequest",
+      "ListTasksResult",
+      "ListToolsRequest",
+      "ListToolsResult",
+      "LoggingLevel",
+      "LoggingMessageNotification",
+      "LoggingMessageNotificationParams",
+      "ModelHint",
+      "ModelPreferences",
+      "MultiSelectEnumSchema",
+      "Notification",
+      "NotificationParams",
+      "NumberSchema",
+      "PaginatedRequest",
+      "PaginatedRequestParams",
+      "PaginatedResult",
+      "PingRequest",
+      "PrimitiveSchemaDefinition",
+      "ProgressNotification",
+      "ProgressNotificationParams",
+      "ProgressToken",
+      "Prompt",
+      "PromptArgument",
+      "PromptListChangedNotification",
+      "PromptMessage",
+      "PromptReference",
+      "ReadResourceRequest",
+      "ReadResourceRequestParams",
+      "ReadResourceResult",
+      "RelatedTaskMetadata",
+      "Request",
+      "RequestId",
+      "RequestParams",
+      "Resource",
+      "ResourceContents",
+      "ResourceLink",
+      "ResourceListChangedNotification",
+      "ResourceRequestParams",
+      "ResourceTemplate",
+      "ResourceTemplateReference",
+      "ResourceUpdatedNotification",
+      "ResourceUpdatedNotificationParams",
+      "Result",
+      "Role",
+      "Root",
+      "RootsListChangedNotification",
+      "SamplingMessage",
+      "SamplingMessageContentBlock",
+      "ServerCapabilities",
+      "ServerNotification",
+      "ServerRequest",
+      "ServerResult",
+      "SetLevelRequest",
+      "SetLevelRequestParams",
+      "SingleSelectEnumSchema",
+      "StringSchema",
+      "SubscribeRequest",
+      "SubscribeRequestParams",
+      "Task",
+      "TaskAugmentedRequestParams",
+      "TaskMetadata",
+      "TaskStatus",
+      "TaskStatusNotification",
+      "TaskStatusNotificationParams",
+      "TextContent",
+      "TextResourceContents",
+      "TitledMultiSelectEnumSchema",
+      "TitledSingleSelectEnumSchema",
+      "Tool",
+      "ToolAnnotations",
+      "ToolChoice",
+      "ToolExecution",
+      "ToolListChangedNotification",
+      "ToolResultContent",
+      "ToolUseContent",
+      "URLElicitationRequiredError",
+      "UnsubscribeRequest",
+      "UnsubscribeRequestParams",
+      "UntitledMultiSelectEnumSchema",
+      "UntitledSingleSelectEnumSchema"
+    ],
+    "roleDefinitions": [
+      "ClientNotification",
+      "ClientRequest",
+      "ClientResult",
+      "ServerNotification",
+      "ServerRequest",
+      "ServerResult"
+    ],
+    "methodBindings": [
+      {
+        "method": "completion/complete",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "CompleteRequest",
+        "kind": "request",
+        "resultDefinition": "CompleteResult"
+      },
+      {
+        "method": "elicitation/create",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "ElicitRequest",
+        "kind": "request",
+        "resultDefinition": "ElicitResult"
+      },
+      {
+        "method": "initialize",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "InitializeRequest",
+        "kind": "request",
+        "resultDefinition": "InitializeResult"
+      },
+      {
+        "method": "logging/setLevel",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "SetLevelRequest",
+        "kind": "request",
+        "resultDefinition": "EmptyResult"
+      },
+      {
+        "method": "notifications/cancelled",
+        "sender": "client",
+        "role": "ClientNotification",
+        "definition": "CancelledNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/cancelled",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "CancelledNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/elicitation/complete",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "ElicitationCompleteNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/initialized",
+        "sender": "client",
+        "role": "ClientNotification",
+        "definition": "InitializedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/message",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "LoggingMessageNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/progress",
+        "sender": "client",
+        "role": "ClientNotification",
+        "definition": "ProgressNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/progress",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "ProgressNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/prompts/list_changed",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "PromptListChangedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/resources/list_changed",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "ResourceListChangedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/resources/updated",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "ResourceUpdatedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/roots/list_changed",
+        "sender": "client",
+        "role": "ClientNotification",
+        "definition": "RootsListChangedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/tasks/status",
+        "sender": "client",
+        "role": "ClientNotification",
+        "definition": "TaskStatusNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/tasks/status",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "TaskStatusNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "notifications/tools/list_changed",
+        "sender": "server",
+        "role": "ServerNotification",
+        "definition": "ToolListChangedNotification",
+        "kind": "notification"
+      },
+      {
+        "method": "ping",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "PingRequest",
+        "kind": "request",
+        "resultDefinition": "EmptyResult"
+      },
+      {
+        "method": "ping",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "PingRequest",
+        "kind": "request",
+        "resultDefinition": "EmptyResult"
+      },
+      {
+        "method": "prompts/get",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "GetPromptRequest",
+        "kind": "request",
+        "resultDefinition": "GetPromptResult"
+      },
+      {
+        "method": "prompts/list",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ListPromptsRequest",
+        "kind": "request",
+        "resultDefinition": "ListPromptsResult"
+      },
+      {
+        "method": "resources/list",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ListResourcesRequest",
+        "kind": "request",
+        "resultDefinition": "ListResourcesResult"
+      },
+      {
+        "method": "resources/read",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ReadResourceRequest",
+        "kind": "request",
+        "resultDefinition": "ReadResourceResult"
+      },
+      {
+        "method": "resources/subscribe",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "SubscribeRequest",
+        "kind": "request",
+        "resultDefinition": "EmptyResult"
+      },
+      {
+        "method": "resources/templates/list",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ListResourceTemplatesRequest",
+        "kind": "request",
+        "resultDefinition": "ListResourceTemplatesResult"
+      },
+      {
+        "method": "resources/unsubscribe",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "UnsubscribeRequest",
+        "kind": "request",
+        "resultDefinition": "EmptyResult"
+      },
+      {
+        "method": "roots/list",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "ListRootsRequest",
+        "kind": "request",
+        "resultDefinition": "ListRootsResult"
+      },
+      {
+        "method": "sampling/createMessage",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "CreateMessageRequest",
+        "kind": "request",
+        "resultDefinition": "CreateMessageResult"
+      },
+      {
+        "method": "tasks/cancel",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "CancelTaskRequest",
+        "kind": "request",
+        "resultDefinition": "CancelTaskResult"
+      },
+      {
+        "method": "tasks/cancel",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "CancelTaskRequest",
+        "kind": "request",
+        "resultDefinition": "CancelTaskResult"
+      },
+      {
+        "method": "tasks/get",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "GetTaskRequest",
+        "kind": "request",
+        "resultDefinition": "GetTaskResult"
+      },
+      {
+        "method": "tasks/get",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "GetTaskRequest",
+        "kind": "request",
+        "resultDefinition": "GetTaskResult"
+      },
+      {
+        "method": "tasks/list",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ListTasksRequest",
+        "kind": "request",
+        "resultDefinition": "ListTasksResult"
+      },
+      {
+        "method": "tasks/list",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "ListTasksRequest",
+        "kind": "request",
+        "resultDefinition": "ListTasksResult"
+      },
+      {
+        "method": "tasks/result",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "GetTaskPayloadRequest",
+        "kind": "request",
+        "resultDefinition": "GetTaskPayloadResult"
+      },
+      {
+        "method": "tasks/result",
+        "sender": "server",
+        "role": "ServerRequest",
+        "definition": "GetTaskPayloadRequest",
+        "kind": "request",
+        "resultDefinition": "GetTaskPayloadResult"
+      },
+      {
+        "method": "tools/call",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "CallToolRequest",
+        "kind": "request",
+        "resultDefinition": "CallToolResult"
+      },
+      {
+        "method": "tools/list",
+        "sender": "client",
+        "role": "ClientRequest",
+        "definition": "ListToolsRequest",
+        "kind": "request",
+        "resultDefinition": "ListToolsResult"
+      }
+    ],
+    "officialConformance": {
+      "harnessVersion": "v0.1.16",
+      "client": [
+        "initialize",
+        "tools_call",
+        "elicitation-sep1034-client-defaults",
+        "sse-retry",
+        "auth/metadata-default",
+        "auth/metadata-var1",
+        "auth/metadata-var2",
+        "auth/metadata-var3",
+        "auth/basic-cimd",
+        "auth/scope-from-www-authenticate",
+        "auth/scope-from-scopes-supported",
+        "auth/scope-omitted-when-undefined",
+        "auth/scope-step-up",
+        "auth/scope-retry-limit",
+        "auth/token-endpoint-auth-basic",
+        "auth/token-endpoint-auth-post",
+        "auth/token-endpoint-auth-none",
+        "auth/pre-registration"
+      ],
+      "server": [
+        "server-initialize",
+        "logging-set-level",
+        "ping",
+        "completion-complete",
+        "tools-list",
+        "tools-call-simple-text",
+        "tools-call-image",
+        "tools-call-audio",
+        "tools-call-embedded-resource",
+        "tools-call-mixed-content",
+        "tools-call-with-logging",
+        "tools-call-error",
+        "tools-call-with-progress",
+        "tools-call-sampling",
+        "tools-call-elicitation",
+        "json-schema-2020-12",
+        "elicitation-sep1034-defaults",
+        "server-sse-polling",
+        "server-sse-multiple-streams",
+        "elicitation-sep1330-enums",
+        "resources-list",
+        "resources-read-text",
+        "resources-read-binary",
+        "resources-templates-read",
+        "resources-subscribe",
+        "resources-unsubscribe",
+        "prompts-list",
+        "prompts-get-simple",
+        "prompts-get-with-args",
+        "prompts-get-embedded-resource",
+        "prompts-get-with-image",
+        "dns-rebinding-protection"
+      ],
+      "serverPendingInHarness": [
+        "json-schema-2020-12",
+        "server-sse-polling"
+      ]
+    }
+  }
+}

@@ -114,6 +114,7 @@ final class Tool {
   const Tool({
     required provider.JsonSchema inputSchema,
     this.description,
+    this.providerOptions,
     this.inputExamples,
     this.contextSchema,
     this.onInputStart,
@@ -130,6 +131,7 @@ final class Tool {
   // initializer 才能在编译期阻止传 null(spec 定案)。
   const Tool.provider(
     provider.ProviderTool providerTool, {
+    this.providerOptions,
     this.execute,
     this.toModelOutput,
     this.contextSchema,
@@ -146,6 +148,12 @@ final class Tool {
 
   /// 工具用途描述,供模型理解何时调用(可空)。
   final String? description;
+
+  /// Provider-specific metadata carried with the function-tool definition.
+  ///
+  /// This is descriptive metadata only. Core execution and authorization do
+  /// not interpret it.
+  final provider.ProviderOptions? providerOptions;
 
   /// 工具入参示例,供模型理解如何填充 JSON 入参。
   final List<provider.JsonObject>? inputExamples;
@@ -209,5 +217,6 @@ List<provider.LanguageModelTool> buildLanguageModelTools(ToolSet tools) =>
             description: entry.value.description,
             inputSchema: entry.value.inputSchema!,
             inputExamples: entry.value.inputExamples,
+            providerOptions: entry.value.providerOptions,
           ),
     ];

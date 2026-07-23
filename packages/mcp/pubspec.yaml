@@ -1,0 +1,24 @@
+name: pigcode_ai_mcp
+description: Portable MCP 2025-11-25 client/server protocols, Streamable HTTP, and neutral Pigcode AI mappings.
+version: 0.0.1
+publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_protocol_utils: ^0.0.1
+  pigcode_ai_provider: ^0.0.1
+  pigcode_ai: ^0.0.1
+  crypto: ^3.0.0
+  equatable: ^2.0.0
+  http: ^1.6.0
+  json_schema: ^5.2.2
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0

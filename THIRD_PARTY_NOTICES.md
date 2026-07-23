@@ -1,7 +1,7 @@
 # Third-Party Notices
 
 Pigcode AI uses the third-party software listed below. This inventory covers
-the direct runtime and development dependencies resolved on 2026-07-17. The
+the direct runtime and development dependencies resolved on 2026-07-23. The
 constraints in the package `pubspec.yaml` files remain authoritative because
 this library workspace does not commit a lockfile; the audited versions are a
 point-in-time record of that resolution.
@@ -29,10 +29,35 @@ complete license text is available in
 The repository copy follows the official Apache Software Foundation text at
 <https://www.apache.org/licenses/LICENSE-2.0.txt>.
 
+## Vendored protocol and conformance sources
+
+The following fixed upstream artifacts are retained as code-generation and
+compatibility inputs. Their exact repository, release, commit, byte size, and
+SHA-256 tuples are locked in
+[`tool/upstream/protocols/sources.json`](tool/upstream/protocols/sources.json).
+They are never refreshed from an upstream default branch during a build.
+
+- Agent Client Protocol schema and metadata, release `schema-v1.20.0`, commit
+  `5e89c71497fe07dd4ae633c181a17224f4a8956d`. These artifacts are licensed
+  under Apache-2.0; the upstream license is retained at
+  [`tool/upstream/protocols/acp/LICENSE`](tool/upstream/protocols/acp/LICENSE),
+  and the reusable license text is also available at
+  [`third_party/licenses/Apache-2.0.txt`](third_party/licenses/Apache-2.0.txt).
+- Model Context Protocol schema, specification release `2025-11-25`, commit
+  `38c84e9f93ad191d9eb26d92b945d17bd0efcaf3`. The pinned artifact is licensed
+  under MIT; its upstream notice and complete license are retained at
+  [`tool/upstream/protocols/mcp/LICENSE`](tool/upstream/protocols/mcp/LICENSE).
+- MCP conformance package metadata and scenario inventory, release `v0.1.16`,
+  commit `21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0`. That repository records an
+  Apache-2.0/MIT transition and CC-BY-4.0 terms for non-specification
+  documentation. Its complete upstream licensing notice is retained at
+  [`tool/upstream/protocols/mcp-conformance/LICENSE`](tool/upstream/protocols/mcp-conformance/LICENSE).
+
 ## Direct dependency inventory
 
 | Package | Constraint | Audited version | Scope | License | Upstream source |
 | --- | --- | --- | --- | --- | --- |
+| `crypto` | `^3.0.0` | 3.0.7 | runtime + development | BSD-3-Clause | <https://github.com/dart-lang/core/tree/main/pkgs/crypto> |
 | `equatable` | `^2.0.0` | 2.1.0 | runtime | MIT | <https://github.com/felangel/equatable> |
 | `http` | `^1.6.0` | 1.6.0 | runtime | BSD-3-Clause | <https://github.com/dart-lang/http/tree/master/pkgs/http> |
 | `http_parser` | `^4.1.2` | 4.1.2 | runtime | BSD-3-Clause | <https://github.com/dart-lang/http/tree/master/pkgs/http_parser> |
@@ -74,6 +99,8 @@ The following packages use the same BSD-3-Clause terms with their respective
 copyright notices:
 
 - `logging` 1.3.0 (runtime) — Copyright 2013, the Dart project authors.
+- `crypto` 3.0.7 (runtime + development) — Copyright 2015, the Dart project
+  authors.
 - `http` 1.6.0 (runtime) — Copyright 2014, the Dart project authors.
 - `http_parser` 4.1.2 (runtime) — Copyright 2014, the Dart project authors.
 - `web_socket_channel` 3.0.3 (runtime) — Copyright 2016, the Dart project
