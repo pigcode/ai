@@ -38,6 +38,11 @@ jobs:
           dart run tool/test/protocol_inventory_test.dart
           dart run tool/test/protocol_codegen_test.dart
           dart run tool/protocol_codegen.dart --check
+      - name: Test protocol compatibility evidence
+        run: |
+          dart run tool/test/protocol_compatibility_manifest_test.dart
+          dart run tool/test/protocol_fixture_coverage_test.dart
+          dart run tool/check_protocol_compatibility.dart
       - name: Test fixed peer
         run: dart run tool/test/ai_core_peer_test.dart
       - name: Test cross-package scripted peer

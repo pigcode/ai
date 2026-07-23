@@ -15,6 +15,16 @@ caller-owned processes or `dart:io` HTTP servers. The package does not bind a
 socket, launch a process, open a browser, persist credentials, or authorize a
 tool on the host's behalf.
 
+Examples:
+
+```bash
+dart run example/portable_client_server.dart
+```
+
+[`example/stdio_io.dart`](example/stdio_io.dart) and
+[`example/streamable_http_io.dart`](example/streamable_http_io.dart) show the
+VM-only adapter boundary without spawning a process or binding a socket.
+
 The workspace pins the official conformance harness to `0.1.16`. Reproduce all
 applicable MCP `2025-11-25` scenarios from the workspace root:
 
@@ -26,3 +36,7 @@ dart run tool/run_mcp_conformance.dart --role server --suite all
 
 The runner rejects expected-failure baselines and writes bounded machine-readable
 reports under `.dart_tool/mcp_conformance`.
+
+Only the exact Streamable HTTP client and server tuples are labelled
+`conformant`; stdio remains `verified`. See the workspace
+[protocol support matrix](../../docs/protocol-support.md).

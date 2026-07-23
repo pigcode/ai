@@ -12,6 +12,12 @@ JSON-RPC transport. Process creation and ownership stay with the host.
 Capabilities describe supported protocol operations and never grant filesystem,
 terminal, or permission authority.
 
+Run the portable in-memory client/agent example:
+
+```bash
+dart run example/client_agent.dart
+```
+
 Run the fixed peer evidence from the workspace root:
 
 ```bash
@@ -19,3 +25,7 @@ dart run tool/run_acp_peer_matrix.dart --peer dart
 dart run tool/run_acp_peer_matrix.dart --peer typescript
 dart run tool/run_acp_peer_matrix.dart --peer rust
 ```
+
+ACP has no official conformance harness and is therefore labelled `verified`,
+never `conformant`. The exact tuples and limitations are in the workspace
+[protocol support matrix](../../docs/protocol-support.md).
