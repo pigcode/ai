@@ -129,8 +129,16 @@ final class McpAuthorizationMetadataDiscovery {
   }) async {
     final canonical = canonicalMcpResource(resource);
     final challenge = parseMcpBearerChallenge(wwwAuthenticate);
+    final challengeMetadata = challenge?.resourceMetadata;
+    if (challengeMetadata != null &&
+        !_isSecureOAuthEndpoint(challengeMetadata)) {
+      throw const FormatException(
+        'Bearer resource_metadata must use HTTPS or loopback HTTP without '
+        'credentials, query, or fragment.',
+      );
+    }
     final candidates = <Uri>[
-      if (challenge?.resourceMetadata != null) challenge!.resourceMetadata!,
+      if (challengeMetadata != null) challengeMetadata,
       ..._resourceMetadataCandidates(canonical),
     ];
     final json = await _firstMetadata(candidates);

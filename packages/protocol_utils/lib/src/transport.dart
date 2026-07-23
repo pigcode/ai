@@ -78,7 +78,9 @@ final class FramedProtocolTransport<T> implements ProtocolMessageTransport<T> {
     await _byteSubscription.cancel();
     await byteTransport.close();
     if (!_messages.isClosed) {
-      await _messages.close();
+      // A single-subscription controller's close future waits for a listener
+      // that may never attach. Transport shutdown must not depend on one.
+      unawaited(_messages.close());
     }
   }
 

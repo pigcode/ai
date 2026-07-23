@@ -31,6 +31,30 @@ void main() {
     expect(http.requests, hasLength(1));
   });
 
+  test('challenge metadata URL is validated before any fetch', () async {
+    final http = RecordingAuthorizationHttpClient(
+      (_) => throw StateError('Unsafe challenge URL must not be fetched.'),
+    );
+    final discovery = McpAuthorizationMetadataDiscovery(httpClient: http);
+
+    for (final url in <String>[
+      'http://169.254.169.254/latest/meta-data',
+      'https://user:secret@metadata.example.test/protected',
+      'https://metadata.example.test/protected?target=internal',
+      'https://metadata.example.test/protected#fragment',
+    ]) {
+      await expectLater(
+        discovery.discoverResource(
+          Uri.parse(resource),
+          wwwAuthenticate: 'Bearer resource_metadata="$url"',
+        ),
+        throwsFormatException,
+      );
+    }
+
+    expect(http.requests, isEmpty);
+  });
+
   test('resource discovery falls back path-first then root', () async {
     final http = RecordingAuthorizationHttpClient(
       (request) {

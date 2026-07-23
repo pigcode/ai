@@ -112,6 +112,20 @@ void main() {
     await transport.close();
   });
 
+  test('framed transport closes before messages are listened to', () async {
+    final bytes = ChaosByteTransport();
+    final transport = FramedProtocolTransport<String>(
+      byteTransport: bytes,
+      inboundFramer: NdjsonFramer(),
+      encode: (message) => utf8.encode('$message\n'),
+    );
+
+    await transport.close().timeout(const Duration(seconds: 1));
+
+    expect(bytes.closeCalled, isTrue);
+    expect(await transport.incomingMessages.isEmpty, isTrue);
+  });
+
   test('framed transport preserves typed receive errors', () async {
     final bytes = ChaosByteTransport();
     final transport = FramedProtocolTransport<String>(
