@@ -255,6 +255,7 @@ final class McpHttpServerSession {
 
   void discardJsonStream(McpHttpServerStream stream) {
     _streams.remove(stream.streamKey);
+    _sideChannels.remove(stream);
     eventStore.removeStream(stream.streamKey);
   }
 

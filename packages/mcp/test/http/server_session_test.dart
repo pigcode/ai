@@ -15,6 +15,7 @@ void main() {
       path: '/mcp',
       allowedHosts: const <String>['mcp.test'],
       createSessionId: () => 'reverse-session',
+      maxStreamsPerSession: 1,
       serverFactory: (transport) {
         server = McpServer(
           transport: transport,
@@ -92,6 +93,45 @@ void main() {
     expect(original, isA<JsonRpcSuccessResponse>());
     expect((original as JsonRpcSuccessResponse).id.toJson(), 2);
     expect(await iterator.moveNext(), isFalse);
+
+    final secondResponse = await endpoint.handle(
+      endpointRequest(
+        method: 'POST',
+        headers: initializedHeaders(sessionId),
+        json: const <String, Object?>{
+          'jsonrpc': '2.0',
+          'id': 3,
+          'method': 'tools/call',
+          'params': <String, Object?>{'name': 'inspect-again'},
+        },
+      ),
+    );
+    expect(secondResponse.statusCode, 200);
+    final secondIterator = StreamIterator<List<int>>(secondResponse.body);
+    expect(await secondIterator.moveNext(), isTrue);
+    final secondReverse =
+        _decodeSseMessage(secondIterator.current) as JsonRpcRequest;
+    expect(secondReverse.method, 'roots/list');
+    final secondAccepted = await endpoint.handle(
+      endpointRequest(
+        method: 'POST',
+        headers: initializedHeaders(sessionId),
+        json: <String, Object?>{
+          'jsonrpc': '2.0',
+          'id': secondReverse.id.toJson(),
+          'result': <String, Object?>{'roots': <Object?>[]},
+        },
+      ),
+    );
+    expect(secondAccepted.statusCode, 202);
+    expect(await secondIterator.moveNext(), isTrue);
+    expect(
+      (_decodeSseMessage(secondIterator.current) as JsonRpcSuccessResponse)
+          .id
+          .toJson(),
+      3,
+    );
+    expect(await secondIterator.moveNext(), isFalse);
     await endpoint.close();
   });
 

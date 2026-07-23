@@ -244,7 +244,7 @@ final class McpHttpEndpoint {
           'cache-control': 'no-cache',
           if (isInitialize) mcpHttpSessionHeader: session.id,
         },
-        body: _sseBody(stream),
+        body: _sseBody(session, stream),
       );
     } on ProtocolException catch (error) {
       if (isInitialize) {
@@ -302,7 +302,7 @@ final class McpHttpEndpoint {
         'content-type': 'text/event-stream',
         'cache-control': 'no-cache',
       },
-      body: _sseBody(stream, afterSequence: afterSequence),
+      body: _sseBody(session, stream, afterSequence: afterSequence),
     );
   }
 
@@ -322,25 +322,37 @@ final class McpHttpEndpoint {
   }
 
   Stream<List<int>> _sseBody(
+    McpHttpServerSession session,
     McpHttpServerStream stream, {
     int afterSequence = 0,
   }) async* {
     var count = 0;
+    var completed = false;
     final maxEvents =
         stream.isSideChannel && maxSseEventsPerSideChannelResponse > 0
             ? maxSseEventsPerSideChannelResponse
             : maxSseEventsPerResponse;
-    await for (final event in stream.events(afterSequence: afterSequence)) {
-      yield utf8.encode(
-        'event: message\n'
-        'id: ${event.id}\n'
-        'data: ${_codec.encode(event.message)}\n'
-        '\n',
-      );
-      count++;
-      if (maxEvents > 0 && count >= maxEvents && !stream.isTerminal) {
-        yield utf8.encode('retry: ${pollRetry.inMilliseconds}\n\n');
-        return;
+    try {
+      await for (final event in stream.events(afterSequence: afterSequence)) {
+        yield utf8.encode(
+          'event: message\n'
+          'id: ${event.id}\n'
+          'data: ${_codec.encode(event.message)}\n'
+          '\n',
+        );
+        count++;
+        if (maxEvents > 0 && count >= maxEvents && !stream.isTerminal) {
+          yield utf8.encode('retry: ${pollRetry.inMilliseconds}\n\n');
+          return;
+        }
+      }
+      completed = true;
+    } finally {
+      // A normally drained terminal request no longer needs replay state.
+      // Cancelled or polling responses remain retained for Last-Event-ID
+      // resumption.
+      if (completed && stream.isTerminal && !stream.isSideChannel) {
+        session.discardJsonStream(stream);
       }
     }
   }
