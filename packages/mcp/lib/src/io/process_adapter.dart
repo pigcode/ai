@@ -134,23 +134,17 @@ final class McpProcessAdapter implements ProtocolByteTransport {
     );
   }
 
-  Future<void> _handleStdoutDone() async {
+  void _handleStdoutDone() {
     if (_closed || _incoming.isClosed) {
       return;
     }
-    final code = await process.exitCode;
-    if (_closed || _incoming.isClosed) {
-      return;
-    }
-    if (code != 0) {
-      _incoming.addError(
-        ProtocolTransportException(
-          'mcp_process_exited',
-          'Caller-owned MCP process exited before transport close.',
-          cause: code,
-        ),
-      );
-    }
-    await _incoming.close();
+    // Stdout EOF is the protocol transport's terminal signal even when the
+    // caller-owned process keeps other work alive. Its exit status remains
+    // independently available through [exitCode].
+    scheduleMicrotask(() {
+      if (!_closed && !_incoming.isClosed) {
+        unawaited(_incoming.close());
+      }
+    });
   }
 }

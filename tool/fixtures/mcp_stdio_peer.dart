@@ -49,6 +49,9 @@ Future<void> main(List<String> arguments) async {
             stderr.writeln('intentional exit during tools/call');
             exit(17);
           }
+          if (mode == '--close-stdout-and-linger') {
+            return _closeStdoutAndLinger();
+          }
           final params = invocation.params! as Map<String, Object?>;
           final arguments = params['arguments'];
           return <String, Object?>{
@@ -77,8 +80,15 @@ const _modes = <String>{
   '--stderr-flood',
   '--exit-before-handshake',
   '--exit-on-tools-call',
+  '--close-stdout-and-linger',
   '--linger-after-eof',
 };
+
+Future<JsonValue> _closeStdoutAndLinger() async {
+  await stdout.close();
+  await Future<void>.delayed(const Duration(seconds: 30));
+  return const <String, Object?>{};
+}
 
 final class _StdioByteTransport implements ProtocolByteTransport {
   var _closed = false;

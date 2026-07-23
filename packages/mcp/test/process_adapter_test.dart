@@ -49,11 +49,11 @@ void main() {
         isA<ProtocolTransportException>().having(
           (error) => error.code,
           'code',
-          'mcp_process_exited',
+          'transport_closed',
         ),
       ),
     );
-    expect(await process.exitCode, 23);
+    expect(await channel.adapter.exitCode, 23);
     expect(channel.adapter.stderrText, contains('pre-handshake'));
   });
 
@@ -73,11 +73,43 @@ void main() {
         isA<ProtocolTransportException>().having(
           (error) => error.code,
           'code',
-          'mcp_process_exited',
+          'transport_closed',
         ),
       ),
     );
-    expect(await process.exitCode, 17);
+    expect(await channel.adapter.exitCode, 17);
+  });
+
+  test('stdout EOF fails a pending request before the process exits', () async {
+    final process = await _start('--close-stdout-and-linger');
+    addTearDown(() async {
+      process.kill();
+      await process.exitCode;
+    });
+    final channel = McpProcessStdioChannel(process: process);
+    final client = _client(channel);
+    await client.initialize();
+
+    await expectLater(
+      client
+          .callTool(
+            McpCallToolRequestParams.fromJson(
+              const <String, Object?>{'name': 'echo'},
+            ),
+          )
+          .timeout(const Duration(seconds: 2)),
+      throwsA(
+        isA<ProtocolTransportException>().having(
+          (error) => error.code,
+          'code',
+          'transport_closed',
+        ),
+      ),
+    );
+    await expectLater(
+      process.exitCode.timeout(const Duration(milliseconds: 100)),
+      throwsA(isA<TimeoutException>()),
+    );
   });
 
   test('close closes stdin but never kills the caller-owned process', () async {
