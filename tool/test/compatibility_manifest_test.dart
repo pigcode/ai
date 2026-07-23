@@ -276,6 +276,17 @@ void main() {
         fixture.file(ref['path'] as String).deleteSync();
         _expectViolation(fixture.validate(), 'missing_test_path');
       });
+      _withFixture((fixture) {
+        fixture.makeVerified();
+        final ref = _firstRef(
+          fixture.claim('P1-OPENAI-CLAIM-01'),
+          'realProcessTests',
+        );
+        ref['peer'] = 'openai-peer';
+        _expectViolation(fixture.validate(), 'invalid_evidence_tuple');
+        ref['version'] = 'phase1-openai-peer-v1';
+        _expectNoViolations(fixture.validate());
+      });
     },
     'cross fixtures use only the fixed root-test exceptions': () {
       _withFixture((fixture) {

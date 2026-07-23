@@ -5,6 +5,12 @@ const phase1TargetRepository = 'https://github.com/vercel/ai';
 const phase1TargetTag = 'ai@7.0.35';
 const phase1TargetCommit = '799faf71e05a7d580914ad94d943d28c0400554c';
 const phase1PeerVersion = 'phase1-ai-core-peer-v1';
+const phase1RealPeerVersions = <String, String>{
+  'ai-core-peer': phase1PeerVersion,
+  'openai-peer': 'phase1-openai-peer-v1',
+  'openai-compatible-peer': 'phase1-openai-compatible-peer-v1',
+  'anthropic-peer': 'phase1-anthropic-peer-v1',
+};
 const phase1DartSdkConstraint = '^3.6.0';
 
 const phase1FixtureIds = <String>{
@@ -991,14 +997,18 @@ void _validateEvidenceTuple(
         '$location.version must be immutable.',
       ),
     );
-  } else if (kind == _EvidenceKind.realProcess &&
-      version != phase1PeerVersion) {
-    violations.add(
-      CompatibilityViolation(
-        'invalid_evidence_tuple',
-        '$location.version must be $phase1PeerVersion.',
-      ),
-    );
+  } else if (kind == _EvidenceKind.realProcess) {
+    final peer = ref['peer'];
+    final expectedVersion =
+        peer is String ? phase1RealPeerVersions[peer] : null;
+    if (expectedVersion == null || version != expectedVersion) {
+      violations.add(
+        CompatibilityViolation(
+          'invalid_evidence_tuple',
+          '$location.version must match the fixed version for peer $peer.',
+        ),
+      );
+    }
   }
   final peerBinaryHash = ref['peerBinaryHash'];
   if (peerBinaryHash is! String || !_sha40Pattern.hasMatch(peerBinaryHash)) {

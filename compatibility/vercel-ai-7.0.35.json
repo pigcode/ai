@@ -1,0 +1,931 @@
+{
+  "manifestVersion": 1,
+  "claims": [
+    {
+      "claimId": "P1-PROVIDER-CLAIM-01",
+      "package": "pigcode_ai_provider",
+      "surface": "Provider-neutral model, message, result, error, cancellation, middleware, file, and skill contracts",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "@ai-sdk/provider",
+        "packageVersion": "4.0.3",
+        "tree": "e317bb78b50fd0bdd6e0f6968246b3bc20835265"
+      },
+      "fixtureIds": [
+        "P1-PROVIDER-01",
+        "P1-PROVIDER-02",
+        "P1-PROVIDER-03",
+        "P1-PROVIDER-04",
+        "P1-PROVIDER-05",
+        "P1-PROVIDER-06",
+        "P1-PROVIDER-07",
+        "P1-PROVIDER-08"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/provider/src/index.ts",
+          "fixtureIds": [
+            "P1-PROVIDER-01",
+            "P1-PROVIDER-02",
+            "P1-PROVIDER-03",
+            "P1-PROVIDER-04",
+            "P1-PROVIDER-05",
+            "P1-PROVIDER-06",
+            "P1-PROVIDER-07",
+            "P1-PROVIDER-08"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/provider/test/compatibility/provider_contract_test.dart",
+          "fixtureIds": [
+            "P1-PROVIDER-01",
+            "P1-PROVIDER-02",
+            "P1-PROVIDER-03",
+            "P1-PROVIDER-04",
+            "P1-PROVIDER-05",
+            "P1-PROVIDER-06",
+            "P1-PROVIDER-07",
+            "P1-PROVIDER-08"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/provider/test/compatibility/provider_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-PROVIDER-01",
+            "P1-PROVIDER-02",
+            "P1-PROVIDER-03",
+            "P1-PROVIDER-04",
+            "P1-PROVIDER-05",
+            "P1-PROVIDER-06",
+            "P1-PROVIDER-07",
+            "P1-PROVIDER-08"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "provider-scripted-peer",
+          "peerBinaryHash": "a1309583cffacc5fec920783b2069ca2f2e23921",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "e3085f068dd71a4b3c2b31a1b07d6a63ad4f689a"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/provider/test/compatibility/provider_real_process_test.dart",
+          "fixtureIds": [
+            "P1-PROVIDER-01",
+            "P1-PROVIDER-02",
+            "P1-PROVIDER-03",
+            "P1-PROVIDER-04",
+            "P1-PROVIDER-05",
+            "P1-PROVIDER-06",
+            "P1-PROVIDER-07",
+            "P1-PROVIDER-08"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-ai-core-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-peer",
+          "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "e3085f068dd71a4b3c2b31a1b07d6a63ad4f689a"
+        }
+      ],
+      "notes": "The Dart contract package preserves the pinned provider-v4 shape with typed Dart variants and explicit cancellation semantics."
+    },
+    {
+      "claimId": "P1-UTIL-CLAIM-01",
+      "package": "pigcode_ai_provider_utils",
+      "surface": "HTTP, SSE, JSON, multipart, response, redirect, media, settings, and streaming tool-call utilities",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "@ai-sdk/provider-utils",
+        "packageVersion": "5.0.12",
+        "tree": "b14c493fddd3c9de574e794c5e688f417d55bb9f"
+      },
+      "fixtureIds": [
+        "P1-UTIL-01",
+        "P1-UTIL-02",
+        "P1-UTIL-03",
+        "P1-UTIL-04",
+        "P1-UTIL-05",
+        "P1-UTIL-06",
+        "P1-UTIL-07",
+        "P1-UTIL-08"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/provider-utils/src/index.ts",
+          "fixtureIds": [
+            "P1-UTIL-01",
+            "P1-UTIL-02",
+            "P1-UTIL-03",
+            "P1-UTIL-04",
+            "P1-UTIL-05",
+            "P1-UTIL-06",
+            "P1-UTIL-07",
+            "P1-UTIL-08"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/provider_utils/test/compatibility/provider_utils_contract_test.dart",
+          "fixtureIds": [
+            "P1-UTIL-01",
+            "P1-UTIL-02",
+            "P1-UTIL-03",
+            "P1-UTIL-04",
+            "P1-UTIL-05",
+            "P1-UTIL-06",
+            "P1-UTIL-07",
+            "P1-UTIL-08"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/provider_utils/test/compatibility/provider_utils_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-UTIL-01",
+            "P1-UTIL-02",
+            "P1-UTIL-03",
+            "P1-UTIL-04",
+            "P1-UTIL-05",
+            "P1-UTIL-06",
+            "P1-UTIL-07",
+            "P1-UTIL-08"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "provider-utils-scripted-peer",
+          "peerBinaryHash": "f8e1b7dd98f5b088775917968988b40c5983fcb0",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "15418fae4234e6b301a2ffa761dee4b9d90d485a"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/provider_utils/test/compatibility/provider_utils_real_process_test.dart",
+          "fixtureIds": [
+            "P1-UTIL-01",
+            "P1-UTIL-02",
+            "P1-UTIL-03",
+            "P1-UTIL-04",
+            "P1-UTIL-05",
+            "P1-UTIL-06",
+            "P1-UTIL-07",
+            "P1-UTIL-08"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-ai-core-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-peer",
+          "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "15418fae4234e6b301a2ffa761dee4b9d90d485a"
+        }
+      ],
+      "notes": "Shared utilities are verified without external network access against deterministic in-process and loopback peers."
+    },
+    {
+      "claimId": "P1-CORE-CLAIM-01",
+      "package": "pigcode_ai",
+      "surface": "Text generation, streaming, tools, structured output, timeouts, middleware, telemetry, media, UI stream, file, and skill helpers",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "ai",
+        "packageVersion": "7.0.35",
+        "tree": "4007b95ee6c90a1caa03b5f765886990f8526f38"
+      },
+      "fixtureIds": [
+        "P1-CORE-01",
+        "P1-CORE-02",
+        "P1-CORE-03",
+        "P1-CORE-04",
+        "P1-CORE-05",
+        "P1-CORE-06",
+        "P1-CORE-07",
+        "P1-CORE-08",
+        "P1-CORE-09",
+        "P1-CORE-10",
+        "P1-CORE-11",
+        "P1-CORE-12",
+        "P1-CORE-13",
+        "P1-CORE-14",
+        "P1-CORE-15",
+        "P1-CORE-16"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/ai/src/index.ts",
+          "fixtureIds": [
+            "P1-CORE-01",
+            "P1-CORE-02",
+            "P1-CORE-03",
+            "P1-CORE-04",
+            "P1-CORE-05",
+            "P1-CORE-06",
+            "P1-CORE-07",
+            "P1-CORE-08",
+            "P1-CORE-09",
+            "P1-CORE-10",
+            "P1-CORE-11",
+            "P1-CORE-12",
+            "P1-CORE-13",
+            "P1-CORE-14",
+            "P1-CORE-15",
+            "P1-CORE-16"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/ai/test/generate_text/generate_text_test.dart",
+          "fixtureIds": [
+            "P1-CORE-01",
+            "P1-CORE-02"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/tool_loop_test.dart",
+          "fixtureIds": [
+            "P1-CORE-03"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/repeated_tool_call_id_test.dart",
+          "fixtureIds": [
+            "P1-CORE-04"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/tool_input_callbacks_test.dart",
+          "fixtureIds": [
+            "P1-CORE-05"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/tool_call_parser_test.dart",
+          "fixtureIds": [
+            "P1-CORE-06"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/output_test.dart",
+          "fixtureIds": [
+            "P1-CORE-07"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/stream_text_test.dart",
+          "fixtureIds": [
+            "P1-CORE-08",
+            "P1-CORE-09",
+            "P1-CORE-10"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_text/timeout_test.dart",
+          "fixtureIds": [
+            "P1-CORE-11"
+          ]
+        },
+        {
+          "path": "packages/ai/test/middleware/wrap_language_model_test.dart",
+          "fixtureIds": [
+            "P1-CORE-12"
+          ]
+        },
+        {
+          "path": "packages/ai/test/telemetry/stream_text_telemetry_test.dart",
+          "fixtureIds": [
+            "P1-CORE-13"
+          ]
+        },
+        {
+          "path": "packages/ai/test/generate_image/generate_image_test.dart",
+          "fixtureIds": [
+            "P1-CORE-14"
+          ]
+        },
+        {
+          "path": "packages/ai/test/ui_message_stream/ui_message_chunk_test.dart",
+          "fixtureIds": [
+            "P1-CORE-15"
+          ]
+        },
+        {
+          "path": "packages/ai/test/upload_file/upload_file_test.dart",
+          "fixtureIds": [
+            "P1-CORE-16"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/ai/test/compatibility/ai_core_text_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-CORE-01",
+            "P1-CORE-02",
+            "P1-CORE-03",
+            "P1-CORE-04",
+            "P1-CORE-05",
+            "P1-CORE-06",
+            "P1-CORE-07",
+            "P1-CORE-08",
+            "P1-CORE-09",
+            "P1-CORE-10",
+            "P1-CORE-11"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-text-scripted-peer",
+          "peerBinaryHash": "3bcad0a90eb99a01ceab4a17ba6b127749921075",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "55b2b9c66a516ff0a6ed3c79a3e85b2f58ee793e"
+        },
+        {
+          "path": "packages/ai/test/compatibility/ai_core_services_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-CORE-12",
+            "P1-CORE-13",
+            "P1-CORE-14",
+            "P1-CORE-15",
+            "P1-CORE-16"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-services-scripted-peer",
+          "peerBinaryHash": "eb219d138dbec50a86cd7b863e249eacfb2766d9",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "881b51940cfabd13cf590ac927102eee010388b6"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/ai/test/compatibility/ai_core_text_real_process_test.dart",
+          "fixtureIds": [
+            "P1-CORE-01",
+            "P1-CORE-02",
+            "P1-CORE-03",
+            "P1-CORE-04",
+            "P1-CORE-05",
+            "P1-CORE-06",
+            "P1-CORE-07",
+            "P1-CORE-08",
+            "P1-CORE-09",
+            "P1-CORE-10",
+            "P1-CORE-11"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-ai-core-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-peer",
+          "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "55b2b9c66a516ff0a6ed3c79a3e85b2f58ee793e"
+        },
+        {
+          "path": "packages/ai/test/compatibility/ai_core_services_real_process_test.dart",
+          "fixtureIds": [
+            "P1-CORE-12",
+            "P1-CORE-13",
+            "P1-CORE-14",
+            "P1-CORE-15",
+            "P1-CORE-16"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-ai-core-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-peer",
+          "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "881b51940cfabd13cf590ac927102eee010388b6"
+        }
+      ],
+      "notes": "Core text and service helpers are separately evidenced so every fixed Phase 1 behavior remains traceable to its owning test."
+    },
+    {
+      "claimId": "P1-OPENAI-CLAIM-01",
+      "package": "pigcode_ai_openai",
+      "surface": "OpenAI Chat Completions, Responses, embeddings, transcription, media, files, skills, tools, errors, usage, and metadata",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "@ai-sdk/openai",
+        "packageVersion": "4.0.18",
+        "tree": "2166f24dcc1fc273374bad00c2d8f63910c1a7c7"
+      },
+      "fixtureIds": [
+        "P1-OPENAI-01",
+        "P1-OPENAI-02",
+        "P1-OPENAI-03",
+        "P1-OPENAI-04",
+        "P1-OPENAI-05",
+        "P1-OPENAI-06",
+        "P1-OPENAI-07",
+        "P1-OPENAI-08"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/openai/src/index.ts",
+          "fixtureIds": [
+            "P1-OPENAI-01",
+            "P1-OPENAI-02",
+            "P1-OPENAI-03",
+            "P1-OPENAI-04",
+            "P1-OPENAI-05",
+            "P1-OPENAI-06",
+            "P1-OPENAI-07",
+            "P1-OPENAI-08"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/openai/test/openai_provider_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-01"
+          ]
+        },
+        {
+          "path": "packages/openai/test/chat/chat_language_model_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-02"
+          ]
+        },
+        {
+          "path": "packages/openai/test/chat/chat_language_model_stream_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-03"
+          ]
+        },
+        {
+          "path": "packages/openai/test/responses/convert_input_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-04"
+          ]
+        },
+        {
+          "path": "packages/openai/test/responses/responses_language_model_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-05"
+          ]
+        },
+        {
+          "path": "packages/openai/test/responses/prepare_tools_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-06"
+          ]
+        },
+        {
+          "path": "packages/openai/test/embedding/embedding_model_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-07"
+          ]
+        },
+        {
+          "path": "packages/openai/test/transcription/transcription_model_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-08"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/openai/test/compatibility/openai_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-01",
+            "P1-OPENAI-02",
+            "P1-OPENAI-03",
+            "P1-OPENAI-04",
+            "P1-OPENAI-05",
+            "P1-OPENAI-06",
+            "P1-OPENAI-07",
+            "P1-OPENAI-08"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "openai-scripted-peer",
+          "peerBinaryHash": "9e7c1103d59e1bca9a656f34ddcec1f2d862e142",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "890fc6b0c5f3e66cb1df00af3a1f01816c2d02d6"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/openai/test/compatibility/openai_real_process_test.dart",
+          "fixtureIds": [
+            "P1-OPENAI-01",
+            "P1-OPENAI-02",
+            "P1-OPENAI-03",
+            "P1-OPENAI-04",
+            "P1-OPENAI-05",
+            "P1-OPENAI-06",
+            "P1-OPENAI-07",
+            "P1-OPENAI-08"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-openai-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "openai-peer",
+          "peerBinaryHash": "1ca0c185a4a8a6a05c168bdbb8106dadacfc7cab",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "890fc6b0c5f3e66cb1df00af3a1f01816c2d02d6"
+        }
+      ],
+      "notes": "The OpenAI adapter is pinned to the 4.0.18 source tree and verified against an immutable local protocol peer."
+    },
+    {
+      "claimId": "P1-COMPAT-CLAIM-01",
+      "package": "pigcode_ai_openai_compatible",
+      "surface": "Configurable OpenAI-compatible Chat Completions and embeddings foundation with typed errors, usage, and metadata",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "@ai-sdk/openai-compatible",
+        "packageVersion": "3.0.14",
+        "tree": "daea26741bc9737bd0fe727c48f142b32346c8e8"
+      },
+      "fixtureIds": [
+        "P1-COMPAT-01",
+        "P1-COMPAT-02",
+        "P1-COMPAT-03",
+        "P1-COMPAT-04"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/openai-compatible/src/index.ts",
+          "fixtureIds": [
+            "P1-COMPAT-01",
+            "P1-COMPAT-02",
+            "P1-COMPAT-03",
+            "P1-COMPAT-04"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/openai_compatible/test/openai_compatible_provider_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-01"
+          ]
+        },
+        {
+          "path": "packages/openai_compatible/test/chat/chat_language_model_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-02"
+          ]
+        },
+        {
+          "path": "packages/openai_compatible/test/chat/chat_options_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-03"
+          ]
+        },
+        {
+          "path": "packages/openai_compatible/test/embedding/embedding_model_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-04"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/openai_compatible/test/compatibility/openai_compatible_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-01",
+            "P1-COMPAT-02",
+            "P1-COMPAT-03",
+            "P1-COMPAT-04"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "openai-compatible-scripted-peer",
+          "peerBinaryHash": "792e003a45430d49795dcf6cdee5520307e9c900",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "de3831301bd78073d2ba26318485a4db8204ae42"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/openai_compatible/test/compatibility/openai_compatible_real_process_test.dart",
+          "fixtureIds": [
+            "P1-COMPAT-01",
+            "P1-COMPAT-02",
+            "P1-COMPAT-03",
+            "P1-COMPAT-04"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-openai-compatible-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "openai-compatible-peer",
+          "peerBinaryHash": "03c0628409c4d9a8b1df106303c40333189fbf63",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "de3831301bd78073d2ba26318485a4db8204ae42"
+        }
+      ],
+      "notes": "The configurable adapter preserves provider-specific extension points while sharing the neutral contract types."
+    },
+    {
+      "claimId": "P1-ANTHROPIC-CLAIM-01",
+      "package": "pigcode_ai_anthropic",
+      "surface": "Anthropic Messages, tools, citations, cache control, files, skills, usage, errors, and container continuation",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "@ai-sdk/anthropic",
+        "packageVersion": "4.0.18",
+        "tree": "67d1d5804f178fb74f8ec7b49d9d82f2ce562f5c"
+      },
+      "fixtureIds": [
+        "P1-ANTHROPIC-01",
+        "P1-ANTHROPIC-02",
+        "P1-ANTHROPIC-03",
+        "P1-ANTHROPIC-04",
+        "P1-ANTHROPIC-05",
+        "P1-ANTHROPIC-06",
+        "P1-ANTHROPIC-07",
+        "P1-ANTHROPIC-08"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/anthropic/src/index.ts",
+          "fixtureIds": [
+            "P1-ANTHROPIC-01",
+            "P1-ANTHROPIC-02",
+            "P1-ANTHROPIC-03",
+            "P1-ANTHROPIC-04",
+            "P1-ANTHROPIC-05",
+            "P1-ANTHROPIC-06",
+            "P1-ANTHROPIC-07",
+            "P1-ANTHROPIC-08"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "packages/anthropic/test/anthropic_provider_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-01"
+          ]
+        },
+        {
+          "path": "packages/anthropic/test/messages/convert_messages_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-02",
+            "P1-ANTHROPIC-04"
+          ]
+        },
+        {
+          "path": "packages/anthropic/test/messages/messages_language_model_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-03"
+          ]
+        },
+        {
+          "path": "packages/anthropic/test/messages/prepare_tools_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-05",
+            "P1-ANTHROPIC-06"
+          ]
+        },
+        {
+          "path": "packages/anthropic/test/messages/model_capabilities_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-07"
+          ]
+        },
+        {
+          "path": "packages/anthropic/test/files/files_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-08"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "packages/anthropic/test/compatibility/anthropic_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-01",
+            "P1-ANTHROPIC-02",
+            "P1-ANTHROPIC-03",
+            "P1-ANTHROPIC-04",
+            "P1-ANTHROPIC-05",
+            "P1-ANTHROPIC-06",
+            "P1-ANTHROPIC-07",
+            "P1-ANTHROPIC-08"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "anthropic-scripted-peer",
+          "peerBinaryHash": "d958e87b31991c66c595ec00eb56f6112073304e",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "1781f7c9a939d55f173310c91dbdf56d919f5e8a"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "packages/anthropic/test/compatibility/anthropic_real_process_test.dart",
+          "fixtureIds": [
+            "P1-ANTHROPIC-01",
+            "P1-ANTHROPIC-02",
+            "P1-ANTHROPIC-03",
+            "P1-ANTHROPIC-04",
+            "P1-ANTHROPIC-05",
+            "P1-ANTHROPIC-06",
+            "P1-ANTHROPIC-07",
+            "P1-ANTHROPIC-08"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-anthropic-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "anthropic-peer",
+          "peerBinaryHash": "c8018a923f97ca63b2617f41b50fc4a383de7b5c",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "1781f7c9a939d55f173310c91dbdf56d919f5e8a"
+        }
+      ],
+      "notes": "Anthropic behavior is pinned to the 4.0.18 source tree, including structured-output fallback and citation metadata."
+    },
+    {
+      "claimId": "P1-CROSS-CLAIM-01",
+      "package": "workspace",
+      "surface": "Six-package public-barrel identity, typed metadata, shared errors, cancellation, dependency direction, and Web portability",
+      "status": "verified",
+      "source": {
+        "repository": "https://github.com/vercel/ai",
+        "tag": "ai@7.0.35",
+        "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+        "package": "ai",
+        "packageVersion": "7.0.35",
+        "tree": "4007b95ee6c90a1caa03b5f765886990f8526f38"
+      },
+      "fixtureIds": [
+        "P1-CROSS-01",
+        "P1-CROSS-02",
+        "P1-CROSS-03",
+        "P1-CROSS-04",
+        "P1-CROSS-05"
+      ],
+      "upstreamRefs": [
+        {
+          "commit": "799faf71e05a7d580914ad94d943d28c0400554c",
+          "path": "packages/ai/src/index.ts",
+          "fixtureIds": [
+            "P1-CROSS-01",
+            "P1-CROSS-02",
+            "P1-CROSS-03",
+            "P1-CROSS-04",
+            "P1-CROSS-05"
+          ]
+        }
+      ],
+      "dartTests": [
+        {
+          "path": "tool/test/ai_core_cross_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-CROSS-01",
+            "P1-CROSS-02",
+            "P1-CROSS-03",
+            "P1-CROSS-04",
+            "P1-CROSS-05"
+          ]
+        }
+      ],
+      "scriptedPeerTests": [
+        {
+          "path": "tool/test/ai_core_cross_scripted_peer_test.dart",
+          "fixtureIds": [
+            "P1-CROSS-01",
+            "P1-CROSS-02",
+            "P1-CROSS-03",
+            "P1-CROSS-04",
+            "P1-CROSS-05"
+          ],
+          "role": "client",
+          "transport": "in-process",
+          "version": "scripted-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "cross-package-scripted-peer",
+          "peerBinaryHash": "63864363a397ba98690c9d12a81ac9626d2050be",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "48f08e1d33c025c44312149c59554d53c5128b62"
+        }
+      ],
+      "realProcessTests": [
+        {
+          "path": "tool/test/ai_core_cross_process_test.dart",
+          "fixtureIds": [
+            "P1-CROSS-01",
+            "P1-CROSS-02",
+            "P1-CROSS-03",
+            "P1-CROSS-04",
+            "P1-CROSS-05"
+          ],
+          "role": "client",
+          "transport": "loopback-http",
+          "version": "phase1-ai-core-peer-v1",
+          "capabilityProfile": "phase1-ai-core",
+          "platform": "dart-vm",
+          "peer": "ai-core-peer",
+          "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
+          "dartSdkConstraint": "^3.6.0",
+          "evidenceCommit": "48f08e1d33c025c44312149c59554d53c5128b62"
+        }
+      ],
+      "notes": "The workspace evidence binds all six public barrels and separately records Chrome plus JavaScript and Wasm compile smoke in CI."
+    }
+  ],
+  "notApplicable": [
+    {
+      "id": "P1-NA-01",
+      "boundary": "javascript-callable-object",
+      "upstreamCommit": "799faf71e05a7d580914ad94d943d28c0400554c",
+      "upstreamPath": "packages/provider-utils/src/schema.ts",
+      "reason": "JavaScript callable-object schema semantics have no direct Dart runtime equivalent; Dart exposes an explicit JsonSchema contract instead."
+    },
+    {
+      "id": "P1-NA-02",
+      "boundary": "node-express-server-response",
+      "upstreamCommit": "799faf71e05a7d580914ad94d943d28c0400554c",
+      "upstreamPath": "packages/ai/src/text-stream/pipe-text-stream-to-response.ts",
+      "reason": "Node and Express response mutation is runtime-specific; the Dart SDK exposes typed streams without a Node response object."
+    },
+    {
+      "id": "P1-NA-03",
+      "boundary": "typescript-zod-ecosystem",
+      "upstreamCommit": "799faf71e05a7d580914ad94d943d28c0400554c",
+      "upstreamPath": "packages/provider-utils/src/to-json-schema/zod3-to-json-schema/zod3-to-json-schema.ts",
+      "reason": "Zod-specific conversion belongs to the TypeScript ecosystem; Dart accepts JSON Schema values and validates them with Dart-native tooling."
+    },
+    {
+      "id": "P1-NA-04",
+      "boundary": "typescript-type-system",
+      "upstreamCommit": "799faf71e05a7d580914ad94d943d28c0400554c",
+      "upstreamPath": "packages/ai/src/ui/chat.ts",
+      "reason": "TypeScript-only conditional and generic type behavior is represented by explicit Dart classes rather than runtime compatibility code."
+    }
+  ]
+}

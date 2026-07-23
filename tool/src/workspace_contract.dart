@@ -20,6 +20,7 @@ const _requiredRootPaths = <String>{
   'THIRD_PARTY_NOTICES.md',
   'compatibility/schema/ai-core-compatibility.schema.json',
   'compatibility/upstream/vercel-ai-7.0.35-paths.json',
+  'compatibility/vercel-ai-7.0.35.json',
   'pubspec.yaml',
   'third_party/licenses/Apache-2.0.txt',
   'tool/check_compatibility.dart',

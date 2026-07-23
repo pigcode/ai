@@ -663,6 +663,7 @@ final class _WorkspaceFixture {
         'compatibility/upstream/vercel-ai-7.0.35-paths.json',
         '{}\n',
       )
+      ..writeTracked('compatibility/vercel-ai-7.0.35.json', '{}\n')
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
       ..writeTracked(
         'tool/check_compatibility.dart',

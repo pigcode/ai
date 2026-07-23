@@ -39,6 +39,8 @@ jobs:
         run: dart run tool/check_workspace.dart
       - name: Verify compatibility fixture coverage
         run: dart run tool/check_compatibility.dart --fixture-coverage-only
+      - name: Verify compatibility manifest
+        run: dart run tool/check_compatibility.dart
       - name: Check formatting
         run: dart run melos format
       - name: Analyze
