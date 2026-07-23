@@ -139,6 +139,8 @@ Future<FinishPart> _finishOf(
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-03
+  // Compatibility fixture (unit): P1-ANTHROPIC-04
   group('AnthropicMessagesLanguageModel.doStream 文本流基线', () {
     test('请求体带 stream:true,URL 以 /messages 结尾', () async {
       final client = _RecordingClient(
@@ -1536,6 +1538,22 @@ void main() {
           'encryptedIndex': 'abc123',
         },
       });
+      expect(
+        parts.whereType<TextEnd>().single.providerMetadata,
+        {
+          'anthropic': {
+            'citations': [
+              {
+                'type': 'web_search_result_location',
+                'cited_text': 'cited',
+                'url': 'https://example.com/a',
+                'title': 'Example A',
+                'encrypted_index': 'abc123',
+              },
+            ],
+          },
+        },
+      );
     });
 
     test('document_index 查不到 → 丢弃,流不报错(:99-103)', () async {

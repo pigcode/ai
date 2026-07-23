@@ -45,6 +45,8 @@ void expectCapabilities(
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-01
+  // Compatibility fixture (unit): P1-ANTHROPIC-07
   group('getAnthropicModelCapabilities', () {
     test('128k adaptive tier: opus-4-8 / opus-4-7 / fable-5 / sonnet-5', () {
       for (final modelId in <String>[

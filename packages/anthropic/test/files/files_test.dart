@@ -47,6 +47,7 @@ AnthropicConfig _config(
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-08
   group('AnthropicFiles', () {
     test('uploads a multipart file and returns canonical metadata', () async {
       const createdAt = '2025-04-14T12:34:56Z';

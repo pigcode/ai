@@ -43,6 +43,12 @@ AnthropicProvider createAnthropic({
       'Please use only one authentication method.',
     );
   }
+  if (baseUrl != null && baseUrl.isEmpty) {
+    throw const InvalidArgumentError(
+      argument: 'baseUrl',
+      message: 'baseUrl must be a non-empty string.',
+    );
+  }
 
   final resolvedBaseUrl = resolveAnthropicBaseUrl(baseUrl);
 

@@ -74,6 +74,7 @@ AnthropicConfig _config(
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-08
   group('AnthropicSkills', () {
     test('creates a skill with raw multipart paths and canonical metadata',
         () async {

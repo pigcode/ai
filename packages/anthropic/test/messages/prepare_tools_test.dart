@@ -24,6 +24,8 @@ AnthropicToolsResult prepare({
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-05
+  // Compatibility fixture (unit): P1-ANTHROPIC-06
   group('prepareAnthropicTools 归一化', () {
     test('tools:null → 全空结果', () {
       final result = prepare(tools: null);

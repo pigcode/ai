@@ -70,6 +70,10 @@ const _prompt = <LanguageModelMessage>[
 ];
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-03
+  // Compatibility fixture (unit): P1-ANTHROPIC-04
+  // Compatibility fixture (unit): P1-ANTHROPIC-06
+  // Compatibility fixture (unit): P1-ANTHROPIC-07
   group('AnthropicMessagesLanguageModel.doGenerate 基础请求体', () {
     test('身份、URL、model 透传与 stream 字段不出现(断言 1/8)', () async {
       final client = _minimalClient();
@@ -108,11 +112,20 @@ void main() {
       ).doGenerate(const LanguageModelCallOptions(prompt: _prompt));
       expect(client.lastBody!['max_tokens'], 64000);
 
-      await AnthropicMessagesLanguageModel(
+      final unknownResult = await AnthropicMessagesLanguageModel(
         'some-unknown-model',
         config: _config(client),
       ).doGenerate(const LanguageModelCallOptions(prompt: _prompt));
       expect(client.lastBody!['max_tokens'], 4096);
+      expect(
+        unknownResult.warnings,
+        contains(const CompatibilityWarning(
+          'maxOutputTokens',
+          details: 'The model "some-unknown-model" is unknown. '
+              'The max output tokens have been limited to 4096. '
+              'Set maxOutputTokens explicitly to override this limit.',
+        )),
+      );
 
       await AnthropicMessagesLanguageModel(
         'claude-sonnet-4-5',
@@ -1045,7 +1058,7 @@ void main() {
 
     test("mode 'jsonTool' 强制回退:支持模型也走 json tool(断言 2b)", () async {
       final client = _minimalClient();
-      await AnthropicMessagesLanguageModel(
+      final result = await AnthropicMessagesLanguageModel(
         'claude-sonnet-4-5',
         config: _config(client),
       ).doGenerate(
@@ -1053,13 +1066,25 @@ void main() {
           prompt: _prompt,
           responseFormat: ResponseFormatJson(schema: schema),
           providerOptions: {
-            'anthropic': {'structuredOutputMode': 'jsonTool'},
+            'anthropic': {
+              'structuredOutputMode': 'jsonTool',
+              'disableParallelToolUse': false,
+            },
           },
         ),
       );
 
       expect(hasJsonTool(client.lastBody!), isTrue);
       expect(client.lastBody!.containsKey('output_config'), isFalse);
+      expect(
+        result.warnings,
+        contains(const UnsupportedWarning(
+          'providerOptions.anthropic.disableParallelToolUse',
+          details: '`disableParallelToolUse: false` is ignored when using the '
+              'JSON response tool. Parallel tool use is disabled to ensure '
+              'a single coherent JSON tool call.',
+        )),
+      );
     });
 
     test('schema 缺失 → OtherWarning,既无 format 也无 json tool(断言 3)', () async {
@@ -2554,6 +2579,20 @@ void main() {
       }
       expect(sources.last.providerMetadata, {
         'anthropic': {'citedText': 'quote', 'encryptedIndex': 'idx1'},
+      });
+      final text = result.content.whereType<TextContent>().single;
+      expect(text.providerMetadata, {
+        'anthropic': {
+          'citations': [
+            {
+              'type': 'web_search_result_location',
+              'cited_text': 'quote',
+              'url': 'https://r.com',
+              'title': 'R',
+              'encrypted_index': 'idx1',
+            },
+          ],
+        },
       });
     });
   });
