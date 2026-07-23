@@ -181,6 +181,21 @@ const _notApplicableKeys = <String>{
   'upstreamPath',
   'reason',
 };
+const _inventoryKeys = <String>{
+  'inventoryVersion',
+  'repository',
+  'tag',
+  'commit',
+  'packages',
+};
+const _inventoryPackageKeys = <String>{
+  'dartPackage',
+  'upstreamPackage',
+  'packageVersion',
+  'tree',
+  'root',
+  'paths',
+};
 
 final _claimIdPattern = RegExp(r'^P1-[A-Z]+-CLAIM-[0-9]{2}$');
 final _sha40Pattern = RegExp(r'^[a-f0-9]{40}$');
@@ -203,15 +218,25 @@ List<CompatibilityViolation> validateCompatibilityManifest({
   required Directory root,
   required File manifestFile,
   required File schemaFile,
+  required File inventoryFile,
 }) {
   final violations = <CompatibilityViolation>[];
   final schema = _readJsonObject(schemaFile, 'schema', violations);
   final manifest = _readJsonObject(manifestFile, 'manifest', violations);
-  if (schema == null || manifest == null) {
+  final inventoryObject = _readJsonObject(
+    inventoryFile,
+    'upstream_inventory',
+    violations,
+  );
+  if (schema == null || manifest == null || inventoryObject == null) {
     return violations;
   }
 
   _validateSchemaFixtureSet(schema, violations);
+  final inventory = _validateUpstreamInventory(
+    inventoryObject,
+    violations,
+  );
   _validateObjectKeys(
     manifest,
     allowed: _manifestKeys,
@@ -243,6 +268,7 @@ List<CompatibilityViolation> validateCompatibilityManifest({
         index,
         fixtureIds,
         claimIds,
+        inventory,
         violations,
       );
     }
@@ -337,6 +363,127 @@ List<CompatibilityViolation> validateFixtureCoverage(Directory root) {
   return violations;
 }
 
+Map<String, Set<String>> _validateUpstreamInventory(
+  Map<String, Object?> inventory,
+  List<CompatibilityViolation> violations,
+) {
+  _validateObjectKeys(
+    inventory,
+    allowed: _inventoryKeys,
+    required: _inventoryKeys,
+    location: 'upstreamInventory',
+    violations: violations,
+  );
+  if (inventory['inventoryVersion'] != 1 ||
+      inventory['repository'] != phase1TargetRepository ||
+      inventory['tag'] != phase1TargetTag ||
+      inventory['commit'] != phase1TargetCommit) {
+    violations.add(
+      const CompatibilityViolation(
+        'invalid_upstream_inventory',
+        'Upstream inventory header does not match the fixed target.',
+      ),
+    );
+  }
+  final records = _objectList(
+    inventory['packages'],
+    location: 'upstreamInventory.packages',
+    violations: violations,
+  );
+  final result = <String, Set<String>>{};
+  if (records == null) {
+    return result;
+  }
+  final expectedPackages =
+      _sourcePins.keys.where((package) => package != 'workspace').toSet();
+  for (var index = 0; index < records.length; index += 1) {
+    final record = records[index];
+    final location = 'upstreamInventory.packages[$index]';
+    _validateObjectKeys(
+      record,
+      allowed: _inventoryPackageKeys,
+      required: _inventoryPackageKeys,
+      location: location,
+      violations: violations,
+    );
+    final dartPackage = record['dartPackage'];
+    final pin = dartPackage is String ? _sourcePins[dartPackage] : null;
+    if (pin == null || dartPackage == 'workspace') {
+      violations.add(
+        CompatibilityViolation(
+          'invalid_upstream_inventory',
+          '$location.dartPackage is not one of the six fixed packages.',
+        ),
+      );
+      continue;
+    }
+    if (result.containsKey(dartPackage)) {
+      violations.add(
+        CompatibilityViolation(
+          'invalid_upstream_inventory',
+          'Duplicate upstream inventory package: $dartPackage.',
+        ),
+      );
+      continue;
+    }
+    if (record['upstreamPackage'] != pin.upstreamPackage ||
+        record['packageVersion'] != pin.version ||
+        record['tree'] != pin.tree ||
+        record['root'] != pin.upstreamRoot) {
+      violations.add(
+        CompatibilityViolation(
+          'invalid_upstream_inventory',
+          '$location does not match the fixed package/version/tree/root pin.',
+        ),
+      );
+    }
+    final paths = _stringList(
+      record['paths'],
+      location: '$location.paths',
+      violations: violations,
+    );
+    if (paths == null) {
+      continue;
+    }
+    final sortedPaths = paths.toList()..sort();
+    final pathSet = paths.toSet();
+    if (paths.isEmpty ||
+        pathSet.length != paths.length ||
+        !_listsEqual(paths, sortedPaths) ||
+        paths.any(
+          (path) =>
+              !_isCanonicalRepoPath(path) ||
+              !path.startsWith('${pin.upstreamRoot}/'),
+        )) {
+      violations.add(
+        CompatibilityViolation(
+          'invalid_upstream_inventory',
+          '$location.paths must be a non-empty, canonical, sorted, unique '
+              'snapshot below ${pin.upstreamRoot}/.',
+        ),
+      );
+    }
+    result[dartPackage as String] = pathSet;
+  }
+  if (!_setsEqual(result.keys.toSet(), expectedPackages)) {
+    violations.add(
+      CompatibilityViolation(
+        'invalid_upstream_inventory',
+        _setDifferenceMessage(
+          'Upstream inventory packages',
+          result.keys.toSet(),
+          expectedPackages,
+        ),
+      ),
+    );
+  }
+  final aiPaths = result['pigcode_ai'];
+  if (aiPaths != null) {
+    result['workspace'] = aiPaths;
+  }
+  return result;
+}
+
 void _validateSchemaFixtureSet(
   Map<String, Object?> schema,
   List<CompatibilityViolation> violations,
@@ -371,6 +518,7 @@ void _validateClaim(
   int index,
   Set<String> manifestFixtureIds,
   Set<String> claimIds,
+  Map<String, Set<String>> inventory,
   List<CompatibilityViolation> violations,
 ) {
   final location = 'manifest.claims[$index]';
@@ -475,6 +623,7 @@ void _validateClaim(
     _validateUpstreamRefs(
       claim['upstreamRefs'],
       pin,
+      inventory[package] ?? const <String>{},
       fixtureIds.toSet(),
       location,
       violations,
@@ -559,6 +708,7 @@ void _validateSource(
 void _validateUpstreamRefs(
   Object? value,
   _SourcePin pin,
+  Set<String> inventoryPaths,
   Set<String> claimFixtureIds,
   String claimLocation,
   List<CompatibilityViolation> violations,
@@ -605,6 +755,14 @@ void _validateUpstreamRefs(
           'invalid_upstream_path',
           '$location.path must be a canonical path under '
               'packages/${pin.upstreamDirectory}/.',
+        ),
+      );
+    } else if (!inventoryPaths.contains(path)) {
+      violations.add(
+        CompatibilityViolation(
+          'upstream_path_not_in_inventory',
+          '$location.path is absent from the fixed upstream tree inventory: '
+              '$path.',
         ),
       );
     }
@@ -1278,6 +1436,18 @@ bool _setsEqual(Set<String> left, Set<String> right) =>
     left.difference(right).isEmpty &&
     right.difference(left).isEmpty;
 
+bool _listsEqual(List<String> left, List<String> right) {
+  if (left.length != right.length) {
+    return false;
+  }
+  for (var index = 0; index < left.length; index += 1) {
+    if (left[index] != right[index]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 String _setDifferenceMessage(
   String label,
   Set<String> actual,
@@ -1306,6 +1476,8 @@ final class _SourcePin {
   final String tree;
   final String upstreamDirectory;
   final String dartDirectory;
+
+  String get upstreamRoot => 'packages/$upstreamDirectory';
 }
 
 enum _EvidenceKind { scriptedPeer, realProcess }

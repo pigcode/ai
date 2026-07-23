@@ -14,9 +14,12 @@ void main(List<String> arguments) {
 
   var manifestPath = 'compatibility/vercel-ai-7.0.35.json';
   var schemaPath = 'compatibility/schema/ai-core-compatibility.schema.json';
+  var inventoryPath = 'compatibility/upstream/vercel-ai-7.0.35-paths.json';
   for (var index = 0; index < arguments.length; index += 1) {
     final argument = arguments[index];
-    if (argument != '--manifest' && argument != '--schema') {
+    if (argument != '--manifest' &&
+        argument != '--schema' &&
+        argument != '--inventory') {
       _usage('Unknown argument: $argument');
     }
     if (index + 1 >= arguments.length) {
@@ -25,8 +28,10 @@ void main(List<String> arguments) {
     final value = arguments[index + 1];
     if (argument == '--manifest') {
       manifestPath = value;
-    } else {
+    } else if (argument == '--schema') {
       schemaPath = value;
+    } else {
+      inventoryPath = value;
     }
     index += 1;
   }
@@ -36,6 +41,7 @@ void main(List<String> arguments) {
       root: root,
       manifestFile: File.fromUri(root.uri.resolve(manifestPath)),
       schemaFile: File.fromUri(root.uri.resolve(schemaPath)),
+      inventoryFile: File.fromUri(root.uri.resolve(inventoryPath)),
     ),
     successMessage: 'AI Core compatibility manifest is valid.',
   );
@@ -66,7 +72,7 @@ Never _usage(String message) {
     ..writeln(message)
     ..writeln(
       'Usage: dart run tool/check_compatibility.dart '
-      '[--manifest PATH] [--schema PATH]',
+      '[--manifest PATH] [--schema PATH] [--inventory PATH]',
     )
     ..writeln(
       '   or: dart run tool/check_compatibility.dart '

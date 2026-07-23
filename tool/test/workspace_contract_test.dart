@@ -659,6 +659,10 @@ final class _WorkspaceFixture {
         'compatibility/schema/ai-core-compatibility.schema.json',
         '{}\n',
       )
+      ..writeTracked(
+        'compatibility/upstream/vercel-ai-7.0.35-paths.json',
+        '{}\n',
+      )
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
       ..writeTracked(
         'tool/check_compatibility.dart',
@@ -668,6 +672,10 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/fixtures/ai_core_peer.dart',
         '// Peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/generate_upstream_path_inventory.dart',
+        '// Inventory generator fixture\n',
       )
       ..writeTracked(
         'tool/src/compatibility_manifest.dart',

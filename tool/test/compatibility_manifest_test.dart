@@ -99,6 +99,19 @@ void main() {
         _expectNoViolations(fixture.validate());
       });
     },
+    'repository inventory carries the fixed upstream package trees': () {
+      _withFixture((fixture) {
+        final repositoryInventory = jsonDecode(
+          File(
+            'compatibility/upstream/vercel-ai-7.0.35-paths.json',
+          ).readAsStringSync(),
+        ) as Map<String, Object?>;
+        fixture.inventory
+          ..clear()
+          ..addAll(repositoryInventory);
+        _expectNoViolations(fixture.validate());
+      });
+    },
     'requires the schema enum to equal the Dart fixture set': () {
       _withFixture((fixture) {
         final definitions = fixture.schema[r'$defs'] as Map<String, Object?>;
@@ -166,9 +179,26 @@ void main() {
       });
       _withFixture((fixture) {
         final ref =
+            _firstRef(fixture.claim('P1-COMPAT-CLAIM-01'), 'upstreamRefs');
+        ref['path'] = 'packages/openai-compatible/src/typo.ts';
+        _expectViolation(
+          fixture.validate(),
+          'upstream_path_not_in_inventory',
+        );
+      });
+      _withFixture((fixture) {
+        final ref =
             _firstRef(fixture.claim('P1-CORE-CLAIM-01'), 'upstreamRefs');
         (ref['fixtureIds'] as List).removeLast();
         _expectViolation(fixture.validate(), 'upstream_coverage_mismatch');
+      });
+    },
+    'rejects an upstream inventory whose package pin drifts': () {
+      _withFixture((fixture) {
+        final packages = fixture.inventory['packages'] as List;
+        final provider = packages.first as Map<String, Object?>;
+        provider['tree'] = _evidenceCommit;
+        _expectViolation(fixture.validate(), 'invalid_upstream_inventory');
       });
     },
     'requires existing package-scoped Dart tests and fixture tokens': () {
@@ -367,11 +397,12 @@ String _metadata(String kind, Iterable<String> ids) =>
     ids.map((id) => '// Compatibility fixture ($kind): $id').join('\n');
 
 final class _ManifestFixture {
-  _ManifestFixture._(this.root, this.manifest, this.schema);
+  _ManifestFixture._(this.root, this.manifest, this.schema, this.inventory);
 
   final Directory root;
   final Map<String, Object?> manifest;
   final Map<String, Object?> schema;
+  final Map<String, Object?> inventory;
 
   static _ManifestFixture create() {
     final root = Directory.systemTemp.createTempSync(
@@ -428,6 +459,7 @@ final class _ManifestFixture {
         ],
       },
       _schema(_expectedFixtureIds),
+      _inventory(),
     );
     for (final claim in claims.cast<Map<String, Object?>>()) {
       final ref = _firstRef(claim, 'dartTests');
@@ -448,10 +480,15 @@ final class _ManifestFixture {
     write(
         'manifest.json', const JsonEncoder.withIndent('  ').convert(manifest));
     write('schema.json', const JsonEncoder.withIndent('  ').convert(schema));
+    write(
+      'inventory.json',
+      const JsonEncoder.withIndent('  ').convert(inventory),
+    );
     return validateCompatibilityManifest(
       root: root,
       manifestFile: file('manifest.json'),
       schemaFile: file('schema.json'),
+      inventoryFile: file('inventory.json'),
     );
   }
 
@@ -586,3 +623,25 @@ Map<String, Object?> _schema(Iterable<String> fixtureIds) => <String, Object?>{
         },
       },
     };
+
+Map<String, Object?> _inventory() => <String, Object?>{
+      'inventoryVersion': 1,
+      'repository': 'https://github.com/vercel/ai',
+      'tag': 'ai@7.0.35',
+      'commit': _targetCommit,
+      'packages': <Object?>[
+        for (final entry in _sources.entries)
+          if (entry.key != 'workspace')
+            <String, Object?>{
+              'dartPackage': entry.key,
+              'upstreamPackage': entry.value['package'],
+              'packageVersion': entry.value['packageVersion'],
+              'tree': entry.value['tree'],
+              'root': _upstreamRoot(entry.value['path']!),
+              'paths': <String>[entry.value['path']!],
+            },
+      ],
+    };
+
+String _upstreamRoot(String upstreamPath) =>
+    upstreamPath.split('/').take(2).join('/');
