@@ -62,6 +62,27 @@ Matcher _timeoutWith(String label) => isA<TimeoutException>().having(
       contains(label),
     );
 
+List<ModelMessage> _resumedApprovedSlowToolMessages() => <ModelMessage>[
+      UserModelMessage.text('slow'),
+      const AssistantModelMessage(<AssistantContentPart>[
+        ToolCallPart(
+          toolCallId: 'call-slow',
+          toolName: 'slow',
+          input: <String, Object?>{},
+        ),
+        ToolApprovalRequestPart(
+          approvalId: 'approval-slow',
+          toolCallId: 'call-slow',
+        ),
+      ]),
+      const ToolModelMessage(<ToolContentPart>[
+        ToolApprovalResponsePart(
+          approvalId: 'approval-slow',
+          approved: true,
+        ),
+      ]),
+    ];
+
 Stream<lm.LanguageModelStreamPart> _idleStream({
   List<lm.LanguageModelStreamPart> initial =
       const <lm.LanguageModelStreamPart>[],
@@ -184,6 +205,69 @@ void main() {
       expect(toolSignal?.isCancelled, isTrue);
       expect(toolSignal?.reason, same(error));
     });
+
+    test(
+        'resumed approved tools honor step, tool, and per-tool override '
+        'timeouts', () async {
+      for (final entry in <(TimeoutConfiguration configuration, String label)>[
+        (
+          const TimeoutConfiguration(
+            tool: Duration(milliseconds: 30),
+          ),
+          'Tool slow',
+        ),
+        (
+          const TimeoutConfiguration(
+            tool: Duration(seconds: 5),
+            tools: <String, Duration>{
+              'slow': Duration(milliseconds: 30),
+            },
+          ),
+          'Tool slow',
+        ),
+        (
+          const TimeoutConfiguration(
+            step: Duration(milliseconds: 30),
+            tool: Duration(seconds: 5),
+          ),
+          'Step',
+        ),
+      ]) {
+        lm.CancellationSignal? toolSignal;
+        final model = _CallbackModel(
+          generate: (_) => Future<lm.LanguageModelGenerateResult>.error(
+            StateError('model must not run before the resumed tool'),
+          ),
+        );
+
+        Object? error;
+        try {
+          await generateText(
+            model: model,
+            messages: _resumedApprovedSlowToolMessages(),
+            tools: <String, Tool>{
+              'slow': Tool(
+                inputSchema: const lm.JsonSchema(<String, Object?>{
+                  'type': 'object',
+                }),
+                execute: (input, options) {
+                  toolSignal = options.cancellation;
+                  return Completer<Object?>().future;
+                },
+              ),
+            },
+            timeout: entry.$1,
+          );
+        } catch (caught) {
+          error = caught;
+        }
+
+        expect(error, _timeoutWith(entry.$2));
+        expect(toolSignal?.isCancelled, isTrue);
+        expect(toolSignal?.reason, same(error));
+        expect(model.calls, isEmpty);
+      }
+    });
   });
 
   group('P1-CORE-11 stream timeouts', () {
@@ -209,6 +293,43 @@ void main() {
         expect(
             parts.whereType<ErrorPart>().single.error, _timeoutWith(entry.$2));
       }
+    });
+
+    test('resumed approved tools honor per-tool timeout overrides', () async {
+      lm.CancellationSignal? toolSignal;
+      final model = _CallbackModel(
+        stream: (_) => Future<lm.LanguageModelStreamResult>.error(
+          StateError('model must not run before the resumed tool'),
+        ),
+      );
+
+      final parts = await streamText(
+        model: model,
+        messages: _resumedApprovedSlowToolMessages(),
+        tools: <String, Tool>{
+          'slow': Tool(
+            inputSchema: const lm.JsonSchema(<String, Object?>{
+              'type': 'object',
+            }),
+            execute: (input, options) {
+              toolSignal = options.cancellation;
+              return Completer<Object?>().future;
+            },
+          ),
+        },
+        timeout: const TimeoutConfiguration(
+          tool: Duration(seconds: 5),
+          tools: <String, Duration>{
+            'slow': Duration(milliseconds: 30),
+          },
+        ),
+      ).stream.toList();
+
+      final error = parts.whereType<ErrorPart>().single.error;
+      expect(error, _timeoutWith('Tool slow'));
+      expect(toolSignal?.isCancelled, isTrue);
+      expect(toolSignal?.reason, same(error));
+      expect(model.calls, isEmpty);
     });
 
     test('source metadata does not satisfy the first semantic chunk timeout',

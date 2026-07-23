@@ -786,6 +786,7 @@ Future<bool> _runToolLoopStream({
     repairToolCall: repairToolCall,
     instructions: instructions,
     cancellation: cancellation,
+    timeout: timeout,
     dispatcher: dispatcher,
   );
   if (resumedToolMessage != null) {
@@ -1968,6 +1969,7 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
   required ToolCallRepairFunction? repairToolCall,
   required String? instructions,
   required provider.CancellationSignal? cancellation,
+  required TimeoutConfiguration timeout,
   required TelemetryDispatcher dispatcher,
 }) async {
   final approvals = collectToolApprovals(messages);
@@ -2070,16 +2072,29 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
     }
     // resumed-approval 无步级 toolStopwatch,就地新建计时。
     final resumedStopwatch = Stopwatch()..start();
+    final stepScope = CancellationScope(
+      parent: cancellation,
+      timeout: timeout.step,
+      label: 'Step',
+    );
+    final toolScope = CancellationScope(
+      parent: stepScope.signal,
+      timeout: timeout.forTool(toolCall.toolName),
+      label: 'Tool ${toolCall.toolName}',
+    );
     final Object? output;
     try {
-      output = await tool.execute!(
-        input,
-        ToolExecuteOptions(
-          toolCallId: toolCall.toolCallId,
-          messages: approval.messages,
-          context: toolContext,
-          cancellation: cancellation,
+      output = await interruptFutureOnCancellation(
+        tool.execute!(
+          input,
+          ToolExecuteOptions(
+            toolCallId: toolCall.toolCallId,
+            messages: approval.messages,
+            context: toolContext,
+            cancellation: toolScope.signal,
+          ),
         ),
+        toolScope.signal,
       );
     } catch (error) {
       if (dispatcher.isActive) {
@@ -2092,6 +2107,9 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
         ));
       }
       rethrow;
+    } finally {
+      toolScope.dispose();
+      stepScope.dispose();
     }
     if (dispatcher.isActive) {
       await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndSuccess(
