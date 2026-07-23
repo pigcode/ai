@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 import '../support/scripted_model.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-03
   group('runToolLoopGenerate', () {
     test('single step text, no tools, no stopWhen', () async {
       final model = ScriptedModel(turns: [

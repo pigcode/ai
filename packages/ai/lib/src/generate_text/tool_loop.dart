@@ -15,6 +15,7 @@ import 'context.dart';
 import 'lifecycle_events.dart';
 import 'performance.dart';
 import 'prepare_step.dart';
+import 'request_timeout.dart';
 import 'request_options_snapshot.dart';
 import 'step_result.dart';
 import 'stop_condition.dart';
@@ -60,6 +61,7 @@ Future<List<StepResult>> runToolLoopGenerate({
   provider.ReasoningEffort? reasoning,
   provider.ResponseFormat? responseFormat,
   provider.CancellationSignal? cancellation,
+  TimeoutConfiguration timeout = const TimeoutConfiguration(),
   Map<String, String>? headers,
   provider.ProviderOptions? providerOptions,
   RuntimeContext runtimeContext = const {},
@@ -129,18 +131,25 @@ Future<List<StepResult>> runToolLoopGenerate({
   final pendingDeferredToolCalls = <String, String>{};
 
   while (true) {
+    throwIfCancelled(cancellation);
     final stepInputMessages =
         List<provider.LanguageModelMessage>.unmodifiable(messagesForNextStep);
-    final prepareStepResult = await prepareStep?.call(PrepareStepOptions(
-      steps: steps,
-      stepNumber: steps.length,
-      model: model,
-      messages: convertFromLanguageModelPrompt(stepInputMessages),
-      initialMessages: initialModelMessagesSnapshot,
-      responseMessages: convertFromLanguageModelPrompt(responseMessages),
-      runtimeContext: currentRuntimeContext,
-      toolsContext: currentToolsContext,
-    ));
+    final prepareStepResult = prepareStep == null
+        ? null
+        : await interruptFutureOnCancellation(
+            prepareStep(PrepareStepOptions(
+              steps: steps,
+              stepNumber: steps.length,
+              model: model,
+              messages: convertFromLanguageModelPrompt(stepInputMessages),
+              initialMessages: initialModelMessagesSnapshot,
+              responseMessages:
+                  convertFromLanguageModelPrompt(responseMessages),
+              runtimeContext: currentRuntimeContext,
+              toolsContext: currentToolsContext,
+            )),
+            cancellation,
+          );
     if (prepareStepResult?.runtimeContext != null) {
       currentRuntimeContext =
           snapshotRuntimeContext(prepareStepResult!.runtimeContext);
@@ -181,6 +190,12 @@ Future<List<StepResult>> runToolLoopGenerate({
       providerOptionsSnapshot,
       prepareStepResult?.providerOptions,
     );
+    final stepScope = CancellationScope(
+      parent: cancellation,
+      timeout: timeout.step,
+      label: 'Step',
+    );
+    final stepCancellation = stepScope.signal;
     final callOptions = provider.LanguageModelCallOptions(
       // 每步传入 messages 的不可变快照:后续追加工具结果不会改动上一次调用
       // 保留的 prompt(保值对象语义,不污染 provider/中间件的 tracing/replay)。
@@ -197,7 +212,7 @@ Future<List<StepResult>> runToolLoopGenerate({
       tools: advertisedTools.isEmpty ? null : advertisedTools,
       toolChoice: stepToolChoice,
       reasoning: reasoning,
-      cancellation: cancellation,
+      cancellation: stepCancellation,
       headers: headersSnapshot,
       providerOptions: stepProviderOptions,
     );
@@ -229,8 +244,12 @@ Future<List<StepResult>> runToolLoopGenerate({
     final stepStopwatch = Stopwatch()..start();
     final provider.LanguageModelGenerateResult result;
     try {
-      result = await stepModel.doGenerate(callOptions);
+      result = await interruptFutureOnCancellation(
+        stepModel.doGenerate(callOptions),
+        stepCancellation,
+      );
     } catch (error) {
+      stepScope.dispose();
       // 模型调用本身抛错(provider/网络/取消)时,补派 lmEnd(finishReason=error)
       // 使 lmStart 恒配对;随后 rethrow 交外层(generateText)派 onError。
       if (dispatcher != null && dispatcher.isActive) {
@@ -254,429 +273,484 @@ Future<List<StepResult>> runToolLoopGenerate({
       }
       rethrow;
     }
-    final responseTime = stepStopwatch.elapsed;
-    if (dispatcher != null && dispatcher.isActive) {
-      await dispatcher.dispatchLanguageModelCallEnd(LanguageModelCallEndEvent(
-        callId: telemetryCallId,
-        providerId: stepModel.provider,
-        modelId: stepModel.modelId,
-        stepNumber: steps.length,
-        content: result.content,
-        usage: result.usage,
-        finishReason: result.finishReason,
+    try {
+      final responseTime = stepStopwatch.elapsed;
+      if (dispatcher != null && dispatcher.isActive) {
+        await dispatcher.dispatchLanguageModelCallEnd(LanguageModelCallEndEvent(
+          callId: telemetryCallId,
+          providerId: stepModel.provider,
+          modelId: stepModel.modelId,
+          stepNumber: steps.length,
+          content: result.content,
+          usage: result.usage,
+          finishReason: result.finishReason,
+          warnings: result.warnings,
+          response: result.response,
+          responseTime: responseTime,
+        ));
+      }
+      logWarnings(
         warnings: result.warnings,
-        response: result.response,
-        responseTime: responseTime,
-      ));
-    }
-    logWarnings(
-      warnings: result.warnings,
-      provider: stepModel.provider,
-      model: stepModel.modelId,
-    );
+        provider: stepModel.provider,
+        model: stepModel.modelId,
+      );
 
-    final stepContent = <provider.LanguageModelContent>[
-      ...result.content,
-    ];
-    final executableCalls = <ParsedToolCall>[];
-    final blockingCalls = <provider.ToolCall>[];
-    final toolResults = <provider.ToolResult>[];
-    final toolResultOutputs = <provider.ToolResultOutput>[];
-    final toolApprovalResponses = <provider.ToolApprovalResponsePart>[];
-    final toolExecutionTimes = <String, Duration>{};
-    final providerApprovalRequestsByToolCallId =
-        <String, provider.ToolApprovalRequest>{
-      for (final content in result.content)
-        if (content is provider.ToolApprovalRequest)
-          content.toolCallId: content,
-    };
-    for (var contentIndex = 0;
-        contentIndex < result.content.length;
-        contentIndex++) {
-      final content = result.content[contentIndex];
-      if (content is provider.ToolCall) {
-        var toolCall = content;
-        ParsedToolCall? parsedCall;
-        final providerExecutedApprovalRequest =
-            providerApprovalRequestsByToolCallId[content.toolCallId];
-        // provider 已侧执行(`providerExecuted == true`)的调用会由 provider 自带
-        // 结果,本地循环不得再跑同名 `execute`,也不做 repair(否则可能误改
-        // provider-managed 工具协议)。
-        if (content.providerExecuted == true) {
-          if (providerExecutedApprovalRequest != null) {
-            final approval = await resolveToolApproval(
-              toolApproval: toolApprovalSnapshot,
-              toolCall: content,
-              messages: stepMessages,
-              tools: stepTools,
-            );
-            switch (approval.type) {
-              case ToolApprovalStatusType.approved:
-                toolApprovalResponses.add(provider.ToolApprovalResponsePart(
-                  approvalId: providerExecutedApprovalRequest.approvalId,
-                  approved: true,
-                  reason: approval.reason,
-                  providerOptions:
-                      providerExecutedApprovalRequest.providerMetadata,
-                ));
-              case ToolApprovalStatusType.denied:
-                toolApprovalResponses.add(provider.ToolApprovalResponsePart(
-                  approvalId: providerExecutedApprovalRequest.approvalId,
-                  approved: false,
-                  reason: approval.reason,
-                  providerOptions:
-                      providerExecutedApprovalRequest.providerMetadata,
-                ));
-              case ToolApprovalStatusType.notApplicable:
-              case ToolApprovalStatusType.userApproval:
-                blockingCalls.add(content);
+      final stepContent = <provider.LanguageModelContent>[
+        ...result.content,
+      ];
+      final executableCalls = <ParsedToolCall>[];
+      final blockingCalls = <provider.ToolCall>[];
+      final toolResults = <provider.ToolResult>[];
+      final toolResultOutputs = <provider.ToolResultOutput>[];
+      final toolApprovalResponses = <provider.ToolApprovalResponsePart>[];
+      final toolExecutionTimes = <String, Duration>{};
+      final providerApprovalRequestsByToolCallId =
+          <String, provider.ToolApprovalRequest>{
+        for (final content in result.content)
+          if (content is provider.ToolApprovalRequest)
+            content.toolCallId: content,
+      };
+      for (var contentIndex = 0;
+          contentIndex < result.content.length;
+          contentIndex++) {
+        final content = result.content[contentIndex];
+        if (content is provider.ToolCall) {
+          var toolCall = content;
+          ParsedToolCall? parsedCall;
+          final providerExecutedApprovalRequest =
+              providerApprovalRequestsByToolCallId[content.toolCallId];
+          // provider 已侧执行(`providerExecuted == true`)的调用会由 provider 自带
+          // 结果,本地循环不得再跑同名 `execute`,也不做 repair(否则可能误改
+          // provider-managed 工具协议)。
+          if (content.providerExecuted == true) {
+            if (providerExecutedApprovalRequest != null) {
+              final approval = await resolveToolApproval(
+                toolApproval: toolApprovalSnapshot,
+                toolCall: content,
+                messages: stepMessages,
+                tools: stepTools,
+              );
+              switch (approval.type) {
+                case ToolApprovalStatusType.approved:
+                  toolApprovalResponses.add(provider.ToolApprovalResponsePart(
+                    approvalId: providerExecutedApprovalRequest.approvalId,
+                    approved: true,
+                    reason: approval.reason,
+                    providerOptions:
+                        providerExecutedApprovalRequest.providerMetadata,
+                  ));
+                case ToolApprovalStatusType.denied:
+                  toolApprovalResponses.add(provider.ToolApprovalResponsePart(
+                    approvalId: providerExecutedApprovalRequest.approvalId,
+                    approved: false,
+                    reason: approval.reason,
+                    providerOptions:
+                        providerExecutedApprovalRequest.providerMetadata,
+                  ));
+                case ToolApprovalStatusType.notApplicable:
+                case ToolApprovalStatusType.userApproval:
+                  blockingCalls.add(content);
+              }
             }
+            continue;
           }
-          continue;
-        }
-        final originalTool = stepTools?[content.toolName];
-        if (originalTool != null && originalTool.execute == null) {
-          blockingCalls.add(content);
-          continue;
-        }
-        if (originalTool == null && repairToolCall != null) {
-          var repairReturnedNull = false;
-          var repairReturnedNonNull = false;
-          try {
-            parsedCall = await parseOrRepairToolCall(
-              toolCall: content,
-              tools: stepTools,
-              repairToolCall: (options) async {
-                final repaired = await repairToolCall(options);
-                if (repaired == null) {
-                  repairReturnedNull = true;
-                } else {
-                  repairReturnedNonNull = true;
-                }
-                return repaired;
-              },
-              instructions: instructions,
-              messages: stepMessages,
-            );
-            toolCall = parsedCall.toolCall;
-            stepContent[contentIndex] = toolCall;
-          } on NoSuchToolError {
-            if (repairReturnedNonNull || !repairReturnedNull) {
-              rethrow;
-            }
+          final originalTool = stepTools?[content.toolName];
+          if (originalTool != null && originalTool.execute == null) {
             blockingCalls.add(content);
             continue;
           }
-        }
-        final tool = stepTools?[toolCall.toolName];
-        if (tool == null || tool.execute == null) {
-          blockingCalls.add(toolCall);
-          continue;
-        }
-
-        Future<ParsedToolCall> parseForExecution({
-          required bool allowIdentityChange,
-        }) async {
-          if (parsedCall != null) {
-            return parsedCall!;
-          }
-          if (repairToolCall != null) {
-            parsedCall = await parseOrRepairToolCall(
-              toolCall: toolCall,
-              tools: stepTools,
-              repairToolCall: repairToolCall,
-              instructions: instructions,
-              messages: stepMessages,
-            );
-            final repairedToolCall = parsedCall!.toolCall;
-            if (!allowIdentityChange &&
-                (repairedToolCall.toolName != toolCall.toolName ||
-                    repairedToolCall.toolCallId != toolCall.toolCallId)) {
-              throw StateError(
-                'repairToolCall cannot change toolName or toolCallId after '
-                'tool approval has been resolved.',
+          if (originalTool == null && repairToolCall != null) {
+            var repairReturnedNull = false;
+            var repairReturnedNonNull = false;
+            try {
+              parsedCall = await parseOrRepairToolCall(
+                toolCall: content,
+                tools: stepTools,
+                repairToolCall: (options) async {
+                  final repaired = await repairToolCall(options);
+                  if (repaired == null) {
+                    repairReturnedNull = true;
+                  } else {
+                    repairReturnedNonNull = true;
+                  }
+                  return repaired;
+                },
+                instructions: instructions,
+                messages: stepMessages,
               );
+              toolCall = parsedCall.toolCall;
+              stepContent[contentIndex] = toolCall;
+            } on NoSuchToolError {
+              if (repairReturnedNonNull || !repairReturnedNull) {
+                rethrow;
+              }
+              blockingCalls.add(content);
+              continue;
             }
-            toolCall = repairedToolCall;
-            stepContent[contentIndex] = toolCall;
-            return parsedCall!;
           }
-          parsedCall = parseToolCall(toolCall: toolCall, tools: stepTools);
-          final parsedToolCall = parsedCall!.toolCall;
-          if (parsedToolCall != toolCall) {
-            toolCall = parsedToolCall;
-            stepContent[contentIndex] = toolCall;
-          }
-          return parsedCall!;
-        }
-
-        if (toolApprovalRequiresInput(
-              toolApproval: toolApprovalSnapshot,
-              toolCall: toolCall,
-            ) ||
-            (repairToolCall != null &&
-                !toolApprovalMayBlockBeforeInput(
-                  toolApproval: toolApprovalSnapshot,
-                  toolCall: toolCall,
-                ))) {
-          await parseForExecution(allowIdentityChange: true);
-          final repairedTool = stepTools?[toolCall.toolName];
-          if (repairedTool == null || repairedTool.execute == null) {
+          final tool = stepTools?[toolCall.toolName];
+          if (tool == null || tool.execute == null) {
             blockingCalls.add(toolCall);
             continue;
           }
-        }
 
-        final approval = await resolveToolApproval(
-          toolApproval: toolApprovalSnapshot,
-          toolCall: toolCall,
-          messages: stepMessages,
-          tools: stepTools,
-        );
+          Future<ParsedToolCall> parseForExecution({
+            required bool allowIdentityChange,
+          }) async {
+            if (parsedCall != null) {
+              return parsedCall!;
+            }
+            if (repairToolCall != null) {
+              parsedCall = await parseOrRepairToolCall(
+                toolCall: toolCall,
+                tools: stepTools,
+                repairToolCall: repairToolCall,
+                instructions: instructions,
+                messages: stepMessages,
+              );
+              final repairedToolCall = parsedCall!.toolCall;
+              if (!allowIdentityChange &&
+                  (repairedToolCall.toolName != toolCall.toolName ||
+                      repairedToolCall.toolCallId != toolCall.toolCallId)) {
+                throw StateError(
+                  'repairToolCall cannot change toolName or toolCallId after '
+                  'tool approval has been resolved.',
+                );
+              }
+              toolCall = repairedToolCall;
+              stepContent[contentIndex] = toolCall;
+              return parsedCall!;
+            }
+            parsedCall = parseToolCall(toolCall: toolCall, tools: stepTools);
+            final parsedToolCall = parsedCall!.toolCall;
+            if (parsedToolCall != toolCall) {
+              toolCall = parsedToolCall;
+              stepContent[contentIndex] = toolCall;
+            }
+            return parsedCall!;
+          }
 
-        switch (approval.type) {
-          case ToolApprovalStatusType.notApplicable:
-            if (providerApprovalRequestsByToolCallId
-                .containsKey(toolCall.toolCallId)) {
+          if (toolApprovalRequiresInput(
+                toolApproval: toolApprovalSnapshot,
+                toolCall: toolCall,
+              ) ||
+              (repairToolCall != null &&
+                  !toolApprovalMayBlockBeforeInput(
+                    toolApproval: toolApprovalSnapshot,
+                    toolCall: toolCall,
+                  ))) {
+            await parseForExecution(allowIdentityChange: true);
+            final repairedTool = stepTools?[toolCall.toolName];
+            if (repairedTool == null || repairedTool.execute == null) {
               blockingCalls.add(toolCall);
-            } else {
+              continue;
+            }
+          }
+
+          if (tool.onInputStart != null || tool.onInputAvailable != null) {
+            final callbackCall =
+                await parseForExecution(allowIdentityChange: true);
+            final callbackTool = stepTools?[callbackCall.toolCall.toolName];
+            if (callbackTool != null) {
+              final callbackMessages =
+                  List<provider.LanguageModelMessage>.unmodifiable(
+                stepMessages
+                    .where((message) => message is! provider.SystemMessage),
+              );
+              final callbackContext = _validateToolContext(
+                toolName: callbackCall.toolCall.toolName,
+                tool: callbackTool,
+                toolsContext: currentToolsContext,
+              );
+              if (callbackTool.onInputStart case final callback?) {
+                await interruptFutureOnCancellation(
+                  callback(ToolInputStartOptions(
+                    toolCallId: callbackCall.toolCall.toolCallId,
+                    messages: callbackMessages,
+                    context: callbackContext,
+                    cancellation: stepCancellation,
+                  )),
+                  stepCancellation,
+                );
+              }
+              if (callbackTool.onInputAvailable case final callback?) {
+                await interruptFutureOnCancellation(
+                  callback(ToolInputAvailableOptions(
+                    input: callbackCall.input,
+                    toolCallId: callbackCall.toolCall.toolCallId,
+                    messages: callbackMessages,
+                    context: callbackContext,
+                    cancellation: stepCancellation,
+                  )),
+                  stepCancellation,
+                );
+              }
+            }
+          }
+
+          final approval = await resolveToolApproval(
+            toolApproval: toolApprovalSnapshot,
+            toolCall: toolCall,
+            messages: stepMessages,
+            tools: stepTools,
+          );
+
+          switch (approval.type) {
+            case ToolApprovalStatusType.notApplicable:
+              if (providerApprovalRequestsByToolCallId
+                  .containsKey(toolCall.toolCallId)) {
+                blockingCalls.add(toolCall);
+              } else {
+                executableCalls.add(
+                  await parseForExecution(allowIdentityChange: false),
+                );
+              }
+            case ToolApprovalStatusType.approved:
+              final request =
+                  providerApprovalRequestsByToolCallId[toolCall.toolCallId] ??
+                      provider.ToolApprovalRequest(
+                        approvalId: generateApprovalId(),
+                        toolCallId: toolCall.toolCallId,
+                      );
+              final response = provider.ToolApprovalResponsePart(
+                approvalId: request.approvalId,
+                approved: true,
+                reason: approval.reason,
+                providerOptions: request.providerMetadata,
+              );
+              if (!providerApprovalRequestsByToolCallId
+                  .containsKey(toolCall.toolCallId)) {
+                stepContent.add(request);
+              }
+              toolApprovalResponses.add(response);
               executableCalls.add(
                 await parseForExecution(allowIdentityChange: false),
               );
-            }
-          case ToolApprovalStatusType.approved:
-            final request =
-                providerApprovalRequestsByToolCallId[toolCall.toolCallId] ??
-                    provider.ToolApprovalRequest(
-                      approvalId: generateApprovalId(),
-                      toolCallId: toolCall.toolCallId,
-                    );
-            final response = provider.ToolApprovalResponsePart(
-              approvalId: request.approvalId,
-              approved: true,
-              reason: approval.reason,
-              providerOptions: request.providerMetadata,
-            );
-            if (!providerApprovalRequestsByToolCallId
-                .containsKey(toolCall.toolCallId)) {
-              stepContent.add(request);
-            }
-            toolApprovalResponses.add(response);
-            executableCalls.add(
-              await parseForExecution(allowIdentityChange: false),
-            );
-          case ToolApprovalStatusType.denied:
-            final request =
-                providerApprovalRequestsByToolCallId[toolCall.toolCallId] ??
-                    provider.ToolApprovalRequest(
-                      approvalId: generateApprovalId(),
-                      toolCallId: toolCall.toolCallId,
-                    );
-            final response = provider.ToolApprovalResponsePart(
-              approvalId: request.approvalId,
-              approved: false,
-              reason: approval.reason,
-              providerOptions: request.providerMetadata,
-            );
-            final resultOutput = provider.ToolResultExecutionDenied(
-              reason: approval.reason,
-            );
-            if (!providerApprovalRequestsByToolCallId
-                .containsKey(toolCall.toolCallId)) {
-              stepContent.add(request);
-            }
-            toolApprovalResponses.add(response);
-            toolResultOutputs.add(resultOutput);
-            toolResults.add(provider.ToolResult(
-              toolCallId: toolCall.toolCallId,
-              toolName: toolCall.toolName,
-              result: _toolResultOutputValue(resultOutput),
-            ));
-          case ToolApprovalStatusType.userApproval:
-            if (!providerApprovalRequestsByToolCallId
-                .containsKey(toolCall.toolCallId)) {
-              stepContent.add(provider.ToolApprovalRequest(
-                approvalId: generateApprovalId(),
+            case ToolApprovalStatusType.denied:
+              final request =
+                  providerApprovalRequestsByToolCallId[toolCall.toolCallId] ??
+                      provider.ToolApprovalRequest(
+                        approvalId: generateApprovalId(),
+                        toolCallId: toolCall.toolCallId,
+                      );
+              final response = provider.ToolApprovalResponsePart(
+                approvalId: request.approvalId,
+                approved: false,
+                reason: approval.reason,
+                providerOptions: request.providerMetadata,
+              );
+              final resultOutput = provider.ToolResultExecutionDenied(
+                reason: approval.reason,
+              );
+              if (!providerApprovalRequestsByToolCallId
+                  .containsKey(toolCall.toolCallId)) {
+                stepContent.add(request);
+              }
+              toolApprovalResponses.add(response);
+              toolResultOutputs.add(resultOutput);
+              toolResults.add(provider.ToolResult(
                 toolCallId: toolCall.toolCallId,
+                toolName: toolCall.toolName,
+                result: _toolResultOutputValue(resultOutput),
               ));
-            }
-            blockingCalls.add(toolCall);
+            case ToolApprovalStatusType.userApproval:
+              if (!providerApprovalRequestsByToolCallId
+                  .containsKey(toolCall.toolCallId)) {
+                stepContent.add(provider.ToolApprovalRequest(
+                  approvalId: generateApprovalId(),
+                  toolCallId: toolCall.toolCallId,
+                ));
+              }
+              blockingCalls.add(toolCall);
+          }
         }
       }
-    }
 
-    for (final parsedCall in executableCalls) {
-      final call = parsedCall.toolCall;
-      final tool = stepTools![call.toolName]!;
-      final input = parsedCall.input;
-      // 在 telemetry start 之前完成 context 校验,保证 start/end 恒配对:
-      // 校验失败则不派 start(工具从未执行),错误照旧向上传播。
-      final toolContext = _validateToolContext(
-        toolName: call.toolName,
-        tool: tool,
-        toolsContext: currentToolsContext,
-      );
-      if (dispatcher != null && dispatcher.isActive) {
-        await dispatcher.dispatchToolExecutionStart(ToolExecutionStartEvent(
-          callId: call.toolCallId,
-          toolCallId: call.toolCallId,
+      for (final parsedCall in executableCalls) {
+        final call = parsedCall.toolCall;
+        final tool = stepTools![call.toolName]!;
+        final input = parsedCall.input;
+        // 在 telemetry start 之前完成 context 校验,保证 start/end 恒配对:
+        // 校验失败则不派 start(工具从未执行),错误照旧向上传播。
+        final toolContext = _validateToolContext(
           toolName: call.toolName,
-          input: input,
-          toolContext: toolContext,
-        ));
-      }
-      final toolStopwatch = Stopwatch()..start();
-      final Object? output;
-      try {
-        output = await tool.execute!(
-          input,
-          ToolExecuteOptions(
-            toolCallId: call.toolCallId,
-            // v7:ToolExecuteOptions.messages 不含 system prompt;传不可变副本,
-            // 避免向工具暴露 system 指令、也防工具改动循环内部历史。
-            messages: List<provider.LanguageModelMessage>.unmodifiable(
-              stepMessages.where((m) => m is! provider.SystemMessage),
-            ),
-            context: toolContext,
-            cancellation: cancellation,
-          ),
+          tool: tool,
+          toolsContext: currentToolsContext,
         );
-      } catch (error) {
-        // per-tool error 变体(与 step 级 onError 不同粒度,不重复);记时后 rethrow。
-        toolExecutionTimes[call.toolCallId] = toolStopwatch.elapsed;
         if (dispatcher != null && dispatcher.isActive) {
-          await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndError(
+          await dispatcher.dispatchToolExecutionStart(ToolExecutionStartEvent(
             callId: call.toolCallId,
             toolCallId: call.toolCallId,
             toolName: call.toolName,
-            error: error,
+            input: input,
+            toolContext: toolContext,
+          ));
+        }
+        final toolStopwatch = Stopwatch()..start();
+        final toolScope = CancellationScope(
+          parent: stepCancellation,
+          timeout: timeout.forTool(call.toolName),
+          label: 'Tool ${call.toolName}',
+        );
+        final Object? output;
+        try {
+          output = await interruptFutureOnCancellation(
+            tool.execute!(
+              input,
+              ToolExecuteOptions(
+                toolCallId: call.toolCallId,
+                // v7:ToolExecuteOptions.messages 不含 system prompt;传不可变副本,
+                // 避免向工具暴露 system 指令、也防工具改动循环内部历史。
+                messages: List<provider.LanguageModelMessage>.unmodifiable(
+                  stepMessages.where((m) => m is! provider.SystemMessage),
+                ),
+                context: toolContext,
+                cancellation: toolScope.signal,
+              ),
+            ),
+            toolScope.signal,
+          );
+        } catch (error) {
+          // per-tool error 变体(与 step 级 onError 不同粒度,不重复);记时后 rethrow。
+          toolExecutionTimes[call.toolCallId] = toolStopwatch.elapsed;
+          if (dispatcher != null && dispatcher.isActive) {
+            await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndError(
+              callId: call.toolCallId,
+              toolCallId: call.toolCallId,
+              toolName: call.toolName,
+              error: error,
+              toolExecutionMs: toolStopwatch.elapsed.inMilliseconds,
+            ));
+          }
+          rethrow;
+        } finally {
+          toolScope.dispose();
+        }
+        toolExecutionTimes[call.toolCallId] = toolStopwatch.elapsed;
+        if (dispatcher != null && dispatcher.isActive) {
+          await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndSuccess(
+            callId: call.toolCallId,
+            toolCallId: call.toolCallId,
+            toolName: call.toolName,
+            output: output,
             toolExecutionMs: toolStopwatch.elapsed.inMilliseconds,
           ));
         }
-        rethrow;
-      }
-      toolExecutionTimes[call.toolCallId] = toolStopwatch.elapsed;
-      if (dispatcher != null && dispatcher.isActive) {
-        await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndSuccess(
-          callId: call.toolCallId,
+        final resultOutput = tool.toModelOutput != null
+            ? tool.toModelOutput!(input, output)
+            : _defaultToModelOutput(output);
+        toolResultOutputs.add(resultOutput);
+        toolResults.add(provider.ToolResult(
           toolCallId: call.toolCallId,
           toolName: call.toolName,
-          output: output,
-          toolExecutionMs: toolStopwatch.elapsed.inMilliseconds,
+          result: _toolResultOutputValue(resultOutput),
+          isError: _isErrorOutput(resultOutput) ? true : null,
         ));
       }
-      final resultOutput = tool.toModelOutput != null
-          ? tool.toModelOutput!(input, output)
-          : _defaultToModelOutput(output);
-      toolResultOutputs.add(resultOutput);
-      toolResults.add(provider.ToolResult(
-        toolCallId: call.toolCallId,
-        toolName: call.toolName,
-        result: _toolResultOutputValue(resultOutput),
-        isError: _isErrorOutput(resultOutput) ? true : null,
-      ));
-    }
 
-    final step = StepResult(
-      content: stepContent,
-      finishReason: result.finishReason,
-      usage: result.usage,
-      response: result.response,
-      // 结果级 provider 元数据带出(如 anthropic container id),供
-      // steps[i].providerMetadata / prepareStep 转发消费。
-      providerMetadata: result.providerMetadata,
-      executedToolResults: toolResults,
-      toolResultOutputs: toolResultOutputs,
-      toolApprovalResponses: toolApprovalResponses,
-      // 保留 provider 告警(如选项被忽略/降级),供非流式调用方经
-      // StepResult.warnings 感知,与流式 StartStepPart.warnings 对称。
-      warnings: result.warnings,
-      runtimeContext: currentRuntimeContext,
-      toolsContext: currentToolsContext,
-      performance: buildStepPerformance(
+      final step = StepResult(
+        content: stepContent,
+        finishReason: result.finishReason,
         usage: result.usage,
-        responseTime: responseTime,
-        stepTime: stepStopwatch.elapsed,
-        toolExecutionTimes: toolExecutionTimes,
-      ),
-    );
-    steps.add(step);
-    onStepEnd?.call(step);
-    if (dispatcher != null && dispatcher.isActive) {
-      await dispatcher.dispatchStepEnd(step);
-    }
-
-    // 追踪(:1231-1251):本步 providerExecuted 且 deferred-capable 的调用,
-    // 同响应无配对 tool-result → 记入 pending。判定读用户 ToolSet 快照
-    // (toolSet,非 wire 列表、非 activeTools 过滤集)。
-    for (final item in step.content.whereType<provider.ToolCall>()) {
-      if (item.providerExecuted != true) {
-        continue;
-      }
-      if (toolSet?[item.toolName]?.providerTool?.supportsDeferredResults !=
-          true) {
-        continue;
-      }
-      final hasResultInResponse = step.content.any(
-        (part) =>
-            part is provider.ToolResult && part.toolCallId == item.toolCallId,
+        response: result.response,
+        // 结果级 provider 元数据带出(如 anthropic container id),供
+        // steps[i].providerMetadata / prepareStep 转发消费。
+        providerMetadata: result.providerMetadata,
+        executedToolResults: toolResults,
+        toolResultOutputs: toolResultOutputs,
+        toolApprovalResponses: toolApprovalResponses,
+        // 保留 provider 告警(如选项被忽略/降级),供非流式调用方经
+        // StepResult.warnings 感知,与流式 StartStepPart.warnings 对称。
+        warnings: result.warnings,
+        runtimeContext: currentRuntimeContext,
+        toolsContext: currentToolsContext,
+        performance: buildStepPerformance(
+          usage: result.usage,
+          responseTime: responseTime,
+          stepTime: stepStopwatch.elapsed,
+          toolExecutionTimes: toolExecutionTimes,
+        ),
       );
-      if (!hasResultInResponse) {
-        pendingDeferredToolCalls[item.toolCallId] = item.toolName;
+      steps.add(step);
+      onStepEnd?.call(step);
+      if (dispatcher != null && dispatcher.isActive) {
+        await dispatcher.dispatchStepEnd(step);
       }
-    }
-    // 解销(:1253-1258):对本响应全部 tool-result 无条件 remove(不限定
-    // deferred 工具、不看 isError)——跨步到达的 deferred 结果在此闭环。
-    for (final item in step.content.whereType<provider.ToolResult>()) {
-      pendingDeferredToolCalls.remove(item.toolCallId);
-    }
 
-    final hasToolContentForNextStep =
-        toolResults.isNotEmpty || toolApprovalResponses.isNotEmpty;
-    final hasBlockingCalls = blockingCalls.isNotEmpty;
-    final isToolCallsFinish =
-        step.finishReason.unified == provider.FinishReasonType.toolCalls;
-    final hasStopConditions = stopConditions.isNotEmpty;
-    final stopWhenSatisfied =
-        await _anyStopConditionTrue(stopConditions, steps);
+      // 追踪(:1231-1251):本步 providerExecuted 且 deferred-capable 的调用,
+      // 同响应无配对 tool-result → 记入 pending。判定读用户 ToolSet 快照
+      // (toolSet,非 wire 列表、非 activeTools 过滤集)。
+      for (final item in step.content.whereType<provider.ToolCall>()) {
+        if (item.providerExecuted != true) {
+          continue;
+        }
+        if (toolSet?[item.toolName]?.providerTool?.supportsDeferredResults !=
+            true) {
+          continue;
+        }
+        final hasResultInResponse = step.content.any(
+          (part) =>
+              part is provider.ToolResult && part.toolCallId == item.toolCallId,
+        );
+        if (!hasResultInResponse) {
+          pendingDeferredToolCalls[item.toolCallId] = item.toolName;
+        }
+      }
+      // 解销(:1253-1258):对本响应全部 tool-result 无条件 remove(不限定
+      // deferred 工具、不看 isError)——跨步到达的 deferred 结果在此闭环。
+      for (final item in step.content.whereType<provider.ToolResult>()) {
+        pendingDeferredToolCalls.remove(item.toolCallId);
+      }
 
-    // 无 stopWhen 时恒为单步(v7 行为):即便本步命中工具调用,也不发起第二次
-    // 模型调用。pending 支与 client-complete 支平级 OR(:1340-1350),不受
-    // isToolCallsFinish/hasToolContentForNextStep/blocking 闸门约束(deferred
-    // 悬置步的 finishReason 未必是 toolCalls;审批悬置不阻塞 deferred 闭环)。
-    final clientComplete =
-        isToolCallsFinish && hasToolContentForNextStep && !hasBlockingCalls;
-    final shouldContinue =
-        (clientComplete || pendingDeferredToolCalls.isNotEmpty) &&
-            hasStopConditions &&
-            !stopWhenSatisfied;
+      final hasToolContentForNextStep =
+          toolResults.isNotEmpty || toolApprovalResponses.isNotEmpty;
+      final hasBlockingCalls = blockingCalls.isNotEmpty;
+      final isToolCallsFinish =
+          step.finishReason.unified == provider.FinishReasonType.toolCalls;
+      final hasStopConditions = stopConditions.isNotEmpty;
+      final stopWhenSatisfied =
+          await _anyStopConditionTrue(stopConditions, steps);
 
-    if (!shouldContinue) {
-      return steps;
-    }
+      // 无 stopWhen 时恒为单步(v7 行为):即便本步命中工具调用,也不发起第二次
+      // 模型调用。pending 支与 client-complete 支平级 OR(:1340-1350),不受
+      // isToolCallsFinish/hasToolContentForNextStep/blocking 闸门约束(deferred
+      // 悬置步的 finishReason 未必是 toolCalls;审批悬置不阻塞 deferred 闭环)。
+      final clientComplete =
+          isToolCallsFinish && hasToolContentForNextStep && !hasBlockingCalls;
+      final shouldContinue =
+          (clientComplete || pendingDeferredToolCalls.isNotEmpty) &&
+              hasStopConditions &&
+              !stopWhenSatisfied;
 
-    final assistantMessage = _toAssistantMessage(step.content);
-    responseMessages.add(assistantMessage);
-    messagesForNextStep = List<provider.LanguageModelMessage>.of(stepMessages)
-      ..add(assistantMessage);
-    // pending-only 续接(本步无本地工具输出/审批回复)只追加 assistant 消息,
-    // 禁止产生空 tool role 消息(对齐 :1325 与 :208-216:tool 消息仅当存在
-    // client 工具输出/审批回复才构造)。responseMessages 公开面同受此约束。
-    if (hasToolContentForNextStep) {
-      final toolMessage = provider.ToolMessage(
-        // 内容列表冻结,理由同上。
-        List<provider.ToolContentPart>.unmodifiable([
-          ...step.toolApprovalResponses,
-          for (var i = 0; i < toolResults.length; i++)
-            provider.ToolResultPart(
-              toolCallId: toolResults[i].toolCallId,
-              toolName: toolResults[i].toolName,
-              output: toolResultOutputs[i],
-            ),
-        ]),
-      );
-      responseMessages.add(toolMessage);
-      messagesForNextStep.add(toolMessage);
+      if (!shouldContinue) {
+        return steps;
+      }
+
+      final assistantMessage = _toAssistantMessage(step.content);
+      responseMessages.add(assistantMessage);
+      messagesForNextStep = List<provider.LanguageModelMessage>.of(stepMessages)
+        ..add(assistantMessage);
+      // pending-only 续接(本步无本地工具输出/审批回复)只追加 assistant 消息,
+      // 禁止产生空 tool role 消息(对齐 :1325 与 :208-216:tool 消息仅当存在
+      // client 工具输出/审批回复才构造)。responseMessages 公开面同受此约束。
+      if (hasToolContentForNextStep) {
+        final toolMessage = provider.ToolMessage(
+          // 内容列表冻结,理由同上。
+          List<provider.ToolContentPart>.unmodifiable([
+            ...step.toolApprovalResponses,
+            for (var i = 0; i < toolResults.length; i++)
+              provider.ToolResultPart(
+                toolCallId: toolResults[i].toolCallId,
+                toolName: toolResults[i].toolName,
+                output: toolResultOutputs[i],
+              ),
+          ]),
+        );
+        responseMessages.add(toolMessage);
+        messagesForNextStep.add(toolMessage);
+      }
+    } finally {
+      stepScope.dispose();
     }
   }
 }

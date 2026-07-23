@@ -15,6 +15,7 @@ import 'context.dart';
 import 'lifecycle_events.dart';
 import 'output.dart';
 import 'prepare_step.dart';
+import 'request_timeout.dart';
 import 'request_options_snapshot.dart';
 import 'step_result.dart';
 import 'stop_condition.dart';
@@ -172,6 +173,7 @@ Future<GenerateTextResult<Complete>> generateText<Complete, Partial, Element>({
   Output<Complete, Partial, Element>? output,
   Object? stopWhen,
   provider.CancellationSignal? cancellation,
+  Object? timeout,
   Map<String, String>? headers,
   provider.ProviderOptions? providerOptions,
   RuntimeContext? runtimeContext,
@@ -189,6 +191,7 @@ Future<GenerateTextResult<Complete>> generateText<Complete, Partial, Element>({
 }) async {
   final outputSpec =
       output ?? (Output.text() as Output<Complete, Partial, Element>);
+  final timeoutConfiguration = normalizeTimeoutConfiguration(timeout);
   final dispatcher = TelemetryDispatcher(telemetry);
   // preflight(prompt 校验/转换)失败也要进 telemetry onError(与流式路径对称:
   // 流式的 promptError 经 driver catch 派 onError)。失败时不派 onStart,
@@ -228,90 +231,104 @@ Future<GenerateTextResult<Complete>> generateText<Complete, Partial, Element>({
   final toolApprovalSnapshot = toolApproval is Map<String, Object?>
       ? Map<String, Object?>.unmodifiable(toolApproval)
       : toolApproval;
-  onStart?.call(GenerateTextStartEvent(
-    model: model,
-    messages: startMessages,
-  ));
-  await dispatcher.dispatchStart(GenerateTextStartEvent(
-    model: model,
-    messages: startMessages,
-  ));
-
-  final responseMessages = <ModelMessage>[];
-  final List<StepResult> steps;
-  try {
-    steps = await runToolLoopGenerate(
-      model: model,
-      initialMessages: initialMessages,
-      instructions: instructions,
-      tools: toolSet,
-      toolChoice: toolChoice,
-      maxOutputTokens: maxOutputTokens,
-      temperature: temperature,
-      topP: topP,
-      topK: topK,
-      presencePenalty: presencePenalty,
-      frequencyPenalty: frequencyPenalty,
-      seed: seed,
-      stopSequences: stopSequencesSnapshot,
-      reasoning: reasoning,
-      responseFormat: responseFormat,
-      stopWhen: stopWhenSnapshot,
-      cancellation: cancellation,
-      headers: headersSnapshot,
-      providerOptions: providerOptionsSnapshot,
-      runtimeContext: runtimeContextSnapshot,
-      toolsContext: toolsContextSnapshot,
-      activeTools: activeToolsSnapshot,
-      toolOrder: toolOrderSnapshot,
-      prepareStep: prepareStep,
-      toolApproval: toolApprovalSnapshot,
-      repairToolCall: repairToolCall,
-      onStepStart: onStepStart,
-      onStepEnd: onStepEnd,
-      onResumedToolMessage: (message) {
-        responseMessages.add(_toModelToolMessage(message));
-      },
-      dispatcher: dispatcher,
-    );
-  } catch (error) {
-    await dispatcher.dispatchError(error);
-    rethrow;
-  }
-
-  final finalStep = steps.last;
-  final usage = _sumUsage(steps);
-  onEnd?.call(GenerateTextEndEvent(steps: steps));
-  final shouldParseOutput =
-      finalStep.finishReason.unified == provider.FinishReasonType.stop;
-  // C3:telemetry `dispatchEnd` 放到 parse 成功之后;parse 失败 → dispatchError
-  // (此时尚未 dispatchEnd),故 telemetry 永不出现 onEnd → onError。用户既有
-  // onEnd?.call 保持原位(parse 之前),不改既有语义。
-  final Complete? parsedOutput;
-  try {
-    parsedOutput = shouldParseOutput
-        ? await outputSpec.parseCompleteOutput(
-            OutputText(finalStep.text),
-            OutputParseContext(
-              response: finalStep.response,
-              usage: usage,
-              finishReason: finalStep.finishReason,
-            ),
-          )
-        : null;
-  } catch (error) {
-    await dispatcher.dispatchError(error);
-    rethrow;
-  }
-  await dispatcher.dispatchEnd(GenerateTextEndEvent(steps: steps));
-
-  final result = GenerateTextResult<Complete>(
-    steps: steps,
-    output: parsedOutput,
-    hasOutput: shouldParseOutput,
-    responseMessages: responseMessages,
+  final totalScope = CancellationScope(
+    parent: cancellation,
+    timeout: timeoutConfiguration.total,
+    label: 'Total',
   );
-  return result;
+  try {
+    onStart?.call(GenerateTextStartEvent(
+      model: model,
+      messages: startMessages,
+    ));
+    await dispatcher.dispatchStart(GenerateTextStartEvent(
+      model: model,
+      messages: startMessages,
+    ));
+
+    final responseMessages = <ModelMessage>[];
+    final List<StepResult> steps;
+    try {
+      steps = await runToolLoopGenerate(
+        model: model,
+        initialMessages: initialMessages,
+        instructions: instructions,
+        tools: toolSet,
+        toolChoice: toolChoice,
+        maxOutputTokens: maxOutputTokens,
+        temperature: temperature,
+        topP: topP,
+        topK: topK,
+        presencePenalty: presencePenalty,
+        frequencyPenalty: frequencyPenalty,
+        seed: seed,
+        stopSequences: stopSequencesSnapshot,
+        reasoning: reasoning,
+        responseFormat: responseFormat,
+        stopWhen: stopWhenSnapshot,
+        cancellation: totalScope.signal,
+        timeout: timeoutConfiguration,
+        headers: headersSnapshot,
+        providerOptions: providerOptionsSnapshot,
+        runtimeContext: runtimeContextSnapshot,
+        toolsContext: toolsContextSnapshot,
+        activeTools: activeToolsSnapshot,
+        toolOrder: toolOrderSnapshot,
+        prepareStep: prepareStep,
+        toolApproval: toolApprovalSnapshot,
+        repairToolCall: repairToolCall,
+        onStepStart: onStepStart,
+        onStepEnd: onStepEnd,
+        onResumedToolMessage: (message) {
+          responseMessages.add(_toModelToolMessage(message));
+        },
+        dispatcher: dispatcher,
+      );
+    } catch (error) {
+      await dispatcher.dispatchError(error);
+      rethrow;
+    }
+
+    final finalStep = steps.last;
+    final usage = _sumUsage(steps);
+    onEnd?.call(GenerateTextEndEvent(steps: steps));
+    final shouldParseOutput =
+        finalStep.finishReason.unified == provider.FinishReasonType.stop;
+    // C3:telemetry `dispatchEnd` 放到 parse 成功之后;parse 失败 → dispatchError
+    // (此时尚未 dispatchEnd),故 telemetry 永不出现 onEnd → onError。用户既有
+    // onEnd?.call 保持原位(parse 之前),不改既有语义。
+    final Complete? parsedOutput;
+    try {
+      parsedOutput = shouldParseOutput
+          ? await interruptFutureOnCancellation(
+              outputSpec.parseCompleteOutput(
+                OutputText(finalStep.text),
+                OutputParseContext(
+                  response: finalStep.response,
+                  usage: usage,
+                  finishReason: finalStep.finishReason,
+                ),
+              ),
+              totalScope.signal,
+            )
+          : null;
+    } catch (error) {
+      await dispatcher.dispatchError(error);
+      rethrow;
+    }
+    throwIfCancelled(totalScope.signal);
+    await dispatcher.dispatchEnd(GenerateTextEndEvent(steps: steps));
+
+    final result = GenerateTextResult<Complete>(
+      steps: steps,
+      output: parsedOutput,
+      hasOutput: shouldParseOutput,
+      responseMessages: responseMessages,
+    );
+    return result;
+  } finally {
+    totalScope.dispose();
+  }
 }
 
 /// 把输出侧 `provider.OutputFileData`(bytes/base64/url)还原为用户面

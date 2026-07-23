@@ -43,6 +43,7 @@ Future<Object?> _partial(
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-07
   group('Output.text', () {
     test('uses text response format and parses complete and partial text',
         () async {

@@ -20,6 +20,9 @@ import '../support/logging.dart';
 import '../support/scripted_model.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-08
+  // Compatibility fixture (unit): P1-CORE-09
+  // Compatibility fixture (unit): P1-CORE-10
   group('streamText', () {
     test(
         'StepResult.providerMetadata carries FinishPart providerMetadata '
@@ -4361,8 +4364,10 @@ void main() {
           steps.single.content.whereType<provider.SourceContent>().toList();
       expect(sources, hasLength(1));
       expect(sources.single.id, 's1');
-      expect(steps.single.performance.timeToFirstOutput, isNotNull);
-      expect(steps.single.performance.outputTokensPerSecond, isNotNull);
+      // Source metadata is preserved but is not semantic generated content;
+      // it must not satisfy first/chunk timeout or performance clocks.
+      expect(steps.single.performance.timeToFirstOutput, isNull);
+      expect(steps.single.performance.outputTokensPerSecond, isNull);
       expect(steps.single.performance.timeBetweenOutputChunks, isNull);
     });
 

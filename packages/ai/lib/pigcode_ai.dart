@@ -28,6 +28,7 @@ export 'src/generate_text/tool_order.dart' show ToolOrder;
 export 'src/generate_text/stop_condition.dart';
 export 'src/generate_text/prune_messages.dart';
 export 'src/generate_text/prepare_step.dart';
+export 'src/generate_text/request_timeout.dart' show TimeoutConfiguration;
 export 'src/generate_text/tool_approval.dart';
 export 'src/generate_text/tool_call_repair.dart';
 export 'src/generate_text/lifecycle_events.dart';

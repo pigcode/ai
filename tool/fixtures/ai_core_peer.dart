@@ -248,7 +248,24 @@ Future<void> _handleHttpRequest(
             charset: 'utf-8',
           )
           ..set(HttpHeaders.cacheControlHeader, 'no-cache');
-        for (final event in decoded['events'] as List<Object?>) {
+        for (final scriptedEvent in decoded['events'] as List<Object?>) {
+          var event = scriptedEvent;
+          if (scriptedEvent is Map<String, Object?> &&
+              scriptedEvent.containsKey('delayMs')) {
+            final delayMs = scriptedEvent['delayMs'];
+            if (delayMs is! int ||
+                delayMs < 0 ||
+                delayMs > 2000 ||
+                !scriptedEvent.containsKey('data')) {
+              request.response
+                ..statusCode = HttpStatus.badRequest
+                ..write('invalid_sse_delay');
+              await request.response.close();
+              return;
+            }
+            await Future<void>.delayed(Duration(milliseconds: delayMs));
+            event = scriptedEvent['data'];
+          }
           request.response.write('data: ${jsonEncode(event)}\n\n');
           await request.response.flush();
         }

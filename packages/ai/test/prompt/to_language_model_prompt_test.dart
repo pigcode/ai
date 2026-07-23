@@ -8,6 +8,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart' as provider;
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-04
   group('convertToLanguageModelPrompt', () {
     test('prepends instructions as a provider SystemMessage', () {
       final standardized = StandardizedPrompt(
@@ -414,6 +415,68 @@ void main() {
       expect(response.approvalId, 'approval-1');
       expect(response.approved, isTrue);
       expect(response.reason, 'approved by user');
+    });
+
+    test(
+        'P1-CORE-04 merges consecutive tool messages without losing '
+        'provider options', () {
+      final result = convertToLanguageModelPrompt(StandardizedPrompt(
+        instructions: null,
+        messages: const <ModelMessage>[
+          ToolModelMessage(
+            <ToolContentPart>[
+              ToolResultPart(
+                toolCallId: 'call-1',
+                toolName: 'first',
+                output: provider.ToolResultText('one'),
+                providerOptions: <String, provider.JsonObject>{
+                  'openai': <String, Object?>{
+                    'part': true,
+                    'nested': <String, Object?>{'part': 1},
+                  },
+                },
+              ),
+            ],
+            providerOptions: <String, provider.JsonObject>{
+              'openai': <String, Object?>{
+                'message': true,
+                'nested': <String, Object?>{'message': 2},
+              },
+            },
+          ),
+          ToolModelMessage(
+            <ToolContentPart>[
+              ToolResultPart(
+                toolCallId: 'call-2',
+                toolName: 'second',
+                output: provider.ToolResultText('two'),
+              ),
+            ],
+            providerOptions: <String, provider.JsonObject>{
+              'anthropic': <String, Object?>{'cacheControl': true},
+            },
+          ),
+        ],
+      ));
+
+      final message = result.single as provider.ToolMessage;
+      expect(message.content, hasLength(2));
+      expect(
+        (message.content.first as provider.ToolResultPart).providerOptions,
+        <String, provider.JsonObject>{
+          'openai': <String, Object?>{
+            'part': true,
+            'message': true,
+            'nested': <String, Object?>{
+              'part': 1,
+              'message': 2,
+            },
+          },
+        },
+      );
+      expect(message.providerOptions, <String, provider.JsonObject>{
+        'anthropic': <String, Object?>{'cacheControl': true},
+      });
     });
   });
 }
