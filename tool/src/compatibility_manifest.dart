@@ -12,6 +12,7 @@ const phase1RealPeerVersions = <String, String>{
   'anthropic-peer': 'phase1-anthropic-peer-v1',
 };
 const phase1DartSdkConstraint = '^3.6.0';
+const phase1EvidenceCommit = 'b0ef03a5852a83d1630d793f498a622f83c9d167';
 
 const phase1FixtureIds = <String>{
   'P1-PROVIDER-01',
@@ -139,11 +140,7 @@ const _crossRootTestPaths = <String>{
   'tool/test/ai_core_cross_process_test.dart',
 };
 
-const _manifestKeys = <String>{
-  'manifestVersion',
-  'claims',
-  'notApplicable',
-};
+const _manifestKeys = <String>{'manifestVersion', 'claims', 'notApplicable'};
 const _claimKeys = <String>{
   'claimId',
   'package',
@@ -239,10 +236,7 @@ List<CompatibilityViolation> validateCompatibilityManifest({
   }
 
   _validateSchemaFixtureSet(schema, violations);
-  final inventory = _validateUpstreamInventory(
-    inventoryObject,
-    violations,
-  );
+  final inventory = _validateUpstreamInventory(inventoryObject, violations);
   _validateObjectKeys(
     manifest,
     allowed: _manifestKeys,
@@ -292,11 +286,7 @@ List<CompatibilityViolation> validateCompatibilityManifest({
     );
   }
 
-  _validateNotApplicable(
-    manifest['notApplicable'],
-    inventory,
-    violations,
-  );
+  _validateNotApplicable(manifest['notApplicable'], inventory, violations);
   return violations;
 }
 
@@ -310,8 +300,9 @@ List<CompatibilityViolation> validateFixtureCoverage(Directory root) {
 
   final files = <File>[];
   for (final relativeDirectory in const <String>['packages', 'tool/test']) {
-    final directory =
-        Directory.fromUri(root.uri.resolve('$relativeDirectory/'));
+    final directory = Directory.fromUri(
+      root.uri.resolve('$relativeDirectory/'),
+    );
     if (!directory.existsSync()) {
       continue;
     }
@@ -1035,6 +1026,14 @@ void _validateEvidenceTuple(
         '$location.evidenceCommit must be a lowercase 40-character commit.',
       ),
     );
+  } else if (evidenceCommit != phase1EvidenceCommit) {
+    violations.add(
+      CompatibilityViolation(
+        'evidence_commit_mismatch',
+        '$location.evidenceCommit must match the Phase 1 implementation '
+            'merge commit $phase1EvidenceCommit.',
+      ),
+    );
   }
 }
 
@@ -1104,9 +1103,7 @@ bool _containsFixtureToken(
   String metadataKind,
   String fixtureId,
 ) {
-  if (contents.contains(
-    'Compatibility fixture ($metadataKind): $fixtureId',
-  )) {
+  if (contents.contains('Compatibility fixture ($metadataKind): $fixtureId')) {
     return true;
   }
   final escapedId = RegExp.escape(fixtureId);
@@ -1213,10 +1210,7 @@ void _validateObjectKeys(
   for (final key in object.keys) {
     if (!allowed.contains(key)) {
       violations.add(
-        CompatibilityViolation(
-          'unknown_key',
-          'Unknown key $location.$key.',
-        ),
+        CompatibilityViolation('unknown_key', 'Unknown key $location.$key.'),
       );
     }
   }
@@ -1237,11 +1231,7 @@ List<String>? _fixtureIdList(
   required String location,
   required List<CompatibilityViolation> violations,
 }) {
-  final values = _stringList(
-    value,
-    location: location,
-    violations: violations,
-  );
+  final values = _stringList(value, location: location, violations: violations);
   if (values == null) {
     return null;
   }

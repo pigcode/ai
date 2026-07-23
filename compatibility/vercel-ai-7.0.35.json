@@ -76,7 +76,7 @@
           "peer": "provider-scripted-peer",
           "peerBinaryHash": "a1309583cffacc5fec920783b2069ca2f2e23921",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "e3085f068dd71a4b3c2b31a1b07d6a63ad4f689a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -100,7 +100,7 @@
           "peer": "ai-core-peer",
           "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "e3085f068dd71a4b3c2b31a1b07d6a63ad4f689a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "The Dart contract package preserves the pinned provider-v4 shape with typed Dart variants and explicit cancellation semantics."
@@ -180,7 +180,7 @@
           "peer": "provider-utils-scripted-peer",
           "peerBinaryHash": "f8e1b7dd98f5b088775917968988b40c5983fcb0",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "15418fae4234e6b301a2ffa761dee4b9d90d485a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -204,7 +204,7 @@
           "peer": "ai-core-peer",
           "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "15418fae4234e6b301a2ffa761dee4b9d90d485a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "Shared utilities are verified without external network access against deterministic in-process and loopback peers."
@@ -371,7 +371,7 @@
           "peer": "ai-core-text-scripted-peer",
           "peerBinaryHash": "3bcad0a90eb99a01ceab4a17ba6b127749921075",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "55b2b9c66a516ff0a6ed3c79a3e85b2f58ee793e"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         },
         {
           "path": "packages/ai/test/compatibility/ai_core_services_scripted_peer_test.dart",
@@ -390,7 +390,7 @@
           "peer": "ai-core-services-scripted-peer",
           "peerBinaryHash": "eb219d138dbec50a86cd7b863e249eacfb2766d9",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "881b51940cfabd13cf590ac927102eee010388b6"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -417,7 +417,7 @@
           "peer": "ai-core-peer",
           "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "55b2b9c66a516ff0a6ed3c79a3e85b2f58ee793e"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         },
         {
           "path": "packages/ai/test/compatibility/ai_core_services_real_process_test.dart",
@@ -436,7 +436,7 @@
           "peer": "ai-core-peer",
           "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "881b51940cfabd13cf590ac927102eee010388b6"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "Core text and service helpers are separately evidenced so every fixed Phase 1 behavior remains traceable to its owning test."
@@ -551,7 +551,7 @@
           "peer": "openai-scripted-peer",
           "peerBinaryHash": "9e7c1103d59e1bca9a656f34ddcec1f2d862e142",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "890fc6b0c5f3e66cb1df00af3a1f01816c2d02d6"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -575,7 +575,7 @@
           "peer": "openai-peer",
           "peerBinaryHash": "1ca0c185a4a8a6a05c168bdbb8106dadacfc7cab",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "890fc6b0c5f3e66cb1df00af3a1f01816c2d02d6"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "The OpenAI adapter is pinned to the 4.0.18 source tree and verified against an immutable local protocol peer."
@@ -654,7 +654,7 @@
           "peer": "openai-compatible-scripted-peer",
           "peerBinaryHash": "792e003a45430d49795dcf6cdee5520307e9c900",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "de3831301bd78073d2ba26318485a4db8204ae42"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -674,7 +674,7 @@
           "peer": "openai-compatible-peer",
           "peerBinaryHash": "03c0628409c4d9a8b1df106303c40333189fbf63",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "de3831301bd78073d2ba26318485a4db8204ae42"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "The configurable adapter preserves provider-specific extension points while sharing the neutral contract types."
@@ -779,7 +779,7 @@
           "peer": "anthropic-scripted-peer",
           "peerBinaryHash": "d958e87b31991c66c595ec00eb56f6112073304e",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "1781f7c9a939d55f173310c91dbdf56d919f5e8a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -803,7 +803,7 @@
           "peer": "anthropic-peer",
           "peerBinaryHash": "c8018a923f97ca63b2617f41b50fc4a383de7b5c",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "1781f7c9a939d55f173310c91dbdf56d919f5e8a"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "Anthropic behavior is pinned to the 4.0.18 source tree, including structured-output fallback and citation metadata."
@@ -871,7 +871,7 @@
           "peer": "cross-package-scripted-peer",
           "peerBinaryHash": "63864363a397ba98690c9d12a81ac9626d2050be",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "48f08e1d33c025c44312149c59554d53c5128b62"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "realProcessTests": [
@@ -892,7 +892,7 @@
           "peer": "ai-core-peer",
           "peerBinaryHash": "daea56677a53e487cd8190cb8b74e3c8a41e5397",
           "dartSdkConstraint": "^3.6.0",
-          "evidenceCommit": "48f08e1d33c025c44312149c59554d53c5128b62"
+          "evidenceCommit": "b0ef03a5852a83d1630d793f498a622f83c9d167"
         }
       ],
       "notes": "The workspace evidence binds all six public barrels and separately records Chrome plus JavaScript and Wasm compile smoke in CI."

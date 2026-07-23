@@ -6,7 +6,7 @@ import '../src/compatibility_manifest.dart';
 typedef _TestBody = void Function();
 
 const _targetCommit = '799faf71e05a7d580914ad94d943d28c0400554c';
-const _evidenceCommit = '1111111111111111111111111111111111111111';
+const _evidenceCommit = phase1EvidenceCommit;
 const _peerHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
 const _sources = <String, Map<String, String>>{
@@ -172,23 +172,26 @@ void main() {
         _expectViolation(fixture.validate(), 'invalid_upstream_ref');
       });
       _withFixture((fixture) {
-        final ref =
-            _firstRef(fixture.claim('P1-UTIL-CLAIM-01'), 'upstreamRefs');
+        final ref = _firstRef(
+          fixture.claim('P1-UTIL-CLAIM-01'),
+          'upstreamRefs',
+        );
         ref['path'] = 'https://github.com/vercel/ai/blob/main/index.ts';
         _expectViolation(fixture.validate(), 'invalid_upstream_path');
       });
       _withFixture((fixture) {
-        final ref =
-            _firstRef(fixture.claim('P1-COMPAT-CLAIM-01'), 'upstreamRefs');
-        ref['path'] = 'packages/openai-compatible/src/typo.ts';
-        _expectViolation(
-          fixture.validate(),
-          'upstream_path_not_in_inventory',
+        final ref = _firstRef(
+          fixture.claim('P1-COMPAT-CLAIM-01'),
+          'upstreamRefs',
         );
+        ref['path'] = 'packages/openai-compatible/src/typo.ts';
+        _expectViolation(fixture.validate(), 'upstream_path_not_in_inventory');
       });
       _withFixture((fixture) {
-        final ref =
-            _firstRef(fixture.claim('P1-CORE-CLAIM-01'), 'upstreamRefs');
+        final ref = _firstRef(
+          fixture.claim('P1-CORE-CLAIM-01'),
+          'upstreamRefs',
+        );
         (ref['fixtureIds'] as List).removeLast();
         _expectViolation(fixture.validate(), 'upstream_coverage_mismatch');
       });
@@ -213,8 +216,10 @@ void main() {
         _expectViolation(fixture.validate(), 'missing_fixture_token');
       });
       _withFixture((fixture) {
-        final ref =
-            _firstRef(fixture.claim('P1-ANTHROPIC-CLAIM-01'), 'dartTests');
+        final ref = _firstRef(
+          fixture.claim('P1-ANTHROPIC-CLAIM-01'),
+          'dartTests',
+        );
         fixture.file(ref['path'] as String).deleteSync();
         _expectViolation(fixture.validate(), 'missing_test_path');
       });
@@ -230,10 +235,7 @@ void main() {
         fixture.makeVerified();
         fixture.claim('P1-PROVIDER-CLAIM-01')['scriptedPeerTests'] =
             <Object?>[];
-        _expectViolation(
-          fixture.validate(),
-          'scripted_peer_coverage_mismatch',
-        );
+        _expectViolation(fixture.validate(), 'scripted_peer_coverage_mismatch');
       });
       _withFixture((fixture) {
         fixture.makeVerified();
@@ -242,10 +244,7 @@ void main() {
           'realProcessTests',
         );
         (ref['fixtureIds'] as List).removeLast();
-        _expectViolation(
-          fixture.validate(),
-          'real_process_coverage_mismatch',
-        );
+        _expectViolation(fixture.validate(), 'real_process_coverage_mismatch');
       });
     },
     'verified evidence rejects incomplete mutable or missing tuples': () {
@@ -286,6 +285,17 @@ void main() {
         _expectViolation(fixture.validate(), 'invalid_evidence_tuple');
         ref['version'] = 'phase1-openai-peer-v1';
         _expectNoViolations(fixture.validate());
+      });
+    },
+    'evidence tuples require the main-bound implementation commit': () {
+      _withFixture((fixture) {
+        fixture.makeVerified();
+        final ref = _firstRef(
+          fixture.claim('P1-CORE-CLAIM-01'),
+          'realProcessTests',
+        );
+        ref['evidenceCommit'] = '1111111111111111111111111111111111111111';
+        _expectViolation(fixture.validate(), 'evidence_commit_mismatch');
       });
     },
     'cross fixtures use only the fixed root-test exceptions': () {
@@ -388,10 +398,7 @@ void _withFixture(void Function(_ManifestFixture fixture) body) {
   }
 }
 
-void _expectViolation(
-  List<CompatibilityViolation> violations,
-  String code,
-) {
+void _expectViolation(List<CompatibilityViolation> violations, String code) {
   _expect(
     violations.any((violation) => violation.code == code),
     'Expected $code, got ${violations.join('; ')}',
@@ -400,7 +407,9 @@ void _expectViolation(
 
 void _expectNoViolations(List<CompatibilityViolation> violations) {
   _expect(
-      violations.isEmpty, 'Expected no violations: ${violations.join('; ')}');
+    violations.isEmpty,
+    'Expected no violations: ${violations.join('; ')}',
+  );
 }
 
 void _expect(bool condition, String message) {
@@ -426,12 +435,11 @@ final class _ManifestFixture {
     );
     final claims = <Object?>[
       _claim(
-          'P1-PROVIDER-CLAIM-01', 'pigcode_ai_provider', _ids('PROVIDER', 8)),
-      _claim(
-        'P1-UTIL-CLAIM-01',
-        'pigcode_ai_provider_utils',
-        _ids('UTIL', 8),
+        'P1-PROVIDER-CLAIM-01',
+        'pigcode_ai_provider',
+        _ids('PROVIDER', 8),
       ),
+      _claim('P1-UTIL-CLAIM-01', 'pigcode_ai_provider_utils', _ids('UTIL', 8)),
       _claim('P1-CORE-CLAIM-01', 'pigcode_ai', _ids('CORE', 16)),
       _claim('P1-OPENAI-CLAIM-01', 'pigcode_ai_openai', _ids('OPENAI', 8)),
       _claim(
@@ -488,14 +496,15 @@ final class _ManifestFixture {
     return fixture;
   }
 
-  Map<String, Object?> claim(String id) =>
-      (manifest['claims'] as List).cast<Map<String, Object?>>().singleWhere(
-            (claim) => claim['claimId'] == id,
-          );
+  Map<String, Object?> claim(String id) => (manifest['claims'] as List)
+      .cast<Map<String, Object?>>()
+      .singleWhere((claim) => claim['claimId'] == id);
 
   List<CompatibilityViolation> validate() {
     write(
-        'manifest.json', const JsonEncoder.withIndent('  ').convert(manifest));
+      'manifest.json',
+      const JsonEncoder.withIndent('  ').convert(manifest),
+    );
     write('schema.json', const JsonEncoder.withIndent('  ').convert(schema));
     write(
       'inventory.json',
