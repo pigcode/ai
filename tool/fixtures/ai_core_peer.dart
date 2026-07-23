@@ -253,6 +253,42 @@ Future<void> _handleHttpRequest(
           await request.response.flush();
         }
         await request.response.close();
+      case '/redirect':
+        final requestedStatus =
+            int.tryParse(request.uri.queryParameters['status'] ?? '');
+        final status = requestedStatus != null &&
+                requestedStatus >= 300 &&
+                requestedStatus < 400
+            ? requestedStatus
+            : HttpStatus.found;
+        final target = request.uri.queryParameters['target'] ?? '/health';
+        request.response
+          ..statusCode = status
+          ..headers.set(HttpHeaders.locationHeader, target);
+        await request.response.close();
+      case '/status':
+        final requestedStatus =
+            int.tryParse(request.uri.queryParameters['code'] ?? '');
+        final status = requestedStatus != null &&
+                requestedStatus >= 100 &&
+                requestedStatus <= 599
+            ? requestedStatus
+            : HttpStatus.badRequest;
+        await _writeJsonResponse(
+          request.response,
+          <String, Object?>{'ok': false, 'status': status},
+          statusCode: status,
+        );
+      case '/multipart':
+        final body = await utf8.decoder.bind(request).join();
+        await _writeJsonResponse(request.response, <String, Object?>{
+          'ok': true,
+          'method': request.method,
+          'contentType': request.headers.contentType?.toString(),
+          'bodyLength': body.length,
+          'containsFixtureFilename': body.contains('filename="fixture.txt"'),
+          'containsFixtureBody': body.contains('fixture body'),
+        });
       case '/ws':
         if (!WebSocketTransformer.isUpgradeRequest(request)) {
           request.response

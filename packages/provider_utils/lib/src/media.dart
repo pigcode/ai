@@ -3,6 +3,15 @@ import 'dart:typed_data';
 
 import 'package:pigcode_ai_provider/pigcode_ai_provider.dart' as provider;
 
+const _defaultSniffBytes = 18;
+const _maxSignatureBytes = 12;
+
+/// Largest ID3v2 tag prefix inspected before looking for an audio signature.
+///
+/// The bound includes the 10-byte ID3 header and prevents base64 inputs from
+/// forcing an unbounded decode merely to sniff their media type.
+const maxId3TagBytes = 128 * 1024;
+
 /// Detects a file's IANA media type from raw bytes or a base64 string.
 ///
 /// When [topLevelType] is provided, only signatures for that top-level segment
@@ -11,7 +20,7 @@ String? detectMediaType({
   required Object data,
   String? topLevelType,
 }) {
-  final bytes = _mediaBytes(data);
+  var bytes = _mediaPrefix(data, _defaultSniffBytes);
   if (bytes == null) {
     return null;
   }
@@ -29,9 +38,18 @@ String? detectMediaType({
     return null;
   }
 
-  final processedBytes = _stripId3TagsIfPresent(bytes);
+  if (_hasId3(bytes)) {
+    final id3Prefix = _mediaPrefix(
+      data,
+      maxId3TagBytes + _maxSignatureBytes,
+    );
+    if (id3Prefix == null) {
+      return null;
+    }
+    bytes = _stripId3Tag(id3Prefix);
+  }
   for (final signature in signatures) {
-    if (_hasSignature(processedBytes, signature.bytesPrefix)) {
+    if (_hasSignature(bytes, signature.bytesPrefix)) {
       return signature.mediaType;
     }
   }
@@ -113,16 +131,25 @@ String resolveFullMediaType(provider.FilePart part) {
   );
 }
 
-Uint8List? _mediaBytes(Object data) {
+Uint8List? _mediaPrefix(Object data, int maxBytes) {
   if (data is Uint8List) {
-    return data;
+    return data.length <= maxBytes
+        ? data
+        : Uint8List.sublistView(data, 0, maxBytes);
   }
   if (data is List<int>) {
-    return Uint8List.fromList(data);
+    return Uint8List.fromList(data.take(maxBytes).toList(growable: false));
   }
   if (data is String) {
     try {
-      return base64Decode(data);
+      final maxCharacters = ((maxBytes + 2) ~/ 3) * 4;
+      final encodedPrefix = data.length <= maxCharacters
+          ? data
+          : data.substring(0, maxCharacters);
+      final decoded = base64Decode(encodedPrefix);
+      return decoded.length <= maxBytes
+          ? decoded
+          : Uint8List.sublistView(decoded, 0, maxBytes);
     } on FormatException {
       return null;
     }
@@ -130,20 +157,19 @@ Uint8List? _mediaBytes(Object data) {
   return null;
 }
 
-Uint8List _stripId3TagsIfPresent(Uint8List bytes) {
-  if (bytes.length <= 10 ||
-      bytes[0] != 0x49 ||
-      bytes[1] != 0x44 ||
-      bytes[2] != 0x33) {
-    return bytes;
-  }
+bool _hasId3(Uint8List bytes) =>
+    bytes.length > 10 &&
+    bytes[0] == 0x49 &&
+    bytes[1] == 0x44 &&
+    bytes[2] == 0x33;
 
+Uint8List _stripId3Tag(Uint8List bytes) {
   final id3Size = ((bytes[6] & 0x7f) << 21) |
       ((bytes[7] & 0x7f) << 14) |
       ((bytes[8] & 0x7f) << 7) |
       (bytes[9] & 0x7f);
   final payloadStart = id3Size + 10;
-  if (payloadStart >= bytes.length) {
+  if (payloadStart > maxId3TagBytes || payloadStart >= bytes.length) {
     return Uint8List(0);
   }
   return Uint8List.sublistView(bytes, payloadStart);

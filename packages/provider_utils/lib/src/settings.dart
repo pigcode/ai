@@ -2,6 +2,34 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 
 final _trailingSlash = RegExp(r'/$');
 
+/// Validates an optional provider base URL.
+///
+/// `null` preserves the provider default. Empty or whitespace-only overrides
+/// are rejected because silently accepting them can turn an intended absolute
+/// API endpoint into an unrelated relative request.
+String? validateBaseUrl(String? baseUrl) {
+  if (baseUrl != null && baseUrl.trim().isEmpty) {
+    throw const InvalidArgumentError(
+      argument: 'baseURL',
+      message: 'baseURL must be a non-empty string.',
+    );
+  }
+  if (baseUrl != null) {
+    final parsed = Uri.tryParse(baseUrl);
+    final scheme = parsed?.scheme.toLowerCase();
+    if (parsed == null ||
+        !parsed.hasAuthority ||
+        parsed.host.isEmpty ||
+        (scheme != 'http' && scheme != 'https')) {
+      throw const InvalidArgumentError(
+        argument: 'baseURL',
+        message: 'baseURL must be a valid absolute http(s) URL.',
+      );
+    }
+  }
+  return baseUrl;
+}
+
 /// 去掉 [url] 唯一一个尾部斜杠;`null` 原样返回 `null`。
 String? withoutTrailingSlash(String? url) {
   if (url == null) {
