@@ -62,6 +62,8 @@ final class FullTelemetry with Telemetry {
   @override
   FutureOr<void> onEnd(GenerateTextEndEvent e, TelemetryMetadata m) {}
   @override
+  FutureOr<void> onAbort(GenerateTextAbortEvent e, TelemetryMetadata m) {}
+  @override
   FutureOr<void> onError(Object? error, TelemetryMetadata m) {}
 }
 
@@ -126,6 +128,9 @@ void main() {
       // 未覆写的默认方法调用应为 no-op,不抛错。
       final noop = t.onError(StateError('x'), meta);
       if (noop is Future) await noop;
+      final abortNoop =
+          t.onAbort(GenerateTextAbortEvent(steps: const []), meta);
+      if (abortNoop is Future) await abortNoop;
 
       expect(t.calls, ['lmStart:call_1', 'toolStart:tc_1', 'toolEnd:tc_1']);
       expect(t.lastMetadata?.functionId, 'f1');

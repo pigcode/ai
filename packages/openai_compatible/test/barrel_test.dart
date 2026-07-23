@@ -1,9 +1,18 @@
+// Compatibility fixture (unit): P1-CROSS-01
+// Compatibility fixture (unit): P1-CROSS-02
 import 'package:pigcode_ai_openai_compatible/pigcode_ai_openai_compatible.dart';
 import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('barrel 导出完整性', () {
+    test('cross-package provider metadata remains typed', () {
+      const ProviderMetadata metadata = <String, JsonObject>{
+        'fixed-compatible': <String, Object?>{'traceId': 'compatible'},
+      };
+      expect(metadata['fixed-compatible']?['traceId'], 'compatible');
+    });
+
     test('createOpenAiCompatible 与 OpenAiCompatibleProvider 经 barrel 可达', () {
       final provider = createOpenAiCompatible(
         name: 'mycustom',

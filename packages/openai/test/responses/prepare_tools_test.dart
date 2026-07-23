@@ -3,6 +3,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-06
   final weatherTool = FunctionTool(
     name: 'get_weather',
     description: 'Get the weather for a city',
@@ -117,6 +118,27 @@ void main() {
           'timezone': 'America/Los_Angeles',
         },
       });
+    });
+
+    test('openaiTools.computer maps to the Responses computer tool', () {
+      final tool = openAiTools.computer();
+      final result = prepareOpenAiResponsesTools(
+        tools: [tool],
+        toolChoice: const ToolChoiceTool('computer'),
+      );
+
+      expect(
+          tool,
+          const ProviderTool(
+            id: 'openai.computer',
+            name: 'computer',
+            args: {},
+          ));
+      expect(result.tools, [
+        {'type': 'computer'},
+      ]);
+      expect(result.toolChoice, {'type': 'computer'});
+      expect(result.warnings, isEmpty);
     });
 
     test('openai.web_search ProviderTool maps to Responses web_search', () {

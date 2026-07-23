@@ -192,6 +192,7 @@ OpenAiConfig _config(http.Client client) {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-03
   group('OpenAiChatLanguageModel.doStream', () {
     test('请求体无条件带 stream_options.include_usage', () async {
       final client = _RecordingClient(

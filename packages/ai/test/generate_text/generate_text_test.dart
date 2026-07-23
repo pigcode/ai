@@ -16,6 +16,8 @@ import '../support/scripted_model.dart';
 bool _stopAtTwoSteps(List<StepResult> steps) => steps.length >= 2;
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-01
+  // Compatibility fixture (unit): P1-CORE-02
   group('generateText', () {
     test('单步文本结果:聚合 text/finishReason/usage/response 均来自唯一一步', () async {
       final model = ScriptedModel(turns: [

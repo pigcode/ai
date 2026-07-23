@@ -3,6 +3,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart' as provider;
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-15
   group('UiMessageChunk JSON', () {
     test('round-trips every supported chunk type', () {
       final chunks = <UiMessageChunk>[
@@ -35,6 +36,14 @@ void main() {
         MessageMetadataUiMessageChunk({
           'run': {'id': 'r1'},
         }),
+        DataUiMessageChunk(
+          type: 'data-weather',
+          id: 'weather_1',
+          data: const {
+            'temperature': 21,
+          },
+          transient: false,
+        ),
         const StartStepUiMessageChunk(),
         const FinishStepUiMessageChunk(),
         TextStartUiMessageChunk(
@@ -175,6 +184,52 @@ void main() {
       expectInvalid(
         () => UiMessageChunk.fromJson(const {'type': 'unknown'}),
         'type',
+      );
+    });
+
+    test('accepts forward-compatible data-* chunk types', () {
+      final chunk = UiMessageChunk.fromJson(const {
+        'type': 'data-future-widget',
+        'id': 'widget_1',
+        'data': {
+          'items': [1, 2],
+        },
+        'transient': true,
+      });
+
+      expect(
+        chunk,
+        DataUiMessageChunk(
+          type: 'data-future-widget',
+          id: 'widget_1',
+          data: const {
+            'items': [1, 2],
+          },
+          transient: true,
+        ),
+      );
+      expect(
+        () => (chunk as DataUiMessageChunk).data as Map<String, Object?>
+          ..['changed'] = true,
+        throwsUnsupportedError,
+      );
+    });
+
+    test('validates data chunk type and payload', () {
+      expectInvalid(
+        () => DataUiMessageChunk(type: 'custom', data: null),
+        'type',
+      );
+      expectInvalid(
+        () => UiMessageChunk.fromJson(const {'type': 'data-missing'}),
+        'data',
+      );
+      expectInvalid(
+        () => UiMessageChunk.fromJson({
+          'type': 'data-invalid',
+          'data': DateTime(2026),
+        }),
+        'data',
       );
     });
 

@@ -9,6 +9,7 @@ typedef _LanguageModelGenerateResult = provider.LanguageModelGenerateResult;
 typedef _LanguageModelStreamResult = provider.LanguageModelStreamResult;
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-12
   const prompt = <provider.LanguageModelMessage>[
     provider.UserMessage([provider.TextPart('hi')]),
   ];

@@ -14,6 +14,7 @@ export 'src/http/http.dart';
 export 'src/http/multipart.dart';
 export 'src/http/response_handler.dart';
 export 'src/http/sse.dart';
+export 'src/http/url_security.dart';
 export 'src/ids.dart';
 export 'src/json/json.dart';
 export 'src/media.dart';

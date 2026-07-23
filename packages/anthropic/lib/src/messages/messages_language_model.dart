@@ -63,6 +63,16 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
     final anthropicOptions = resolvedOptions.options;
     final capabilities = getAnthropicModelCapabilities(modelId);
 
+    if (!capabilities.isKnownModel && options.maxOutputTokens == null) {
+      warnings.add(CompatibilityWarning(
+        'maxOutputTokens',
+        details: 'The model "$modelId" is unknown. '
+            'The max output tokens have been limited to '
+            '${capabilities.maxOutputTokens}. '
+            'Set maxOutputTokens explicitly to override this limit.',
+      ));
+    }
+
     // 不支持的标准参数(报告 03 §5 第 1-3 条,:227-237)。
     if (options.frequencyPenalty != null) {
       warnings.add(const UnsupportedWarning('frequencyPenalty'));
@@ -133,6 +143,16 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
       }
     }
     final usesJsonResponseTool = jsonResponseTool != null;
+    if (usesJsonResponseTool &&
+        anthropicOptions.disableParallelToolUse == false) {
+      warnings.add(const UnsupportedWarning(
+        'providerOptions.anthropic.disableParallelToolUse',
+        details:
+            '`disableParallelToolUse: false` is ignored when using the JSON '
+            'response tool. Parallel tool use is disabled to ensure a single '
+            'coherent JSON tool call.',
+      ));
+    }
 
     // rejectsSamplingParameters 模型裁剪采样参数(报告 03 §5 第 6 条,
     // :304-329);此分支在 clamp 之后执行,越界温度会先后产生两条 warning
@@ -711,10 +731,28 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
           if (built.usesJsonResponseTool) {
             continue;
           }
-          content.add(TextContent(block['text']! as String));
+          final citations = block['citations'];
+          final webSearchCitations = citations is List<Object?>
+              ? citations
+                  .whereType<JsonObject>()
+                  .where(
+                    (citation) =>
+                        citation['type'] == 'web_search_result_location',
+                  )
+                  .toList()
+              : const <JsonObject>[];
+          content.add(TextContent(
+            block['text']! as String,
+            providerMetadata: webSearchCitations.isEmpty
+                ? null
+                : <String, JsonObject>{
+                    'anthropic': <String, Object?>{
+                      'citations': webSearchCitations,
+                    },
+                  },
+          ));
           // citations 逐条映射为 source,紧随所属 text 块之后追加
           // (报告 03 §10.3 :70-127)。
-          final citations = block['citations'];
           if (citations is List<Object?>) {
             for (final citation in citations) {
               final source = _createCitationSource(
@@ -1139,7 +1177,7 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
                   break;
                 }
                 // text 块 id = String(块索引)(报告 04 §3 :133)。
-                contentBlocks[index] = _ContentBlockState.text;
+                contentBlocks[index] = _TextBlockState();
                 yield TextStart('$index');
               case 'thinking':
                 contentBlocks[index] = _ContentBlockState.reasoning;
@@ -1157,7 +1195,7 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
                 // String(index)),工具输入以文本流形式输出(:1635-1646)。
                 if (usesJsonResponseTool && contentBlock['name'] == 'json') {
                   isJsonResponseFromTool = true;
-                  contentBlocks[index] = _ContentBlockState.text;
+                  contentBlocks[index] = _TextBlockState();
                   yield TextStart('$index');
                   break;
                 }
@@ -1294,7 +1332,7 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
                 // content 字段忽略不读(流式 schema nullish,文本全靠
                 // compaction_delta 到达);stop 走既有 text 分支自然产
                 // TextEnd(报告 10 §9.3,核心缓冲保留 start 的 metadata)。
-                contentBlocks[index] = _ContentBlockState.text;
+                contentBlocks[index] = _TextBlockState();
                 yield TextStart('$index', providerMetadata: const {
                   'anthropic': {'type': 'compaction'},
                 });
@@ -1414,8 +1452,14 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
               case 'citations_delta':
                 // citation → source part,查不到文档则丢弃不 yield
                 // (:2288-2301)。
+                final citation = delta['citation']! as JsonObject;
+                final contentBlock = contentBlocks[index];
+                if (contentBlock is _TextBlockState &&
+                    citation['type'] == 'web_search_result_location') {
+                  contentBlock.citations.add(citation);
+                }
                 final source = _createCitationSource(
-                  delta['citation']! as JsonObject,
+                  citation,
                   citationDocuments,
                 );
                 if (source != null) {
@@ -1441,8 +1485,17 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
           case 'content_block_stop':
             final index = (value['index']! as num).toInt();
             switch (contentBlocks[index]) {
-              case _TextBlockState():
-                yield TextEnd('$index');
+              case final _TextBlockState block:
+                yield TextEnd(
+                  '$index',
+                  providerMetadata: block.citations.isEmpty
+                      ? null
+                      : <String, JsonObject>{
+                          'anthropic': <String, Object?>{
+                            'citations': block.citations,
+                          },
+                        },
+                );
               case _ReasoningBlockState():
                 yield ReasoningEnd('$index');
               case final _ToolCallBlockState block:
@@ -1645,16 +1698,16 @@ final class AnthropicMessagesLanguageModel implements LanguageModel {
 sealed class _ContentBlockState {
   const _ContentBlockState();
 
-  /// text 块标记(无附加状态)。
-  static const text = _TextBlockState();
-
   /// reasoning 块标记(thinking/redacted_thinking 共用,无附加状态)。
   static const reasoning = _ReasoningBlockState();
 }
 
-/// text 块注册状态。
+/// text 块注册状态;流式 web-search citation 会累积到 [citations],并在
+/// [TextEnd] 的 provider metadata 中回传,供下一轮 assistant text 回放。
 final class _TextBlockState extends _ContentBlockState {
-  const _TextBlockState();
+  _TextBlockState();
+
+  final List<JsonObject> citations = <JsonObject>[];
 }
 
 /// reasoning 块注册状态。

@@ -223,6 +223,21 @@ data: {"type":"response.completed","response":{"usage":{"input_tokens":10,"outpu
 
 ''');
 
+final _responsesComputerStream = _flushLeft('''
+event: response.created
+data: {"type":"response.created","response":{"id":"resp_computer_stream","created_at":1700000000,"model":"gpt-5.4"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"type":"computer_call","id":"computer_item_123","call_id":"computer_call_123","status":"in_progress"}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","output_index":0,"item":{"type":"computer_call","id":"computer_item_123","call_id":"computer_call_123","status":"completed","pending_safety_checks":[{"id":"safety_123","code":"confirm_action","message":"Confirm this action."}],"actions":[{"type":"click","button":"left","x":100,"y":200,"keys":["CTRL"]},{"type":"screenshot"},{"type":"scroll","x":130,"y":230,"scroll_x":0,"scroll_y":500}]}}
+
+event: response.completed
+data: {"type":"response.completed","response":{"usage":{"input_tokens":10,"output_tokens":3}}}
+
+''');
+
 final _responsesMcpApprovalRequestStream = _flushLeft('''
 event: response.created
 data: {"type":"response.created","response":{"id":"resp_mcp_approval_stream","created_at":1700000000,"model":"gpt-4.1"}}
@@ -408,6 +423,7 @@ data: {"type":"response.output_text.delta","item_id":"msg_te","delta":"two"}
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-05
   OpenAiConfig configWith(FakeHttpClient client) => OpenAiConfig(
         providerName: 'openai',
         baseUrl: 'https://api.openai.com/v1',
@@ -968,7 +984,7 @@ void main() {
 
     test(
         "缺合法 'output' 数组的 2xx 响应(如误配到 Chat Completions 端点)"
-        '触发 InvalidResponseDataError,不再静默返回空结果', () async {
+        '触发带完整 wire 诊断信息的 ApiCallError', () async {
       final client = FakeHttpClient(
         responseBuilder: (request) async => fakeStreamedResponse(
           statusCode: 200,
@@ -993,8 +1009,112 @@ void main() {
 
       await expectLater(
         model.doGenerate(optionsWith()),
-        throwsA(isA<InvalidResponseDataError>()),
+        throwsA(
+          isA<ApiCallError>()
+              .having((error) => error.statusCode, 'statusCode', 200)
+              .having(
+                (error) => error.url,
+                'url',
+                'https://api.openai.com/v1/responses',
+              )
+              .having(
+                (error) => error.responseBody,
+                'responseBody',
+                contains('"object":"chat.completion"'),
+              )
+              .having(
+                (error) => error.data,
+                'data',
+                isA<Map<String, Object?>>(),
+              )
+              .having((error) => error.isRetryable, 'isRetryable', isFalse),
+        ),
       );
+    });
+
+    test('maps a batched computer call and preserves its stored item id',
+        () async {
+      final client = FakeHttpClient(
+        responseBuilder: (request) async => fakeStreamedResponse(
+          statusCode: 200,
+          body: jsonEncode({
+            'id': 'resp_computer',
+            'created_at': 1700000000,
+            'model': 'gpt-5.4',
+            'output': [
+              {
+                'type': 'computer_call',
+                'id': 'computer_item_123',
+                'call_id': 'computer_call_123',
+                'status': 'completed',
+                'pending_safety_checks': [
+                  {
+                    'id': 'safety_123',
+                    'code': 'confirm_action',
+                    'message': 'Confirm this action.',
+                  },
+                ],
+                'actions': [
+                  {
+                    'type': 'scroll',
+                    'x': 10,
+                    'y': 20,
+                    'scroll_x': 0,
+                    'scroll_y': 100,
+                  },
+                ],
+              },
+            ],
+            'usage': {'input_tokens': 10, 'output_tokens': 3},
+          }),
+        ),
+      );
+      final model = OpenAiResponsesLanguageModel(
+        'gpt-5.4',
+        config: configWith(client),
+      );
+
+      final result = await model.doGenerate(
+        optionsWith(tools: [openAiTools.computer()]),
+      );
+
+      expect(
+        jsonDecode(client.recordedBodies.single)['tools'],
+        [
+          {'type': 'computer'},
+        ],
+      );
+      expect(result.content, [
+        ToolCall(
+          toolCallId: 'computer_call_123',
+          toolName: 'computer',
+          input: jsonEncode({
+            'actions': [
+              {
+                'type': 'scroll',
+                'x': 10,
+                'y': 20,
+                'scrollX': 0,
+                'scrollY': 100,
+              },
+            ],
+            'pendingSafetyChecks': [
+              {
+                'id': 'safety_123',
+                'code': 'confirm_action',
+                'message': 'Confirm this action.',
+              },
+            ],
+            'status': 'completed',
+          }),
+          providerMetadata: const {
+            'openai': {
+              'itemId': 'computer_item_123',
+            },
+          },
+        ),
+      ]);
+      expect(result.finishReason.unified, FinishReasonType.toolCalls);
     });
 
     test('maps a function_call response and sets finishReason tool-calls',
@@ -3798,6 +3918,62 @@ void main() {
 
       final finish = parts.whereType<FinishPart>().single;
       expect(finish.finishReason.unified, FinishReasonType.toolCalls);
+    });
+
+    test('computer stream emits one complete batched tool input', () async {
+      final parts = await collectStream(
+        _responsesComputerStream,
+        tools: [openAiTools.computer()],
+      );
+
+      expect(
+        parts.whereType<ToolInputStart>().single,
+        const ToolInputStart(
+          id: 'computer_call_123',
+          toolName: 'computer',
+        ),
+      );
+      final delta = parts.whereType<ToolInputDelta>().single;
+      expect(jsonDecode(delta.delta), {
+        'actions': [
+          {
+            'type': 'click',
+            'button': 'left',
+            'x': 100,
+            'y': 200,
+            'keys': ['CTRL'],
+          },
+          {'type': 'screenshot'},
+          {
+            'type': 'scroll',
+            'x': 130,
+            'y': 230,
+            'scrollX': 0,
+            'scrollY': 500,
+          },
+        ],
+        'pendingSafetyChecks': [
+          {
+            'id': 'safety_123',
+            'code': 'confirm_action',
+            'message': 'Confirm this action.',
+          },
+        ],
+        'status': 'completed',
+      });
+      expect(parts.whereType<ToolInputEnd>().single.id, 'computer_call_123');
+      final call = parts.whereType<ToolCall>().single;
+      expect(call.toolCallId, 'computer_call_123');
+      expect(call.toolName, 'computer');
+      expect(call.input, delta.delta);
+      expect(
+        call.providerMetadata?['openai']?['itemId'],
+        'computer_item_123',
+      );
+      expect(
+        parts.whereType<FinishPart>().single.finishReason.unified,
+        FinishReasonType.toolCalls,
+      );
     });
 
     test('failed mcp_call stream emits an error tool result', () async {

@@ -1,9 +1,18 @@
+// Compatibility fixture (unit): P1-CROSS-01
+// Compatibility fixture (unit): P1-CROSS-02
 import 'package:pigcode_ai_anthropic/pigcode_ai_anthropic.dart';
 import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('barrel 导出完整性', () {
+    test('cross-package provider metadata remains typed', () {
+      const ProviderMetadata metadata = <String, JsonObject>{
+        'anthropic': <String, Object?>{'traceId': 'anthropic'},
+      };
+      expect(metadata['anthropic']?['traceId'], 'anthropic');
+    });
+
     test('createAnthropic 与 AnthropicProvider 经 barrel 可达', () {
       final provider = createAnthropic(apiKey: 'k');
       expect(provider, isA<AnthropicProvider>());

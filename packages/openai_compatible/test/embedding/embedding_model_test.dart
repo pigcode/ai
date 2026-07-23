@@ -79,6 +79,7 @@ String _successBody({
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-COMPAT-04
   group('OpenAiCompatibleEmbeddingModel — 基础字段与能力值', () {
     test(
         'provider/modelId,默认 maxEmbeddingsPerCall 2048、'

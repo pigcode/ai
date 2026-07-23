@@ -27,6 +27,25 @@ void main() {
       expect(completed, isTrue);
     });
 
+    test('cancel() preserves the first reason', () async {
+      final controller = CancellationController();
+      final firstReason = StateError('first');
+
+      controller.cancel(firstReason);
+      controller.cancel(StateError('second'));
+      await controller.signal.whenCancelled;
+
+      expect(controller.signal.reason, same(firstReason));
+    });
+
+    test('cancel() without a reason preserves null', () {
+      final controller = CancellationController();
+
+      controller.cancel();
+
+      expect(controller.signal.reason, isNull);
+    });
+
     test('whenCancelled resolves even when awaited after cancel()', () async {
       final controller = CancellationController();
       controller.cancel();

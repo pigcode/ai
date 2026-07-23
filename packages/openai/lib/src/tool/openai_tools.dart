@@ -64,6 +64,15 @@ final class OpenAiTools {
     );
   }
 
+  /// Creates the Responses API `computer` client-executed tool.
+  ProviderTool computer() {
+    return const ProviderTool(
+      id: 'openai.computer',
+      name: 'computer',
+      args: {},
+    );
+  }
+
   /// Creates the current Responses API `image_generation` provider-executed
   /// tool.
   ProviderTool imageGeneration({

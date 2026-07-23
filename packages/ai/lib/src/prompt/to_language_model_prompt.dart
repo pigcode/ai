@@ -35,7 +35,35 @@ provider.LanguageModelPrompt convertModelMessagesToLanguageModelPrompt(
 ) {
   final result = <provider.LanguageModelMessage>[];
   for (final message in messages) {
-    result.add(_convertMessage(message));
+    final converted = _convertMessage(message);
+    if (converted is! provider.ToolMessage ||
+        result.isEmpty ||
+        result.last is! provider.ToolMessage) {
+      result.add(converted);
+      continue;
+    }
+
+    final previous = result.removeLast() as provider.ToolMessage;
+    final previousContent = List<provider.ToolContentPart>.of(previous.content);
+    if (previousContent.isNotEmpty && previous.providerOptions != null) {
+      final lastIndex = previousContent.length - 1;
+      previousContent[lastIndex] = _withToolPartProviderOptions(
+        previousContent[lastIndex],
+        _mergeProviderOptions(
+          previous.providerOptions,
+          _toolPartProviderOptions(previousContent[lastIndex]),
+        ),
+      );
+    }
+    result.add(provider.ToolMessage(
+      List<provider.ToolContentPart>.unmodifiable(
+        <provider.ToolContentPart>[
+          ...previousContent,
+          ...converted.content,
+        ],
+      ),
+      providerOptions: converted.providerOptions,
+    ));
   }
   return result;
 }
@@ -369,6 +397,83 @@ provider.ProviderOptions? _snapshotProviderOptions(
       (key, value) => MapEntry(key, _deepUnmodifiableJsonObject(value)),
     ),
   );
+}
+
+provider.ProviderOptions? _toolPartProviderOptions(
+  provider.ToolContentPart part,
+) {
+  return switch (part) {
+    provider.ToolResultPart(:final providerOptions) => providerOptions,
+    provider.ToolApprovalResponsePart(:final providerOptions) =>
+      providerOptions,
+  };
+}
+
+provider.ToolContentPart _withToolPartProviderOptions(
+  provider.ToolContentPart part,
+  provider.ProviderOptions? providerOptions,
+) {
+  return switch (part) {
+    provider.ToolResultPart(
+      :final toolCallId,
+      :final toolName,
+      :final output,
+    ) =>
+      provider.ToolResultPart(
+        toolCallId: toolCallId,
+        toolName: toolName,
+        output: output,
+        providerOptions: providerOptions,
+      ),
+    provider.ToolApprovalResponsePart(
+      :final approvalId,
+      :final approved,
+      :final reason,
+    ) =>
+      provider.ToolApprovalResponsePart(
+        approvalId: approvalId,
+        approved: approved,
+        reason: reason,
+        providerOptions: providerOptions,
+      ),
+  };
+}
+
+provider.ProviderOptions? _mergeProviderOptions(
+  provider.ProviderOptions? base,
+  provider.ProviderOptions? override,
+) {
+  if (base == null) {
+    return _snapshotProviderOptions(override);
+  }
+  if (override == null) {
+    return _snapshotProviderOptions(base);
+  }
+  return _snapshotProviderOptions(<String, provider.JsonObject>{
+    for (final key in <String>{...base.keys, ...override.keys})
+      key: switch ((base[key], override[key])) {
+        (final left?, final right?) => _mergeJsonObjects(left, right),
+        (final left?, null) => left,
+        (null, final right?) => right,
+        _ => const <String, Object?>{},
+      },
+  });
+}
+
+provider.JsonObject _mergeJsonObjects(
+  provider.JsonObject base,
+  provider.JsonObject override,
+) {
+  return <String, Object?>{
+    for (final key in <String>{...base.keys, ...override.keys})
+      key: switch ((base[key], override[key])) {
+        (final Map<String, Object?> left, final Map<String, Object?> right) =>
+          _mergeJsonObjects(left, right),
+        (_, final right?) => right,
+        (final left?, null) => left,
+        _ => null,
+      },
+  };
 }
 
 provider.JsonValue _snapshotJsonValue(provider.JsonValue value) {

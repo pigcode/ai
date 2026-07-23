@@ -1,5 +1,7 @@
 // 目的:仅经由公共 barrel 触达每个公共区域的一个代表性符号,
 // 证明 barrel 完整且未泄漏/漏导出任何内部类型。
+// Compatibility fixture (unit): P1-CROSS-01
+// Compatibility fixture (unit): P1-CROSS-02
 import 'dart:typed_data';
 
 import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';

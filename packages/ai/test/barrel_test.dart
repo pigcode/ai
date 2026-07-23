@@ -1,3 +1,5 @@
+// Compatibility fixture (unit): P1-CROSS-01
+// Compatibility fixture (unit): P1-CROSS-02
 import 'dart:typed_data';
 
 import 'package:pigcode_ai/pigcode_ai.dart';
@@ -328,6 +330,15 @@ final class _EchoProvider implements Provider {
 }
 
 void main() {
+  test('barrel re-exports typed provider metadata', () {
+    const ProviderMetadata metadata = <String, JsonObject>{
+      'portable': <String, Object?>{'traceId': 'ai'},
+    };
+    const Headers headers = <String, String>{'x-trace-id': 'ai'};
+    expect(metadata['portable']?['traceId'], 'ai');
+    expect(headers['x-trace-id'], 'ai');
+  });
+
   test('barrel exposes telemetry surface', () {
     final integration = _BarrelTelemetry();
     expect(integration, isA<Telemetry>());

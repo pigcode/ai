@@ -414,6 +414,7 @@ data: {"error":{"message":"immediate failure","type":"server_error","code":null}
 ''');
 
 void main() {
+  // Compatibility fixture (unit): P1-COMPAT-02
   group('OpenAiCompatibleChatLanguageModel.doStream', () {
     test('文本流:惰性 txt-0 start/delta/end,FinishPart 收尾且为最后分块', () async {
       final client = _RecordingClient(
@@ -505,7 +506,10 @@ void main() {
         'I cannot',
       );
       final errorPart = parts.whereType<ErrorPart>().single;
-      expect(errorPart.error, 'server exploded');
+      expect(errorPart.error, <String, Object?>{
+        'message': 'server exploded',
+        'type': 'server_error',
+      });
       expect(parts.last, isA<ErrorPart>());
       expect(parts.whereType<TextEnd>(), isEmpty);
       expect(parts.whereType<FinishPart>(), isEmpty);
@@ -1064,7 +1068,11 @@ data: [DONE]
         'partial',
       );
       final errorPart = parts.whereType<ErrorPart>().single;
-      expect(errorPart.error, 'stream interrupted');
+      expect(errorPart.error, <String, Object?>{
+        'message': 'stream interrupted',
+        'type': 'server_error',
+        'code': null,
+      });
       expect(parts.last, isA<ErrorPart>());
       expect(parts.whereType<TextEnd>(), isEmpty);
       expect(parts.whereType<FinishPart>(), isEmpty);
@@ -1110,7 +1118,11 @@ data: [DONE]
       expect(parts, hasLength(2));
       expect(parts[0], isA<StreamStart>());
       expect(parts[1], isA<ErrorPart>());
-      expect((parts[1] as ErrorPart).error, 'immediate failure');
+      expect((parts[1] as ErrorPart).error, <String, Object?>{
+        'message': 'immediate failure',
+        'type': 'server_error',
+        'code': null,
+      });
     });
 
     test('includeUsage 默认 false:请求体不含 stream_options', () async {

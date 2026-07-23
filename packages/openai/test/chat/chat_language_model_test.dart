@@ -40,6 +40,7 @@ OpenAiConfig _config(http.Client client) {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-02
   group('OpenAiChatLanguageModel.doGenerate', () {
     test('provider/modelId/请求 URL 与基础字段', () async {
       final client = _RecordingClient(

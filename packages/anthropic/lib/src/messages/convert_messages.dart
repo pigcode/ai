@@ -983,11 +983,13 @@ List<Map<String, Object?>> _convertAssistantBlockContent(
             });
             break;
           }
+          final citations = providerOptions?['anthropic']?['citations'];
           content.add(<String, Object?>{
             'type': 'text',
             // 末位 text trim 延后到过滤/重排后统一处理(见函数尾部),避免末尾
             // part 被跳过时漏 trim(§4.1 :596-607)。
             'text': text,
+            if (citations is List<Object?>) 'citations': citations,
             ..._cacheControlEntry(cacheControlFor(providerOptions)),
           });
         case ReasoningPart(:final text, :final providerOptions):

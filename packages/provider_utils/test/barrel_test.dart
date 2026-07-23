@@ -1,3 +1,5 @@
+// Compatibility fixture (unit): P1-CROSS-01
+// Compatibility fixture (unit): P1-CROSS-02
 import 'dart:async';
 import 'dart:convert';
 
@@ -7,6 +9,15 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
+  test('cross-package provider metadata stays typed', () {
+    const ProviderMetadata metadata = <String, JsonObject>{
+      'portable': <String, Object?>{'traceId': 'provider-utils'},
+    };
+    const Headers headers = <String, String>{'x-trace-id': 'provider-utils'};
+    expect(metadata['portable']?['traceId'], 'provider-utils');
+    expect(headers['x-trace-id'], 'provider-utils');
+  });
+
   test('provider reference helpers are exported', () {
     expect(
       resolveProviderReference(

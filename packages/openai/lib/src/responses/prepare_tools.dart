@@ -549,6 +549,8 @@ OpenAiResponsesToolsResult prepareOpenAiResponsesTools({
             openaiTools.add(_prepareApplyPatchTool());
           case 'openai.code_interpreter':
             openaiTools.add(_prepareCodeInterpreterTool(args));
+          case 'openai.computer':
+            openaiTools.add(_prepareComputerTool());
           case 'openai.custom':
             openaiTools.add(_prepareCustomTool(name, args));
           case 'openai.file_search':
@@ -615,6 +617,11 @@ JsonObject _resolveToolChoiceTool(
   if (toolName == 'code_interpreter' &&
       _hasProviderTool(tools, id: 'openai.code_interpreter')) {
     return <String, Object?>{'type': 'code_interpreter'};
+  }
+
+  if (toolName == 'computer' &&
+      _hasProviderTool(tools, id: 'openai.computer')) {
+    return <String, Object?>{'type': 'computer'};
   }
 
   if (toolName == 'file_search' &&
@@ -765,6 +772,10 @@ JsonObject _prepareCodeInterpreterTool(Map<String, Object?> args) {
 
 JsonObject _prepareApplyPatchTool() {
   return <String, Object?>{'type': 'apply_patch'};
+}
+
+JsonObject _prepareComputerTool() {
+  return <String, Object?>{'type': 'computer'};
 }
 
 JsonObject _prepareCustomTool(String name, Map<String, Object?> args) {

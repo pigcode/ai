@@ -39,6 +39,17 @@ void main() {
         );
       });
     },
+    'requires the Phase 1 compatibility tooling': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('tool/fixtures/ai_core_peer.dart');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'tool/fixtures/ai_core_peer.dart',
+        );
+      });
+    },
     'rejects non-canonical tracked paths before applying the allowlist': () {
       _withFixture((fixture) {
         const unsafePaths = <String>{
@@ -644,11 +655,64 @@ final class _WorkspaceFixture {
       ..writeTracked('LICENSE', 'License text\n')
       ..writeTracked('README.md', '# Pigcode AI\n')
       ..writeTracked('THIRD_PARTY_NOTICES.md', '# Third-party notices\n')
+      ..writeTracked(
+        'compatibility/schema/ai-core-compatibility.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'compatibility/upstream/vercel-ai-7.0.35-paths.json',
+        '{}\n',
+      )
+      ..writeTracked('compatibility/vercel-ai-7.0.35.json', '{}\n')
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
+      ..writeTracked(
+        'tool/check_compatibility.dart',
+        '// Compatibility CLI fixture\n',
+      )
       ..writeTracked('tool/check_workspace.dart', '// CLI fixture\n')
+      ..writeTracked(
+        'tool/fixtures/ai_core_peer.dart',
+        '// Peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/anthropic_peer.dart',
+        '// Anthropic peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/openai_compatible_peer.dart',
+        '// OpenAI-compatible peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/openai_peer.dart',
+        '// OpenAI peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/generate_upstream_path_inventory.dart',
+        '// Inventory generator fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/compatibility_manifest.dart',
+        '// Compatibility contract fixture\n',
+      )
       ..writeTracked(
         'tool/src/workspace_contract.dart',
         '// Contract fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/ai_core_peer_test.dart',
+        '// Peer test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/ai_core_cross_process_test.dart',
+        '// Cross-process test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/ai_core_cross_scripted_peer_test.dart',
+        '// Cross-package scripted test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/compatibility_manifest_test.dart',
+        '// Compatibility test fixture\n',
       )
       ..writeTracked(
         'tool/test/workspace_contract_test.dart',

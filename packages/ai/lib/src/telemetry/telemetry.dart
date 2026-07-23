@@ -32,7 +32,6 @@ final class TelemetryMetadata {
 /// 不继承默认实现,会强制实现全部方法;`mixin` + `with` 可只覆写子集,且不占用
 /// 单继承位。每个回调收 `event` + 由 dispatcher 注入的 [TelemetryMetadata]。
 ///
-/// v1 不含 `onAbort`——pigcode 的取消是协作式的,延后到有贯穿式取消终止语义时再补。
 mixin Telemetry {
   /// 生成操作开始(operation 级)。
   FutureOr<void> onStart(GenerateTextStartEvent e, TelemetryMetadata m) {}
@@ -62,6 +61,9 @@ mixin Telemetry {
 
   /// 生成操作结束(全部步骤 + 结构化输出解析成功后)。
   FutureOr<void> onEnd(GenerateTextEndEvent e, TelemetryMetadata m) {}
+
+  /// 流式生成被调用方主动取消。与 [onEnd]/[onError] 互斥。
+  FutureOr<void> onAbort(GenerateTextAbortEvent e, TelemetryMetadata m) {}
 
   /// 生成生命周期内发生不可恢复错误。[error] 无类型(可能是 `AiError`、`Error`
   /// 或任意抛出值)。

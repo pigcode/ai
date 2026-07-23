@@ -65,6 +65,7 @@ String _successBody({bool includeUsage = true}) {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-OPENAI-07
   group('OpenAiEmbeddingModel — 基础字段', () {
     test('provider/modelId/maxEmbeddingsPerCall/supportsParallelCalls',
         () async {

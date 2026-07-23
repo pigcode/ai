@@ -21,6 +21,7 @@ import 'output.dart';
 import 'output_utils.dart';
 import 'performance.dart';
 import 'prepare_step.dart';
+import 'request_timeout.dart';
 import 'request_options_snapshot.dart';
 import 'step_result.dart';
 import 'stop_condition.dart';
@@ -77,6 +78,7 @@ StreamTextResult<Complete, Partial, Element>
   Output<Complete, Partial, Element>? output,
   Object? stopWhen,
   provider.CancellationSignal? cancellation,
+  Object? timeout,
   Map<String, String>? headers,
   provider.ProviderOptions? providerOptions,
   RuntimeContext? runtimeContext,
@@ -96,6 +98,7 @@ StreamTextResult<Complete, Partial, Element>
 }) {
   final outputSpec =
       output ?? (Output.text() as Output<Complete, Partial, Element>);
+  final timeoutConfiguration = normalizeTimeoutConfiguration(timeout);
   // telemetry dispatcher 在调用时刻(同步)构造:解析生效集成集合于此固定,
   // 与其余请求快照同源;无生效集成时 isActive==false,驱动内所有 dispatch 短路。
   final dispatcher = TelemetryDispatcher(telemetry);
@@ -174,6 +177,7 @@ StreamTextResult<Complete, Partial, Element>
     responseFormat: responseFormat,
     stopWhen: stopWhenSnapshot,
     cancellation: cancellation,
+    timeout: timeoutConfiguration,
     headers: headersSnapshot,
     providerOptions: providerOptionsSnapshot,
     runtimeContext: runtimeContextSnapshot,
@@ -266,6 +270,7 @@ final class StreamTextResult<Complete, Partial, Element> {
     required provider.ResponseFormat? responseFormat,
     required Object? stopWhen,
     required provider.CancellationSignal? cancellation,
+    required TimeoutConfiguration timeout,
     required Map<String, String>? headers,
     required provider.ProviderOptions? providerOptions,
     required RuntimeContext runtimeContext,
@@ -293,6 +298,11 @@ final class StreamTextResult<Complete, Partial, Element> {
 
     // 驱动循环:调度为异步任务,保证构造函数先返回、消费者能先挂上。
     scheduleMicrotask(() async {
+      final totalScope = CancellationScope(
+        parent: cancellation,
+        timeout: timeout.total,
+        label: 'Total',
+      );
       emit(const StartPart());
       // 是否因错误终结(provider 流出 ErrorPart,或 try 内抛出被下方 catch 捕获):
       // 用于把聚合结果的 finishReason 置为 error(与 v7 一致),避免失败的生成在
@@ -333,7 +343,8 @@ final class StreamTextResult<Complete, Partial, Element> {
           reasoning: reasoning,
           responseFormat: responseFormat,
           stopWhen: stopWhen,
-          cancellation: cancellation,
+          cancellation: totalScope.signal,
+          timeout: timeout,
           headers: headers,
           providerOptions: providerOptions,
           runtimeContext: runtimeContext,
@@ -387,15 +398,28 @@ final class StreamTextResult<Complete, Partial, Element> {
         }
       } catch (error) {
         hadError = true;
-        emit(ErrorPart(error));
-        onError?.call(error);
-        // site ③ 外层 catch:所有"抛出/重抛"错误在此统一派一次 telemetry error
-        // (provider ErrorPart 终端分支是自派、不进此路;内部工具 catch ② 只派
-        // stepEnd 后 rethrow 到此)。
-        if (dispatcher.isActive) {
-          await dispatcher.dispatchError(error);
+        if (cancellation?.isCancelled ?? false) {
+          // 调用方主动取消与 provider/解析/工具错误是不同的终端状态。
+          // 保留首次取消原因；AbortPart 后不再追加 FinishPart。
+          emit(AbortPart(reason: cancellation?.reason?.toString()));
+          if (dispatcher.isActive) {
+            await dispatcher.dispatchAbort(GenerateTextAbortEvent(
+              steps: List<StepResult>.unmodifiable(capturedSteps),
+              reason: cancellation?.reason,
+            ));
+          }
+        } else {
+          emit(ErrorPart(error));
+          onError?.call(error);
+          // site ③ 外层 catch:所有"抛出/重抛"错误在此统一派一次 telemetry error
+          // (provider ErrorPart 终端分支是自派、不进此路;内部工具 catch ② 只派
+          // stepEnd 后 rethrow 到此)。
+          if (dispatcher.isActive) {
+            await dispatcher.dispatchError(error);
+          }
         }
       } finally {
+        totalScope.dispose();
         var lastFinishReason = const provider.LanguageModelFinishReason(
           provider.FinishReasonType.stop,
         );
@@ -719,6 +743,7 @@ Future<bool> _runToolLoopStream({
   required provider.ResponseFormat? responseFormat,
   required Object? stopWhen,
   required provider.CancellationSignal? cancellation,
+  required TimeoutConfiguration timeout,
   required Map<String, String>? headers,
   required provider.ProviderOptions? providerOptions,
   required RuntimeContext runtimeContext,
@@ -761,6 +786,7 @@ Future<bool> _runToolLoopStream({
     repairToolCall: repairToolCall,
     instructions: instructions,
     cancellation: cancellation,
+    timeout: timeout,
     dispatcher: dispatcher,
   );
   if (resumedToolMessage != null) {
@@ -787,18 +813,25 @@ Future<bool> _runToolLoopStream({
   final pendingDeferredToolCalls = <String, String>{};
 
   while (true) {
+    throwIfCancelled(cancellation);
     final stepInputMessages =
         List<provider.LanguageModelMessage>.unmodifiable(messagesForNextStep);
-    final prepareStepResult = await prepareStep?.call(PrepareStepOptions(
-      steps: steps,
-      stepNumber: steps.length,
-      model: model,
-      messages: convertFromLanguageModelPrompt(stepInputMessages),
-      initialMessages: initialModelMessagesSnapshot,
-      responseMessages: convertFromLanguageModelPrompt(responseMessages),
-      runtimeContext: currentRuntimeContext,
-      toolsContext: currentToolsContext,
-    ));
+    final prepareStepResult = prepareStep == null
+        ? null
+        : await interruptFutureOnCancellation(
+            prepareStep(PrepareStepOptions(
+              steps: steps,
+              stepNumber: steps.length,
+              model: model,
+              messages: convertFromLanguageModelPrompt(stepInputMessages),
+              initialMessages: initialModelMessagesSnapshot,
+              responseMessages:
+                  convertFromLanguageModelPrompt(responseMessages),
+              runtimeContext: currentRuntimeContext,
+              toolsContext: currentToolsContext,
+            )),
+            cancellation,
+          );
     if (prepareStepResult?.runtimeContext != null) {
       currentRuntimeContext =
           snapshotRuntimeContext(prepareStepResult!.runtimeContext);
@@ -839,6 +872,13 @@ Future<bool> _runToolLoopStream({
       providerOptions,
       prepareStepResult?.providerOptions,
     );
+    final stepScope = CancellationScope(
+      parent: cancellation,
+      timeout: timeout.step,
+      label: 'Step',
+      locallyCancellable: timeout.firstChunk != null || timeout.chunk != null,
+    );
+    final stepCancellation = stepScope.signal;
     final callOptions = provider.LanguageModelCallOptions(
       // 每步传入 messages 的不可变快照(理由同 tool_loop.dart)。
       prompt: stepMessages,
@@ -855,7 +895,7 @@ Future<bool> _runToolLoopStream({
       toolChoice: stepToolChoice,
       reasoning: reasoning,
       includeRawChunks: includeRawChunks,
-      cancellation: cancellation,
+      cancellation: stepCancellation,
       headers: headers,
       providerOptions: stepProviderOptions,
     );
@@ -890,8 +930,29 @@ Future<bool> _runToolLoopStream({
     Duration? previousOutputChunkTime;
     final outputChunkTimes = <Duration>[];
     final toolExecutionTimes = <String, Duration>{};
+    Timer? firstChunkTimer;
+    Timer? chunkTimer;
+
+    void clearSemanticTimers() {
+      firstChunkTimer?.cancel();
+      firstChunkTimer = null;
+      chunkTimer?.cancel();
+      chunkTimer = null;
+    }
 
     void recordOutputChunk() {
+      firstChunkTimer?.cancel();
+      firstChunkTimer = null;
+      chunkTimer?.cancel();
+      final chunkTimeout = timeout.chunk;
+      if (chunkTimeout != null) {
+        chunkTimer = Timer(
+          chunkTimeout,
+          () => stepScope.cancel(
+            timeoutException('Chunk', chunkTimeout),
+          ),
+        );
+      }
       final now = stepStopwatch.elapsed;
       if (timeToFirstOutput == null) {
         timeToFirstOutput = now;
@@ -903,8 +964,13 @@ Future<bool> _runToolLoopStream({
 
     final provider.LanguageModelStreamResult streamResult;
     try {
-      streamResult = await stepModel.doStream(callOptions);
+      streamResult = await interruptFutureOnCancellation(
+        stepModel.doStream(callOptions),
+        stepCancellation,
+      );
     } catch (error) {
+      clearSemanticTimers();
+      stepScope.dispose();
       // doStream 本身抛错(请求建立/传输失败,尚未返回流)时,补派 lmEnd
       // (finishReason=error)使 lmStart 恒配对;随后 rethrow 交外层 catch 派 onError。
       if (dispatcher.isActive) {
@@ -928,9 +994,23 @@ Future<bool> _runToolLoopStream({
       }
       rethrow;
     }
+    final firstChunkTimeout = timeout.firstChunk;
+    if (firstChunkTimeout != null) {
+      firstChunkTimer = Timer(
+        firstChunkTimeout,
+        () => stepScope.cancel(
+          timeoutException('First chunk', firstChunkTimeout),
+        ),
+      );
+    }
     final content = <provider.LanguageModelContent>[];
     final parsedToolCallsById = <String, ParsedToolCall>{};
     final deferredToolCallFailuresById = <String, ToolCallRepairFailure>{};
+    final ongoingToolCallNames = <String, String>{};
+    final toolCallbackMessages =
+        List<provider.LanguageModelMessage>.unmodifiable(
+      stepMessages.where((message) => message is! provider.SystemMessage),
+    );
     // 文本块缓冲:按 id 累积 TextDelta,并跟踪 providerMetadata(v7 语义:
     // Start 事件的 metadata 打底,后续 Delta/End 事件给出非空值时覆盖——
     // 最新非空值胜出),TextEnd 时落成 TextContent 进 content。
@@ -974,7 +1054,10 @@ Future<bool> _runToolLoopStream({
         : streamResult.response;
 
     try {
-      await for (final part in streamResult.stream) {
+      await for (final part in interruptOnCancellation(
+        streamResult.stream,
+        stepCancellation,
+      )) {
         if (!startStepEmitted && part is! provider.StreamStart) {
           // 兜底:约定上 `StreamStart` 通常是首个分块,但类型系统未强制;
           // 若 provider 未发出 `StreamStart` 就产出了其他分块,仍需先补上
@@ -1110,6 +1193,54 @@ Future<bool> _runToolLoopStream({
             }
             content.add(toolCall);
             emit(ToolCallStreamPart(toolCall));
+            final framedCallbackToolName = ongoingToolCallNames.remove(
+                  part.toolCallId,
+                ) ??
+                ongoingToolCallNames.remove(toolCall.toolCallId);
+            final callbackToolName =
+                framedCallbackToolName ?? toolCall.toolName;
+            final callbackTool = stepTools?[callbackToolName];
+            if (callbackTool != null &&
+                (callbackTool.onInputStart != null ||
+                    callbackTool.onInputAvailable != null)) {
+              final callbackCall = parsedToolCallsById[toolCall.toolCallId] ??
+                  parseToolCall(
+                    toolCall: toolCall,
+                    tools: stepTools,
+                  );
+              parsedToolCallsById[toolCall.toolCallId] = callbackCall;
+              final callbackContext = _validateToolContext(
+                toolName: callbackToolName,
+                tool: callbackTool,
+                toolsContext: currentToolsContext,
+              );
+              if (framedCallbackToolName == null &&
+                  callbackTool.onInputStart != null) {
+                await interruptFutureOnCancellation(
+                  callbackTool.onInputStart!(ToolInputStartOptions(
+                    toolCallId: callbackCall.toolCall.toolCallId,
+                    messages: toolCallbackMessages,
+                    context: callbackContext,
+                    cancellation: stepCancellation,
+                  )),
+                  stepCancellation,
+                );
+              }
+              if (callbackTool.onInputAvailable != null) {
+                await interruptFutureOnCancellation(
+                  callbackTool.onInputAvailable!(
+                    ToolInputAvailableOptions(
+                      input: callbackCall.input,
+                      toolCallId: callbackCall.toolCall.toolCallId,
+                      messages: toolCallbackMessages,
+                      context: callbackContext,
+                      cancellation: stepCancellation,
+                    ),
+                  ),
+                  stepCancellation,
+                );
+              }
+            }
           case provider.ToolResult(:final toolCallId):
             // 去重保留最新:同一 toolCallId 可能先收到一个 preliminary(可替换)
             // 结果、后收到最终结果——累积的 content(继而 StepResult/
@@ -1127,7 +1258,25 @@ Future<bool> _runToolLoopStream({
             }
             emit(ToolResultStreamPart(part));
           case provider.ToolInputStart(:final id, :final toolName):
+            ongoingToolCallNames[id] = toolName;
             emit(ToolInputStartPart(id, toolName));
+            final callbackTool = stepTools?[toolName];
+            if (callbackTool?.onInputStart != null) {
+              final callbackContext = _validateToolContext(
+                toolName: toolName,
+                tool: callbackTool!,
+                toolsContext: currentToolsContext,
+              );
+              await interruptFutureOnCancellation(
+                callbackTool.onInputStart!(ToolInputStartOptions(
+                  toolCallId: id,
+                  messages: toolCallbackMessages,
+                  context: callbackContext,
+                  cancellation: stepCancellation,
+                )),
+                stepCancellation,
+              );
+            }
           case provider.ToolInputDelta(:final id, :final delta):
             if (delta.isNotEmpty) {
               recordOutputChunk();
@@ -1231,6 +1380,8 @@ Future<bool> _runToolLoopStream({
               await dispatcher.dispatchError(error);
             }
             emit(ErrorPart(error));
+            clearSemanticTimers();
+            stepScope.dispose();
             return true;
           case provider.RawPart(:final rawValue):
             // 仅在 provider 侧开启 includeRawChunks 时出现;原样转发,保持
@@ -1240,7 +1391,10 @@ Future<bool> _runToolLoopStream({
             content.add(request);
             emit(ToolApprovalRequestStreamPart(request));
           case final provider.LanguageModelContent contentPart:
-            recordOutputChunk();
+            if (contentPart is provider.FileContent ||
+                contentPart is provider.ReasoningFileContent) {
+              recordOutputChunk();
+            }
             // 其余「内容型」流分块(SourceContent/FileContent/ReasoningFileContent/
             // CustomContentBlock —— 均同时实现 LanguageModelContent 与
             // LanguageModelStreamPart)累积进 content,与
@@ -1250,7 +1404,10 @@ Future<bool> _runToolLoopStream({
             content.add(contentPart);
         }
       }
+      clearSemanticTimers();
     } catch (error) {
+      clearSemanticTimers();
+      stepScope.dispose();
       // C4:模型流在产出 provider ErrorPart 之外「直接抛异常」终止时(如传输层
       // 断连),补派 lmEnd 使每个 lmStart 恒配对一个 lmEnd(finishReason 保留已见
       // 值,否则 error);随后 rethrow 交外层 catch(site ③)统一派 onError,不给
@@ -1562,19 +1719,27 @@ Future<bool> _runToolLoopStream({
           ));
         }
         final toolStopwatch = Stopwatch()..start();
+        final toolScope = CancellationScope(
+          parent: stepCancellation,
+          timeout: timeout.forTool(call.toolName),
+          label: 'Tool ${call.toolName}',
+        );
         final Object? output;
         try {
-          output = await tool.execute!(
-            input,
-            ToolExecuteOptions(
-              toolCallId: call.toolCallId,
-              // 过滤 system 的不可变副本(理由同 tool_loop.dart)。
-              messages: List<provider.LanguageModelMessage>.unmodifiable(
-                stepMessages.where((m) => m is! provider.SystemMessage),
+          output = await interruptFutureOnCancellation(
+            tool.execute!(
+              input,
+              ToolExecuteOptions(
+                toolCallId: call.toolCallId,
+                // 过滤 system 的不可变副本(理由同 tool_loop.dart)。
+                messages: List<provider.LanguageModelMessage>.unmodifiable(
+                  stepMessages.where((m) => m is! provider.SystemMessage),
+                ),
+                context: toolContext,
+                cancellation: toolScope.signal,
               ),
-              context: toolContext,
-              cancellation: cancellation,
             ),
+            toolScope.signal,
           );
         } catch (error) {
           // per-tool error 变体(与 step 级 onError 不同粒度,不重复);记时后 rethrow
@@ -1590,6 +1755,8 @@ Future<bool> _runToolLoopStream({
             ));
           }
           rethrow;
+        } finally {
+          toolScope.dispose();
         }
         toolExecutionTimes[call.toolCallId] = toolStopwatch.elapsed;
         if (dispatcher.isActive) {
@@ -1655,6 +1822,8 @@ Future<bool> _runToolLoopStream({
       if (dispatcher.isActive) {
         await dispatcher.dispatchStepEnd(erroredStep);
       }
+      clearSemanticTimers();
+      stepScope.dispose();
       rethrow;
     }
 
@@ -1739,6 +1908,8 @@ Future<bool> _runToolLoopStream({
             !stopWhenSatisfied;
 
     if (!shouldContinue) {
+      clearSemanticTimers();
+      stepScope.dispose();
       return false;
     }
 
@@ -1765,6 +1936,8 @@ Future<bool> _runToolLoopStream({
       responseMessages.add(toolMessage);
       messagesForNextStep.add(toolMessage);
     }
+    clearSemanticTimers();
+    stepScope.dispose();
   }
 }
 
@@ -1812,6 +1985,7 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
   required ToolCallRepairFunction? repairToolCall,
   required String? instructions,
   required provider.CancellationSignal? cancellation,
+  required TimeoutConfiguration timeout,
   required TelemetryDispatcher dispatcher,
 }) async {
   final approvals = collectToolApprovals(messages);
@@ -1914,16 +2088,29 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
     }
     // resumed-approval 无步级 toolStopwatch,就地新建计时。
     final resumedStopwatch = Stopwatch()..start();
+    final stepScope = CancellationScope(
+      parent: cancellation,
+      timeout: timeout.step,
+      label: 'Step',
+    );
+    final toolScope = CancellationScope(
+      parent: stepScope.signal,
+      timeout: timeout.forTool(toolCall.toolName),
+      label: 'Tool ${toolCall.toolName}',
+    );
     final Object? output;
     try {
-      output = await tool.execute!(
-        input,
-        ToolExecuteOptions(
-          toolCallId: toolCall.toolCallId,
-          messages: approval.messages,
-          context: toolContext,
-          cancellation: cancellation,
+      output = await interruptFutureOnCancellation(
+        tool.execute!(
+          input,
+          ToolExecuteOptions(
+            toolCallId: toolCall.toolCallId,
+            messages: approval.messages,
+            context: toolContext,
+            cancellation: toolScope.signal,
+          ),
         ),
+        toolScope.signal,
       );
     } catch (error) {
       if (dispatcher.isActive) {
@@ -1936,6 +2123,9 @@ Future<provider.ToolMessage?> _executeResumedToolApprovals({
         ));
       }
       rethrow;
+    } finally {
+      toolScope.dispose();
+      stepScope.dispose();
     }
     if (dispatcher.isActive) {
       await dispatcher.dispatchToolExecutionEnd(ToolExecutionEndSuccess(

@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 import '../support/logging.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-14
   group('generateImage', () {
     test('prompt/options/headers/cancellation 透传给 doGenerate', () async {
       final model = _ScriptedImageModel(

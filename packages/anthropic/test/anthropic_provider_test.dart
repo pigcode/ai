@@ -39,6 +39,7 @@ Future<void> _triggerRequest(AnthropicProvider provider) async {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-01
   group('createAnthropic — 认证互斥', () {
     test('apiKey 与 authToken 同时提供时抛 ArgumentError(逐字文案)', () {
       expect(
@@ -135,6 +136,21 @@ void main() {
   });
 
   group('createAnthropic — baseURL 生效', () {
+    test('空 baseUrl 在构造 provider 时立即拒绝', () {
+      expect(
+        () => createAnthropic(apiKey: 'k', baseUrl: ''),
+        throwsA(
+          isA<InvalidArgumentError>()
+              .having((error) => error.argument, 'argument', 'baseUrl')
+              .having(
+                (error) => error.message,
+                'message',
+                'baseUrl must be a non-empty string.',
+              ),
+        ),
+      );
+    });
+
     test('自定义 baseUrl(带尾斜杠)→ 去斜杠后拼 /messages', () async {
       final client = _minimalClient();
       final provider = createAnthropic(

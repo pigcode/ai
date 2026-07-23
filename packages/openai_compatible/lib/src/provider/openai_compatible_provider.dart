@@ -73,8 +73,15 @@ OpenAiCompatibleProvider createOpenAiCompatible({
   int? embeddingMaxEmbeddingsPerCall,
   bool embeddingSupportsParallelCalls = true,
 }) {
-  // `baseUrl` 是必填非空 String,`withoutTrailingSlash` 对非 null 输入
-  // 保证返回非 null,故 `!` 永不触发。
+  if (baseUrl.isEmpty) {
+    throw const InvalidArgumentError(
+      argument: 'baseUrl',
+      message: 'baseUrl must be a non-empty string.',
+    );
+  }
+
+  // `baseUrl` 已通过非空校验,`withoutTrailingSlash` 对非 null 输入保证
+  // 返回非 null,故 `!` 永不触发。
   final resolvedBaseUrl = withoutTrailingSlash(baseUrl)!;
 
   // apiKey 头先放入,用户 headers 后合并覆盖(用户可覆盖 Authorization),

@@ -15,6 +15,56 @@ typedef ToolExecute = FutureOr<Object?> Function(
   ToolExecuteOptions options,
 );
 
+/// Called when a tool input starts becoming available.
+typedef ToolOnInputStart = FutureOr<void> Function(
+  ToolInputStartOptions options,
+);
+
+/// Called after the complete tool input has been parsed and validated.
+typedef ToolOnInputAvailable = FutureOr<void> Function(
+  ToolInputAvailableOptions options,
+);
+
+/// Context passed to [Tool.onInputStart].
+final class ToolInputStartOptions extends Equatable {
+  const ToolInputStartOptions({
+    required this.toolCallId,
+    required this.messages,
+    this.context,
+    this.cancellation,
+  });
+
+  final String toolCallId;
+  final List<provider.LanguageModelMessage> messages;
+  final Object? context;
+  final provider.CancellationSignal? cancellation;
+
+  @override
+  List<Object?> get props =>
+      <Object?>[toolCallId, messages, context, cancellation];
+}
+
+/// Context passed to [Tool.onInputAvailable].
+final class ToolInputAvailableOptions extends Equatable {
+  const ToolInputAvailableOptions({
+    required this.input,
+    required this.toolCallId,
+    required this.messages,
+    this.context,
+    this.cancellation,
+  });
+
+  final provider.JsonValue input;
+  final String toolCallId;
+  final List<provider.LanguageModelMessage> messages;
+  final Object? context;
+  final provider.CancellationSignal? cancellation;
+
+  @override
+  List<Object?> get props =>
+      <Object?>[input, toolCallId, messages, context, cancellation];
+}
+
 /// 工具执行期的上下文选项。
 ///
 /// 身份语义随调用而变(不同调用的 [toolCallId]/[messages] 不同),但字段
@@ -66,6 +116,8 @@ final class Tool {
     this.description,
     this.inputExamples,
     this.contextSchema,
+    this.onInputStart,
+    this.onInputAvailable,
     this.execute,
     this.toModelOutput,
   })  : inputSchema = inputSchema, // ignore: prefer_initializing_formals
@@ -81,6 +133,8 @@ final class Tool {
     this.execute,
     this.toModelOutput,
     this.contextSchema,
+    this.onInputStart,
+    this.onInputAvailable,
   })  : providerTool = providerTool, // ignore: prefer_initializing_formals
         inputSchema = null,
         description = null,
@@ -98,6 +152,12 @@ final class Tool {
 
   /// 可选的工具上下文 schema,用于校验 `toolsContext` 中该工具的上下文。
   final provider.JsonSchema? contextSchema;
+
+  /// Invoked before the complete input is exposed.
+  final ToolOnInputStart? onInputStart;
+
+  /// Invoked after input parsing/validation and after [onInputStart].
+  final ToolOnInputAvailable? onInputAvailable;
 
   /// provider 定义工具的契约 wire 定义(可空)。仅 [Tool.provider] 构造的
   /// 工具非空;函数工具恒为 `null`。

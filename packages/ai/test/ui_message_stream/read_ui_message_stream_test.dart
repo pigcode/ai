@@ -214,6 +214,66 @@ void main() {
       expect(messages.last.parts, const [StepStartUiPart()]);
     });
 
+    test('stores data chunks and updates matching type and id in place',
+        () async {
+      final messages = await readUiMessageStream(
+        stream: Stream<UiMessageChunk>.fromIterable([
+          DataUiMessageChunk(
+            type: 'data-weather',
+            id: 'weather_1',
+            data: const {'temperature': 20},
+          ),
+          DataUiMessageChunk(
+            type: 'data-weather',
+            id: 'weather_1',
+            data: const {'temperature': 21},
+          ),
+          DataUiMessageChunk(
+            type: 'data-weather',
+            data: const {'temperature': 22},
+          ),
+        ]),
+      ).toList();
+
+      expect(messages.last.parts, const [
+        DataUiPart(
+          type: 'data-weather',
+          id: 'weather_1',
+          data: {'temperature': 21},
+        ),
+        DataUiPart(
+          type: 'data-weather',
+          data: {'temperature': 22},
+        ),
+      ]);
+    });
+
+    test('reports all data chunks but does not persist transient chunks',
+        () async {
+      final data = <DataUiMessageChunk>[];
+      final messages = await readUiMessageStream(
+        stream: Stream<UiMessageChunk>.fromIterable([
+          DataUiMessageChunk(
+            type: 'data-status',
+            data: 'loading',
+            transient: true,
+          ),
+          DataUiMessageChunk(
+            type: 'data-status',
+            data: 'ready',
+          ),
+        ]),
+        onData: data.add,
+      ).toList();
+
+      expect(data, hasLength(2));
+      expect(data.first.transient, isTrue);
+      expect(messages, hasLength(1));
+      expect(messages.single.parts, const [
+        DataUiPart(type: 'data-status', data: 'ready'),
+      ]);
+    });
+
     test('reports invalid chunk order and continues by default', () async {
       final errors = <Object>[];
       final messages = await readUiMessageStream(

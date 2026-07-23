@@ -27,11 +27,37 @@ jobs:
         run: dart pub get
       - name: Test workspace contract
         run: dart run tool/test/workspace_contract_test.dart
+      - name: Test compatibility validator
+        run: dart run tool/test/compatibility_manifest_test.dart
+      - name: Test fixed peer
+        run: dart run tool/test/ai_core_peer_test.dart
+      - name: Test cross-package scripted peer
+        run: dart run tool/test/ai_core_cross_scripted_peer_test.dart
+      - name: Test cross-package real process
+        run: dart run tool/test/ai_core_cross_process_test.dart
       - name: Verify workspace contract
         run: dart run tool/check_workspace.dart
+      - name: Verify compatibility fixture coverage
+        run: dart run tool/check_compatibility.dart --fixture-coverage-only
+      - name: Verify compatibility manifest
+        run: dart run tool/check_compatibility.dart
       - name: Check formatting
         run: dart run melos format
       - name: Analyze
         run: dart run melos analyze
+      - name: Verify portable public barrels
+        shell: bash
+        run: |
+          portable_smoke_root=$(mktemp -d)
+          for package in provider provider_utils ai openai openai_compatible anthropic; do
+            (
+              cd "packages/$package"
+              dart test --platform chrome test/barrel_test.dart
+              dart compile js test/portable_compile_smoke.dart \
+                -o "$portable_smoke_root/$package.js"
+              dart compile wasm test/portable_compile_smoke.dart \
+                -o "$portable_smoke_root/$package.wasm"
+            )
+          done
       - name: Test
         run: dart run melos test

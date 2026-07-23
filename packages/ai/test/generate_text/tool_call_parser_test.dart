@@ -5,6 +5,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-06
   test('provider 工具跳过 schema 校验,透传解析后的 input', () {
     final tools = <String, Tool>{
       'computer': Tool.provider(

@@ -3,6 +3,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-08
   group('forwardAnthropicContainerIdFromLastStep', () {
     test('命中:container id 以标准 providerOptions 形态返回', () {
       final result = forwardAnthropicContainerIdFromLastStep(

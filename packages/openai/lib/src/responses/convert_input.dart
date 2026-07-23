@@ -242,6 +242,7 @@ String? _providerItemId(
 
 final class _OpenAiResponsesProviderTools {
   const _OpenAiResponsesProviderTools({
+    required this.computerToolName,
     required this.shellToolName,
     required this.applyPatchToolName,
     required this.toolSearchToolName,
@@ -249,6 +250,7 @@ final class _OpenAiResponsesProviderTools {
   });
 
   factory _OpenAiResponsesProviderTools.from(List<LanguageModelTool>? tools) {
+    String? computerToolName;
     String? shellToolName;
     String? applyPatchToolName;
     String? toolSearchToolName;
@@ -257,6 +259,8 @@ final class _OpenAiResponsesProviderTools {
     for (final tool in tools ?? const <LanguageModelTool>[]) {
       if (tool case ProviderTool(:final id, :final name)) {
         switch (id) {
+          case 'openai.computer':
+            computerToolName = name;
           case 'openai.shell':
             shellToolName = name;
           case 'openai.apply_patch':
@@ -270,6 +274,7 @@ final class _OpenAiResponsesProviderTools {
     }
 
     return _OpenAiResponsesProviderTools(
+      computerToolName: computerToolName,
       shellToolName: shellToolName,
       applyPatchToolName: applyPatchToolName,
       toolSearchToolName: toolSearchToolName,
@@ -277,10 +282,13 @@ final class _OpenAiResponsesProviderTools {
     );
   }
 
+  final String? computerToolName;
   final String? shellToolName;
   final String? applyPatchToolName;
   final String? toolSearchToolName;
   final Set<String> customToolNames;
+
+  bool isComputer(String toolName) => toolName == computerToolName;
 
   bool isToolSearch(String toolName) => toolName == toolSearchToolName;
 
@@ -291,6 +299,9 @@ final class _OpenAiResponsesProviderTools {
   bool isCustom(String toolName) => customToolNames.contains(toolName);
 
   String? callTypeForToolName(String toolName) {
+    if (isComputer(toolName)) {
+      return 'computer_call';
+    }
     if (isToolSearch(toolName)) {
       return 'tool_search_call';
     }
@@ -307,6 +318,9 @@ final class _OpenAiResponsesProviderTools {
   }
 
   String? outputTypeForToolName(String toolName) {
+    if (isComputer(toolName)) {
+      return 'computer_call_output';
+    }
     if (isToolSearch(toolName)) {
       return 'tool_search_output';
     }
@@ -330,6 +344,44 @@ JsonObject? _convertProviderDefinedToolCall(
   List<Warning> warnings,
 ) {
   final input = part.input;
+
+  if (providerTools.isComputer(part.toolName)) {
+    final object = _jsonObjectInput(input, part.toolName, warnings);
+    final actions = object?['actions'];
+    final status = object?['status'];
+    if (object == null || actions is! List<Object?> || status is! String) {
+      _addProviderToolInputWarning(part.toolName, warnings);
+      return null;
+    }
+    final convertedActions = <JsonObject>[];
+    for (final action in actions) {
+      if (action is! JsonObject) {
+        _addProviderToolInputWarning(part.toolName, warnings);
+        return null;
+      }
+      final converted = _computerActionToWire(action);
+      if (converted == null) {
+        _addProviderToolInputWarning(part.toolName, warnings);
+        return null;
+      }
+      convertedActions.add(converted);
+    }
+    final safetyChecks = _computerSafetyChecksToWire(
+      object['pendingSafetyChecks'],
+    );
+    if (safetyChecks == null && object['pendingSafetyChecks'] != null) {
+      _addProviderToolInputWarning(part.toolName, warnings);
+      return null;
+    }
+    return <String, Object?>{
+      'type': 'computer_call',
+      'id': itemId ?? part.toolCallId,
+      'call_id': part.toolCallId,
+      'status': status,
+      'actions': convertedActions,
+      if (safetyChecks != null) 'pending_safety_checks': safetyChecks,
+    };
+  }
 
   if (providerTools.isToolSearch(part.toolName)) {
     final object = _jsonObjectInput(input, part.toolName, warnings);
@@ -401,6 +453,40 @@ JsonObject? _convertProviderDefinedToolResult(
   List<Warning> warnings, {
   required bool executionFromAssistant,
 }) {
+  if (providerTools.isComputer(part.toolName)) {
+    final value = _toolResultJsonObject(part.output, part.toolName, warnings);
+    final screenshot = value?['output'];
+    if (value == null || screenshot is! JsonObject) {
+      _addProviderToolOutputWarning(part.toolName, warnings);
+      return null;
+    }
+    final imageUrl = screenshot['imageUrl'];
+    final fileId = screenshot['fileId'];
+    if (screenshot['type'] != 'computer_screenshot' ||
+        (imageUrl is! String && fileId is! String)) {
+      _addProviderToolOutputWarning(part.toolName, warnings);
+      return null;
+    }
+    final safetyChecks = _computerSafetyChecksToWire(
+      value['acknowledgedSafetyChecks'],
+    );
+    if (safetyChecks == null && value['acknowledgedSafetyChecks'] != null) {
+      _addProviderToolOutputWarning(part.toolName, warnings);
+      return null;
+    }
+    return <String, Object?>{
+      'type': 'computer_call_output',
+      'call_id': part.toolCallId,
+      'output': <String, Object?>{
+        'type': 'computer_screenshot',
+        'image_url': imageUrl,
+        'file_id': fileId,
+        'detail': screenshot['detail'],
+      }..removeWhere((_, value) => value == null),
+      if (safetyChecks != null) 'acknowledged_safety_checks': safetyChecks,
+    };
+  }
+
   if (providerTools.isToolSearch(part.toolName)) {
     final output = _toolResultJsonObject(part.output, part.toolName, warnings);
     if (output == null) {
@@ -480,6 +566,74 @@ JsonObject? _convertProviderDefinedToolResult(
   }
 
   return null;
+}
+
+JsonObject? _computerActionToWire(JsonObject action) {
+  final type = action['type'];
+  if (type is! String) {
+    return null;
+  }
+
+  final converted = switch (type) {
+    'click' => <String, Object?>{
+        'type': type,
+        'button': action['button'],
+        'x': action['x'],
+        'y': action['y'],
+        'keys': action['keys'],
+      },
+    'double_click' || 'move' => <String, Object?>{
+        'type': type,
+        'x': action['x'],
+        'y': action['y'],
+        'keys': action['keys'],
+      },
+    'drag' => <String, Object?>{
+        'type': type,
+        'path': action['path'],
+        'keys': action['keys'],
+      },
+    'keypress' => <String, Object?>{
+        'type': type,
+        'keys': action['keys'],
+      },
+    'screenshot' || 'wait' => <String, Object?>{'type': type},
+    'scroll' => <String, Object?>{
+        'type': type,
+        'x': action['x'],
+        'y': action['y'],
+        'scroll_x': action['scrollX'],
+        'scroll_y': action['scrollY'],
+        'keys': action['keys'],
+      },
+    'type' => <String, Object?>{
+        'type': type,
+        'text': action['text'],
+      },
+    _ => null,
+  };
+  return converted?..removeWhere((_, value) => value == null);
+}
+
+List<JsonObject>? _computerSafetyChecksToWire(Object? value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is! List<Object?>) {
+    return null;
+  }
+  final checks = <JsonObject>[];
+  for (final check in value) {
+    if (check is! JsonObject || check['id'] is! String) {
+      return null;
+    }
+    checks.add(<String, Object?>{
+      'id': check['id'],
+      'code': check['code'],
+      'message': check['message'],
+    }..removeWhere((_, value) => value == null));
+  }
+  return checks;
 }
 
 JsonObject? _jsonObjectInput(

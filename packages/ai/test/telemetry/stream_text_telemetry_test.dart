@@ -6,6 +6,7 @@ import 'package:pigcode_ai/src/generate_text/stop_condition.dart'
     show isStepCount;
 import 'package:pigcode_ai/src/generate_text/output.dart';
 import 'package:pigcode_ai/src/generate_text/stream_text.dart';
+import 'package:pigcode_ai/src/generate_text/text_stream_part.dart';
 import 'package:pigcode_ai/src/generate_text/tool_approval.dart';
 import 'package:pigcode_ai/src/prompt/content_part.dart';
 import 'package:pigcode_ai/src/prompt/model_message.dart';
@@ -26,6 +27,7 @@ final class _Seq with Telemetry {
   final List<LanguageModelCallStartEvent> lmStarts = [];
   final List<LanguageModelCallEndEvent> lmEnds = [];
   final List<ToolExecutionEndEvent> toolEnds = [];
+  final List<GenerateTextAbortEvent> aborts = [];
   int errorCount = 0;
 
   @override
@@ -61,6 +63,12 @@ final class _Seq with Telemetry {
   void onStepEnd(StepResult step, TelemetryMetadata m) => seq.add('stepEnd');
   @override
   void onEnd(GenerateTextEndEvent e, TelemetryMetadata m) => seq.add('end');
+  @override
+  void onAbort(GenerateTextAbortEvent e, TelemetryMetadata m) {
+    seq.add('abort');
+    aborts.add(e);
+  }
+
   @override
   void onError(Object? error, TelemetryMetadata m) {
     seq.add('error');
@@ -198,6 +206,7 @@ final class _TextThenThrowsModel implements lm.LanguageModel {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-CORE-13
   tearDown(clearTelemetryIntegrations);
 
   test('single step (no tools): start->stepStart->lmStart->lmEnd->stepEnd->end',
@@ -509,6 +518,32 @@ void main() {
     await result.stream.toList();
     expect(errors, ['boom']);
     expect(t.errorCount, 1);
+  });
+
+  test('external cancellation dispatches abort only, with the original reason',
+      () async {
+    final t = _Seq();
+    final reason = StateError('user cancelled');
+    final cancellation = provider.CancellationController()..cancel(reason);
+    final model = _textModel();
+    final result = streamText(
+      model: model,
+      prompt: 'x',
+      cancellation: cancellation.signal,
+      telemetry: TelemetrySettings(integrations: <Telemetry>[t]),
+    );
+
+    final parts = await result.stream.toList();
+
+    expect(parts.last, isA<AbortPart>());
+    expect(t.aborts, hasLength(1));
+    expect(t.aborts.single.reason, same(reason));
+    expect(t.aborts.single.steps, isEmpty);
+    expect(t.seq.where((event) => event == 'abort'), hasLength(1));
+    expect(t.seq, isNot(contains('end')));
+    expect(t.seq, isNot(contains('error')));
+    expect(t.errorCount, 0);
+    expect(model.callCount, 0);
   });
 
   test(

@@ -26,6 +26,8 @@ List<Map<String, Object?>> _toolContent(ToolMessage message) {
 }
 
 void main() {
+  // Compatibility fixture (unit): P1-ANTHROPIC-02
+  // Compatibility fixture (unit): P1-ANTHROPIC-04
   group('convertToAnthropicMessages — 分块与 system', () {
     test('返回形状:system / messages / betas / warnings', () {
       final result = convertToAnthropicMessages(
@@ -1315,6 +1317,45 @@ void main() {
   });
 
   group('assistant 内容块', () {
+    test('assistant text 回放保留 web-search citations provider metadata', () {
+      final result = convertToAnthropicMessages(
+        prompt: <LanguageModelMessage>[
+          const AssistantMessage(<AssistantContentPart>[
+            TextPart(
+              'The rates stayed unchanged.',
+              providerOptions: <String, Map<String, Object?>>{
+                'anthropic': <String, Object?>{
+                  'citations': <Object?>[
+                    <String, Object?>{
+                      'type': 'web_search_result_location',
+                      'cited_text': 'The committee held rates steady.',
+                      'url': 'https://example.com/rates',
+                      'title': 'Rates decision',
+                      'encrypted_index': 'encrypted-1',
+                    },
+                  ],
+                },
+              },
+            ),
+          ]),
+          const UserMessage(<UserContentPart>[TextPart('What came before?')]),
+        ],
+        sendReasoning: false,
+      );
+
+      final content = (result.messages.first['content'] as List<Object?>)
+          .cast<Map<String, Object?>>();
+      expect(content.single['citations'], <Object?>[
+        <String, Object?>{
+          'type': 'web_search_result_location',
+          'cited_text': 'The committee held rates steady.',
+          'url': 'https://example.com/rates',
+          'title': 'Rates decision',
+          'encrypted_index': 'encrypted-1',
+        },
+      ]);
+    });
+
     test('末位 text part 尾随空白被 trim(最后块+最后消息+最后 part)', () {
       final result = convertToAnthropicMessages(
         prompt: <LanguageModelMessage>[

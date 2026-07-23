@@ -3,6 +3,7 @@ import 'package:pigcode_ai_provider/pigcode_ai_provider.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Compatibility fixture (unit): P1-COMPAT-03
   group('OpenAiCompatibleChatProviderOptions.fromProviderOptions', () {
     test('null options 时返回全字段默认(null)的实例', () {
       final options = OpenAiCompatibleChatProviderOptions.fromProviderOptions(
