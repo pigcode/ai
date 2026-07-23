@@ -20,6 +20,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: 3.12.2
@@ -29,12 +32,35 @@ jobs:
         run: dart run tool/test/workspace_contract_test.dart
       - name: Test compatibility validator
         run: dart run tool/test/compatibility_manifest_test.dart
+      - name: Test protocol source lock and generated inventory
+        run: |
+          dart run tool/test/protocol_sources_test.dart
+          dart run tool/test/protocol_inventory_test.dart
+          dart run tool/test/protocol_codegen_test.dart
+          dart run tool/protocol_codegen.dart --check
       - name: Test fixed peer
         run: dart run tool/test/ai_core_peer_test.dart
       - name: Test cross-package scripted peer
         run: dart run tool/test/ai_core_cross_scripted_peer_test.dart
       - name: Test cross-package real process
         run: dart run tool/test/ai_core_cross_process_test.dart
+      - name: Test protocol real processes
+        run: |
+          dart run tool/test/acp_cross_process_test.dart
+          dart run tool/test/mcp_stdio_cross_process_test.dart
+      - name: Verify ACP fixed peer matrix
+        run: |
+          dart run tool/run_acp_peer_matrix.dart --peer dart
+          dart run tool/run_acp_peer_matrix.dart --peer typescript
+          dart run tool/run_acp_peer_matrix.dart --peer rust
+      - name: Install pinned MCP conformance harness
+        run: npm ci --prefix tool/conformance/mcp --ignore-scripts
+      - name: Verify MCP conformance inventory
+        run: dart run tool/test/mcp_conformance_inventory_test.dart
+      - name: Verify MCP official client conformance
+        run: dart run tool/run_mcp_conformance.dart --role client --suite all
+      - name: Verify MCP official server conformance
+        run: dart run tool/run_mcp_conformance.dart --role server --suite all
       - name: Verify workspace contract
         run: dart run tool/check_workspace.dart
       - name: Verify compatibility fixture coverage
@@ -49,7 +75,7 @@ jobs:
         shell: bash
         run: |
           portable_smoke_root=$(mktemp -d)
-          for package in provider provider_utils ai openai openai_compatible anthropic; do
+          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp; do
             (
               cd "packages/$package"
               dart test --platform chrome test/barrel_test.dart
@@ -59,5 +85,15 @@ jobs:
                 -o "$portable_smoke_root/$package.wasm"
             )
           done
+          (
+            cd packages/mcp
+            dart test --platform chrome test/http_barrel_test.dart
+            dart compile js test/http_portable_compile_smoke.dart \
+              -o "$portable_smoke_root/mcp_http.js"
+            dart compile wasm test/http_portable_compile_smoke.dart \
+              -o "$portable_smoke_root/mcp_http.wasm"
+          )
+      - name: Verify MCP IO entrypoint
+        run: dart test packages/mcp/test/io_barrel_test.dart
       - name: Test
         run: dart run melos test

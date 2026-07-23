@@ -1,0 +1,20 @@
+name: pigcode_ai_acp
+description: Portable stable-v1 Agent Client Protocol models, codec, capability negotiation, and client/agent primitives.
+version: 0.0.1
+publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_protocol_utils: ^0.0.1
+  equatable: ^2.0.0
+  json_schema: ^5.2.2
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0

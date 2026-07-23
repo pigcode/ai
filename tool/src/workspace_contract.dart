@@ -10,6 +10,9 @@ const _expectedPackages = <String, String>{
   'openai': 'pigcode_ai_openai',
   'openai_compatible': 'pigcode_ai_openai_compatible',
   'anthropic': 'pigcode_ai_anthropic',
+  'protocol_utils': 'pigcode_ai_protocol_utils',
+  'acp': 'pigcode_ai_acp',
+  'mcp': 'pigcode_ai_mcp',
 };
 
 const _requiredRootPaths = <String>{
@@ -19,24 +22,60 @@ const _requiredRootPaths = <String>{
   'README.md',
   'THIRD_PARTY_NOTICES.md',
   'compatibility/schema/ai-core-compatibility.schema.json',
+  'compatibility/upstream/phase-2a-protocol-inventory.json',
   'compatibility/upstream/vercel-ai-7.0.35-paths.json',
   'compatibility/vercel-ai-7.0.35.json',
   'pubspec.yaml',
   'third_party/licenses/Apache-2.0.txt',
   'tool/check_compatibility.dart',
   'tool/check_workspace.dart',
+  'tool/conformance/mcp/package-lock.json',
+  'tool/conformance/mcp/package.json',
+  'tool/protocol_codegen.dart',
+  'tool/run_acp_peer_matrix.dart',
+  'tool/run_mcp_conformance.dart',
+  'tool/fixtures/acp_peer.dart',
+  'tool/fixtures/acp/rust/README.md',
+  'tool/fixtures/acp/typescript/README.md',
+  'tool/fixtures/acp/typescript/agent.mjs',
+  'tool/fixtures/acp/typescript/package-lock.json',
+  'tool/fixtures/acp/typescript/package.json',
   'tool/fixtures/ai_core_peer.dart',
   'tool/fixtures/anthropic_peer.dart',
+  'tool/fixtures/mcp_conformance_client.dart',
+  'tool/fixtures/mcp_conformance_server.dart',
+  'tool/fixtures/mcp_stdio_peer.dart',
   'tool/fixtures/openai_compatible_peer.dart',
   'tool/fixtures/openai_peer.dart',
   'tool/generate_upstream_path_inventory.dart',
+  'tool/src/acp_peer_harness.dart',
   'tool/src/compatibility_manifest.dart',
+  'tool/src/protocol_codegen.dart',
+  'tool/src/protocol_inventory.dart',
+  'tool/src/protocol_sources.dart',
   'tool/src/workspace_contract.dart',
   'tool/test/ai_core_cross_process_test.dart',
   'tool/test/ai_core_cross_scripted_peer_test.dart',
   'tool/test/ai_core_peer_test.dart',
+  'tool/test/acp_cross_process_test.dart',
   'tool/test/compatibility_manifest_test.dart',
+  'tool/test/mcp_conformance_inventory_test.dart',
+  'tool/test/mcp_stdio_cross_process_test.dart',
+  'tool/test/protocol_codegen_test.dart',
+  'tool/test/protocol_inventory_test.dart',
+  'tool/test/protocol_sources_test.dart',
   'tool/test/workspace_contract_test.dart',
+  'tool/upstream/protocols/acp/LICENSE',
+  'tool/upstream/protocols/acp/schema-v1.20.0/meta.json',
+  'tool/upstream/protocols/acp/schema-v1.20.0/schema.json',
+  'tool/upstream/protocols/mcp-conformance/LICENSE',
+  'tool/upstream/protocols/mcp-conformance/v0.1.16/package.json',
+  'tool/upstream/protocols/mcp-conformance/v0.1.16/scenarios.json',
+  'tool/upstream/protocols/mcp/2025-11-25/schema.json',
+  'tool/upstream/protocols/mcp/LICENSE',
+  'tool/upstream/protocols/sources.json',
+  'packages/acp/lib/src/generated/acp_inventory.g.dart',
+  'packages/mcp/lib/src/generated/mcp_inventory.g.dart',
 };
 
 const _expectedWorkspaceMembers = <String>{
@@ -46,6 +85,50 @@ const _expectedWorkspaceMembers = <String>{
   'packages/openai',
   'packages/openai_compatible',
   'packages/anthropic',
+  'packages/protocol_utils',
+  'packages/acp',
+  'packages/mcp',
+};
+
+const _allowedInternalDependencies = <String, Set<String>>{
+  'pigcode_ai_provider': <String>{},
+  'pigcode_ai_provider_utils': <String>{'pigcode_ai_provider'},
+  'pigcode_ai': <String>{
+    'pigcode_ai_provider',
+    'pigcode_ai_provider_utils',
+  },
+  'pigcode_ai_openai': <String>{
+    'pigcode_ai_provider',
+    'pigcode_ai_provider_utils',
+  },
+  'pigcode_ai_openai_compatible': <String>{
+    'pigcode_ai_provider',
+    'pigcode_ai_provider_utils',
+  },
+  'pigcode_ai_anthropic': <String>{
+    'pigcode_ai_provider',
+    'pigcode_ai_provider_utils',
+  },
+  'pigcode_ai_protocol_utils': <String>{},
+  'pigcode_ai_acp': <String>{'pigcode_ai_protocol_utils'},
+  'pigcode_ai_mcp': <String>{
+    'pigcode_ai_protocol_utils',
+    'pigcode_ai_provider',
+    'pigcode_ai',
+  },
+};
+
+const _portableBarrels = <String>{
+  'packages/provider/lib/pigcode_ai_provider.dart',
+  'packages/provider_utils/lib/pigcode_ai_provider_utils.dart',
+  'packages/ai/lib/pigcode_ai.dart',
+  'packages/openai/lib/pigcode_ai_openai.dart',
+  'packages/openai_compatible/lib/pigcode_ai_openai_compatible.dart',
+  'packages/anthropic/lib/pigcode_ai_anthropic.dart',
+  'packages/protocol_utils/lib/pigcode_ai_protocol_utils.dart',
+  'packages/acp/lib/pigcode_ai_acp.dart',
+  'packages/mcp/lib/pigcode_ai_mcp.dart',
+  'packages/mcp/lib/pigcode_ai_mcp_http.dart',
 };
 
 const _dependencySections = <String>{
@@ -84,6 +167,7 @@ List<WorkspaceViolation> validateWorkspace(
 
   _validateTrackedPaths(root, trackedPaths, violations);
   _validateTrackedFileContents(root, trackedPaths, violations);
+  _validatePortableBarrels(root, trackedPaths, violations);
   _validatePackageDirectories(root, violations);
   final manifests = _loadTrackedManifests(root, trackedPaths, violations);
   _validateRootManifest(manifests['pubspec.yaml'], violations);
@@ -100,7 +184,38 @@ List<WorkspaceViolation> validateWorkspace(
   }
 
   _validateDependencySources(manifests, violations);
+  _validateInternalDependencyDirection(manifests, violations);
   return violations;
+}
+
+void _validatePortableBarrels(
+  Directory root,
+  Set<String> trackedPaths,
+  List<WorkspaceViolation> violations,
+) {
+  for (final barrelPath in _portableBarrels) {
+    if (_trackedFileState(root, trackedPaths, barrelPath) !=
+        _TrackedFileState.regular) {
+      continue;
+    }
+    final contents = _containedFile(root, barrelPath).readAsStringSync();
+    if (RegExp(r'''(?:import|export)\s+['"]dart:io['"]''').hasMatch(contents)) {
+      violations.add(
+        WorkspaceViolation(
+          'portable_barrel_io_dependency',
+          'Portable barrel imports or exports dart:io: $barrelPath',
+        ),
+      );
+    }
+    if (RegExp(r'''export\s+['"][^'"]*_io\.dart['"]''').hasMatch(contents)) {
+      violations.add(
+        WorkspaceViolation(
+          'portable_barrel_reexports_io',
+          'Portable barrel re-exports a VM-only IO entrypoint: $barrelPath',
+        ),
+      );
+    }
+  }
 }
 
 void _validateTrackedFileContents(
@@ -365,7 +480,7 @@ void _validateRootManifest(
     violations.add(
       const WorkspaceViolation(
         'invalid_workspace_membership',
-        'Expected exactly the six public package paths in pubspec.yaml workspace',
+        'Expected exactly the nine public package paths in pubspec.yaml workspace',
       ),
     );
   }
@@ -575,6 +690,36 @@ void _validateDependencySources(
         WorkspaceViolation(
           'git_dependency',
           'Git dependencies are not allowed in ${manifestEntry.key}',
+        ),
+      );
+    }
+  }
+}
+
+void _validateInternalDependencyDirection(
+  Map<String, YamlMap> manifests,
+  List<WorkspaceViolation> violations,
+) {
+  for (final manifestEntry in manifests.entries) {
+    final packageName = manifestEntry.value['name'];
+    if (packageName is! String ||
+        !_allowedInternalDependencies.containsKey(packageName)) {
+      continue;
+    }
+    final dependencies = manifestEntry.value['dependencies'];
+    if (dependencies is! YamlMap) {
+      continue;
+    }
+    final allowed = _allowedInternalDependencies[packageName]!;
+    for (final dependencyName in dependencies.keys.whereType<String>()) {
+      if (!_allowedInternalDependencies.containsKey(dependencyName) ||
+          allowed.contains(dependencyName)) {
+        continue;
+      }
+      violations.add(
+        WorkspaceViolation(
+          'forbidden_internal_dependency',
+          'Forbidden internal dependency: $packageName -> $dependencyName',
         ),
       );
     }

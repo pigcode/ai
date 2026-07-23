@@ -1,0 +1,1067 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "release": "schema-v1.20.0",
+    "sha256": "92c1dfcda10dd47e99127500a3763da2b471f9ac61e12b9bf0430c32cf953796"
+  },
+  "cases": [
+    {
+      "id": "notification:$/cancel_request",
+      "kind": "notification",
+      "root": "protocolLevel",
+      "method": "$/cancel_request",
+      "definition": "CancelRequestNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "$/cancel_request",
+        "params": {
+          "requestId": null
+        }
+      }
+    },
+    {
+      "id": "request:authenticate",
+      "kind": "request",
+      "root": "client",
+      "method": "authenticate",
+      "definition": "AuthenticateRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "authenticate",
+        "params": {
+          "methodId": ""
+        }
+      }
+    },
+    {
+      "id": "response:authenticate",
+      "kind": "response",
+      "root": "agent",
+      "method": "authenticate",
+      "definition": "AuthenticateResponse",
+      "responseMethod": "authenticate",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:fs/read_text_file",
+      "kind": "request",
+      "root": "agent",
+      "method": "fs/read_text_file",
+      "definition": "ReadTextFileRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "fs/read_text_file",
+        "params": {
+          "sessionId": "",
+          "path": ""
+        }
+      }
+    },
+    {
+      "id": "response:fs/read_text_file",
+      "kind": "response",
+      "root": "client",
+      "method": "fs/read_text_file",
+      "definition": "ReadTextFileResponse",
+      "responseMethod": "fs/read_text_file",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": {
+          "content": ""
+        }
+      }
+    },
+    {
+      "id": "request:fs/write_text_file",
+      "kind": "request",
+      "root": "agent",
+      "method": "fs/write_text_file",
+      "definition": "WriteTextFileRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "fs/write_text_file",
+        "params": {
+          "sessionId": "",
+          "path": "",
+          "content": ""
+        }
+      }
+    },
+    {
+      "id": "response:fs/write_text_file",
+      "kind": "response",
+      "root": "client",
+      "method": "fs/write_text_file",
+      "definition": "WriteTextFileResponse",
+      "responseMethod": "fs/write_text_file",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:initialize",
+      "kind": "request",
+      "root": "client",
+      "method": "initialize",
+      "definition": "InitializeRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "initialize",
+        "params": {
+          "protocolVersion": 0
+        }
+      }
+    },
+    {
+      "id": "response:initialize",
+      "kind": "response",
+      "root": "agent",
+      "method": "initialize",
+      "definition": "InitializeResponse",
+      "responseMethod": "initialize",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 8,
+        "result": {
+          "protocolVersion": 0
+        }
+      }
+    },
+    {
+      "id": "request:logout",
+      "kind": "request",
+      "root": "client",
+      "method": "logout",
+      "definition": "LogoutRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "method": "logout",
+        "params": {}
+      }
+    },
+    {
+      "id": "response:logout",
+      "kind": "response",
+      "root": "agent",
+      "method": "logout",
+      "definition": "LogoutResponse",
+      "responseMethod": "logout",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "result": {}
+      }
+    },
+    {
+      "id": "notification:session/cancel",
+      "kind": "notification",
+      "root": "client",
+      "method": "session/cancel",
+      "definition": "CancelNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "session/cancel",
+        "params": {
+          "sessionId": ""
+        }
+      }
+    },
+    {
+      "id": "request:session/close",
+      "kind": "request",
+      "root": "client",
+      "method": "session/close",
+      "definition": "CloseSessionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "method": "session/close",
+        "params": {
+          "sessionId": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/close",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/close",
+      "definition": "CloseSessionResponse",
+      "responseMethod": "session/close",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 12,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:session/delete",
+      "kind": "request",
+      "root": "client",
+      "method": "session/delete",
+      "definition": "DeleteSessionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 13,
+        "method": "session/delete",
+        "params": {
+          "sessionId": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/delete",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/delete",
+      "definition": "DeleteSessionResponse",
+      "responseMethod": "session/delete",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 14,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:session/list",
+      "kind": "request",
+      "root": "client",
+      "method": "session/list",
+      "definition": "ListSessionsRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "method": "session/list",
+        "params": {}
+      }
+    },
+    {
+      "id": "response:session/list",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/list",
+      "definition": "ListSessionsResponse",
+      "responseMethod": "session/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 16,
+        "result": {
+          "sessions": []
+        }
+      }
+    },
+    {
+      "id": "request:session/load",
+      "kind": "request",
+      "root": "client",
+      "method": "session/load",
+      "definition": "LoadSessionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "method": "session/load",
+        "params": {
+          "mcpServers": [],
+          "cwd": "",
+          "sessionId": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/load",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/load",
+      "definition": "LoadSessionResponse",
+      "responseMethod": "session/load",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 18,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:session/new",
+      "kind": "request",
+      "root": "client",
+      "method": "session/new",
+      "definition": "NewSessionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 19,
+        "method": "session/new",
+        "params": {
+          "cwd": "",
+          "mcpServers": []
+        }
+      }
+    },
+    {
+      "id": "response:session/new",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/new",
+      "definition": "NewSessionResponse",
+      "responseMethod": "session/new",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 20,
+        "result": {
+          "sessionId": ""
+        }
+      }
+    },
+    {
+      "id": "request:session/prompt",
+      "kind": "request",
+      "root": "client",
+      "method": "session/prompt",
+      "definition": "PromptRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 21,
+        "method": "session/prompt",
+        "params": {
+          "sessionId": "",
+          "prompt": []
+        }
+      }
+    },
+    {
+      "id": "response:session/prompt",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/prompt",
+      "definition": "PromptResponse",
+      "responseMethod": "session/prompt",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 22,
+        "result": {
+          "stopReason": "end_turn"
+        }
+      }
+    },
+    {
+      "id": "request:session/request_permission",
+      "kind": "request",
+      "root": "agent",
+      "method": "session/request_permission",
+      "definition": "RequestPermissionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 23,
+        "method": "session/request_permission",
+        "params": {
+          "sessionId": "",
+          "toolCall": {
+            "toolCallId": ""
+          },
+          "options": []
+        }
+      }
+    },
+    {
+      "id": "response:session/request_permission",
+      "kind": "response",
+      "root": "client",
+      "method": "session/request_permission",
+      "definition": "RequestPermissionResponse",
+      "responseMethod": "session/request_permission",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 24,
+        "result": {
+          "outcome": {
+            "outcome": "cancelled"
+          }
+        }
+      }
+    },
+    {
+      "id": "request:session/resume",
+      "kind": "request",
+      "root": "client",
+      "method": "session/resume",
+      "definition": "ResumeSessionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 25,
+        "method": "session/resume",
+        "params": {
+          "sessionId": "",
+          "cwd": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/resume",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/resume",
+      "definition": "ResumeSessionResponse",
+      "responseMethod": "session/resume",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 26,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:session/set_config_option",
+      "kind": "request",
+      "root": "client",
+      "method": "session/set_config_option",
+      "definition": "SetSessionConfigOptionRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 27,
+        "method": "session/set_config_option",
+        "params": {
+          "type": "boolean",
+          "value": false,
+          "sessionId": "",
+          "configId": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/set_config_option",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/set_config_option",
+      "definition": "SetSessionConfigOptionResponse",
+      "responseMethod": "session/set_config_option",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 28,
+        "result": {
+          "configOptions": []
+        }
+      }
+    },
+    {
+      "id": "request:session/set_mode",
+      "kind": "request",
+      "root": "client",
+      "method": "session/set_mode",
+      "definition": "SetSessionModeRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 29,
+        "method": "session/set_mode",
+        "params": {
+          "sessionId": "",
+          "modeId": ""
+        }
+      }
+    },
+    {
+      "id": "response:session/set_mode",
+      "kind": "response",
+      "root": "agent",
+      "method": "session/set_mode",
+      "definition": "SetSessionModeResponse",
+      "responseMethod": "session/set_mode",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 30,
+        "result": {}
+      }
+    },
+    {
+      "id": "notification:session/update",
+      "kind": "notification",
+      "root": "agent",
+      "method": "session/update",
+      "definition": "SessionNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "session/update",
+        "params": {
+          "sessionId": "",
+          "update": {
+            "sessionUpdate": "user_message_chunk",
+            "content": {
+              "type": "text",
+              "text": ""
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "request:terminal/create",
+      "kind": "request",
+      "root": "agent",
+      "method": "terminal/create",
+      "definition": "CreateTerminalRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 31,
+        "method": "terminal/create",
+        "params": {
+          "sessionId": "",
+          "command": ""
+        }
+      }
+    },
+    {
+      "id": "response:terminal/create",
+      "kind": "response",
+      "root": "client",
+      "method": "terminal/create",
+      "definition": "CreateTerminalResponse",
+      "responseMethod": "terminal/create",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 32,
+        "result": {
+          "terminalId": ""
+        }
+      }
+    },
+    {
+      "id": "request:terminal/kill",
+      "kind": "request",
+      "root": "agent",
+      "method": "terminal/kill",
+      "definition": "KillTerminalRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 33,
+        "method": "terminal/kill",
+        "params": {
+          "sessionId": "",
+          "terminalId": ""
+        }
+      }
+    },
+    {
+      "id": "response:terminal/kill",
+      "kind": "response",
+      "root": "client",
+      "method": "terminal/kill",
+      "definition": "KillTerminalResponse",
+      "responseMethod": "terminal/kill",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 34,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:terminal/output",
+      "kind": "request",
+      "root": "agent",
+      "method": "terminal/output",
+      "definition": "TerminalOutputRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 35,
+        "method": "terminal/output",
+        "params": {
+          "sessionId": "",
+          "terminalId": ""
+        }
+      }
+    },
+    {
+      "id": "response:terminal/output",
+      "kind": "response",
+      "root": "client",
+      "method": "terminal/output",
+      "definition": "TerminalOutputResponse",
+      "responseMethod": "terminal/output",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 36,
+        "result": {
+          "output": "",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "id": "request:terminal/release",
+      "kind": "request",
+      "root": "agent",
+      "method": "terminal/release",
+      "definition": "ReleaseTerminalRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 37,
+        "method": "terminal/release",
+        "params": {
+          "sessionId": "",
+          "terminalId": ""
+        }
+      }
+    },
+    {
+      "id": "response:terminal/release",
+      "kind": "response",
+      "root": "client",
+      "method": "terminal/release",
+      "definition": "ReleaseTerminalResponse",
+      "responseMethod": "terminal/release",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 38,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:terminal/wait_for_exit",
+      "kind": "request",
+      "root": "agent",
+      "method": "terminal/wait_for_exit",
+      "definition": "WaitForTerminalExitRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 39,
+        "method": "terminal/wait_for_exit",
+        "params": {
+          "sessionId": "",
+          "terminalId": ""
+        }
+      }
+    },
+    {
+      "id": "response:terminal/wait_for_exit",
+      "kind": "response",
+      "root": "client",
+      "method": "terminal/wait_for_exit",
+      "definition": "WaitForTerminalExitResponse",
+      "responseMethod": "terminal/wait_for_exit",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 40,
+        "result": {}
+      }
+    }
+  ],
+  "definitionSamples": {
+    "AgentAuthCapabilities": {},
+    "AgentCapabilities": {},
+    "AgentNotification": {
+      "method": ""
+    },
+    "AgentRequest": {
+      "id": null,
+      "method": ""
+    },
+    "AgentResponse": {
+      "id": null,
+      "result": {
+        "protocolVersion": 0
+      }
+    },
+    "Annotations": {},
+    "AudioContent": {
+      "data": "",
+      "mimeType": ""
+    },
+    "AuthMethod": {
+      "id": "",
+      "name": ""
+    },
+    "AuthMethodAgent": {
+      "id": "",
+      "name": ""
+    },
+    "AuthMethodId": "",
+    "AuthenticateRequest": {
+      "methodId": ""
+    },
+    "AuthenticateResponse": {},
+    "AvailableCommand": {
+      "name": "",
+      "description": ""
+    },
+    "AvailableCommandInput": {
+      "hint": ""
+    },
+    "AvailableCommandsUpdate": {
+      "availableCommands": []
+    },
+    "BlobResourceContents": {
+      "blob": "",
+      "uri": ""
+    },
+    "BooleanConfigOptionCapabilities": {},
+    "CancelNotification": {
+      "sessionId": ""
+    },
+    "CancelRequestNotification": {
+      "requestId": null
+    },
+    "ClientCapabilities": {},
+    "ClientNotification": {
+      "method": ""
+    },
+    "ClientRequest": {
+      "id": null,
+      "method": ""
+    },
+    "ClientResponse": {
+      "id": null,
+      "result": {}
+    },
+    "ClientSessionCapabilities": {},
+    "CloseSessionRequest": {
+      "sessionId": ""
+    },
+    "CloseSessionResponse": {},
+    "ConfigOptionUpdate": {
+      "configOptions": []
+    },
+    "Content": {
+      "content": {
+        "type": "text",
+        "text": ""
+      }
+    },
+    "ContentBlock": {
+      "type": "text",
+      "text": ""
+    },
+    "ContentChunk": {
+      "content": {
+        "type": "text",
+        "text": ""
+      }
+    },
+    "Cost": {
+      "amount": 0.0,
+      "currency": ""
+    },
+    "CreateTerminalRequest": {
+      "sessionId": "",
+      "command": ""
+    },
+    "CreateTerminalResponse": {
+      "terminalId": ""
+    },
+    "CurrentModeUpdate": {
+      "currentModeId": ""
+    },
+    "DeleteSessionRequest": {
+      "sessionId": ""
+    },
+    "DeleteSessionResponse": {},
+    "Diff": {
+      "path": "",
+      "newText": ""
+    },
+    "EmbeddedResource": {
+      "resource": {
+        "text": "",
+        "uri": ""
+      }
+    },
+    "EmbeddedResourceResource": {
+      "text": "",
+      "uri": ""
+    },
+    "EnvVariable": {
+      "name": "",
+      "value": ""
+    },
+    "Error": {
+      "code": -32700,
+      "message": ""
+    },
+    "ErrorCode": -32700,
+    "ExtNotification": {},
+    "ExtRequest": {},
+    "ExtResponse": {},
+    "FileSystemCapabilities": {},
+    "HttpHeader": {
+      "name": "",
+      "value": ""
+    },
+    "ImageContent": {
+      "data": "",
+      "mimeType": ""
+    },
+    "Implementation": {
+      "name": "",
+      "version": ""
+    },
+    "InitializeRequest": {
+      "protocolVersion": 0
+    },
+    "InitializeResponse": {
+      "protocolVersion": 0
+    },
+    "KillTerminalRequest": {
+      "sessionId": "",
+      "terminalId": ""
+    },
+    "KillTerminalResponse": {},
+    "ListSessionsRequest": {},
+    "ListSessionsResponse": {
+      "sessions": []
+    },
+    "LoadSessionRequest": {
+      "mcpServers": [],
+      "cwd": "",
+      "sessionId": ""
+    },
+    "LoadSessionResponse": {},
+    "LogoutCapabilities": {},
+    "LogoutRequest": {},
+    "LogoutResponse": {},
+    "McpCapabilities": {},
+    "McpServer": {
+      "type": "http",
+      "name": "",
+      "url": "",
+      "headers": []
+    },
+    "McpServerHttp": {
+      "name": "",
+      "url": "",
+      "headers": []
+    },
+    "McpServerSse": {
+      "name": "",
+      "url": "",
+      "headers": []
+    },
+    "McpServerStdio": {
+      "name": "",
+      "command": "",
+      "args": [],
+      "env": []
+    },
+    "MessageId": "",
+    "NewSessionRequest": {
+      "cwd": "",
+      "mcpServers": []
+    },
+    "NewSessionResponse": {
+      "sessionId": ""
+    },
+    "PermissionOption": {
+      "optionId": "",
+      "name": "",
+      "kind": "allow_once"
+    },
+    "PermissionOptionId": "",
+    "PermissionOptionKind": "allow_once",
+    "Plan": {
+      "entries": []
+    },
+    "PlanEntry": {
+      "content": "",
+      "priority": "high",
+      "status": "pending"
+    },
+    "PlanEntryPriority": "high",
+    "PlanEntryStatus": "pending",
+    "PromptCapabilities": {},
+    "PromptRequest": {
+      "sessionId": "",
+      "prompt": []
+    },
+    "PromptResponse": {
+      "stopReason": "end_turn"
+    },
+    "ProtocolVersion": 0,
+    "ReadTextFileRequest": {
+      "sessionId": "",
+      "path": ""
+    },
+    "ReadTextFileResponse": {
+      "content": ""
+    },
+    "ReleaseTerminalRequest": {
+      "sessionId": "",
+      "terminalId": ""
+    },
+    "ReleaseTerminalResponse": {},
+    "RequestId": null,
+    "RequestPermissionOutcome": {
+      "outcome": "cancelled"
+    },
+    "RequestPermissionRequest": {
+      "sessionId": "",
+      "toolCall": {
+        "toolCallId": ""
+      },
+      "options": []
+    },
+    "RequestPermissionResponse": {
+      "outcome": {
+        "outcome": "cancelled"
+      }
+    },
+    "ResourceLink": {
+      "name": "",
+      "uri": ""
+    },
+    "ResumeSessionRequest": {
+      "sessionId": "",
+      "cwd": ""
+    },
+    "ResumeSessionResponse": {},
+    "Role": "assistant",
+    "SelectedPermissionOutcome": {
+      "optionId": ""
+    },
+    "SessionAdditionalDirectoriesCapabilities": {},
+    "SessionCapabilities": {},
+    "SessionCloseCapabilities": {},
+    "SessionConfigBoolean": {
+      "currentValue": false
+    },
+    "SessionConfigGroupId": "",
+    "SessionConfigId": "",
+    "SessionConfigOption": {
+      "type": "select",
+      "currentValue": "",
+      "options": [],
+      "id": "",
+      "name": ""
+    },
+    "SessionConfigOptionCategory": "mode",
+    "SessionConfigOptionsCapabilities": {},
+    "SessionConfigSelect": {
+      "currentValue": "",
+      "options": []
+    },
+    "SessionConfigSelectGroup": {
+      "group": "",
+      "name": "",
+      "options": []
+    },
+    "SessionConfigSelectOption": {
+      "value": "",
+      "name": ""
+    },
+    "SessionConfigSelectOptions": [],
+    "SessionConfigValueId": "",
+    "SessionDeleteCapabilities": {},
+    "SessionId": "",
+    "SessionInfo": {
+      "sessionId": "",
+      "cwd": ""
+    },
+    "SessionInfoUpdate": {},
+    "SessionListCapabilities": {},
+    "SessionMode": {
+      "id": "",
+      "name": ""
+    },
+    "SessionModeId": "",
+    "SessionModeState": {
+      "currentModeId": "",
+      "availableModes": []
+    },
+    "SessionNotification": {
+      "sessionId": "",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": ""
+        }
+      }
+    },
+    "SessionResumeCapabilities": {},
+    "SessionUpdate": {
+      "sessionUpdate": "user_message_chunk",
+      "content": {
+        "type": "text",
+        "text": ""
+      }
+    },
+    "SetSessionConfigOptionRequest": {
+      "type": "boolean",
+      "value": false,
+      "sessionId": "",
+      "configId": ""
+    },
+    "SetSessionConfigOptionResponse": {
+      "configOptions": []
+    },
+    "SetSessionModeRequest": {
+      "sessionId": "",
+      "modeId": ""
+    },
+    "SetSessionModeResponse": {},
+    "StopReason": "end_turn",
+    "Terminal": {
+      "terminalId": ""
+    },
+    "TerminalExitStatus": {},
+    "TerminalId": "",
+    "TerminalOutputRequest": {
+      "sessionId": "",
+      "terminalId": ""
+    },
+    "TerminalOutputResponse": {
+      "output": "",
+      "truncated": false
+    },
+    "TextContent": {
+      "text": ""
+    },
+    "TextResourceContents": {
+      "text": "",
+      "uri": ""
+    },
+    "ToolCall": {
+      "toolCallId": "",
+      "title": ""
+    },
+    "ToolCallContent": {
+      "type": "content",
+      "content": {
+        "type": "text",
+        "text": ""
+      }
+    },
+    "ToolCallId": "",
+    "ToolCallLocation": {
+      "path": ""
+    },
+    "ToolCallStatus": "pending",
+    "ToolCallUpdate": {
+      "toolCallId": ""
+    },
+    "ToolKind": "read",
+    "UnstructuredCommandInput": {
+      "hint": ""
+    },
+    "UsageUpdate": {
+      "used": 0,
+      "size": 0
+    },
+    "WaitForTerminalExitRequest": {
+      "sessionId": "",
+      "terminalId": ""
+    },
+    "WaitForTerminalExitResponse": {},
+    "WriteTextFileRequest": {
+      "sessionId": "",
+      "path": "",
+      "content": ""
+    },
+    "WriteTextFileResponse": {}
+  }
+}

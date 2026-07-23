@@ -11,6 +11,9 @@ const _packageNames = <String, String>{
   'openai': 'pigcode_ai_openai',
   'openai_compatible': 'pigcode_ai_openai_compatible',
   'anthropic': 'pigcode_ai_anthropic',
+  'protocol_utils': 'pigcode_ai_protocol_utils',
+  'acp': 'pigcode_ai_acp',
+  'mcp': 'pigcode_ai_mcp',
 };
 
 void main() {
@@ -47,6 +50,17 @@ void main() {
           validateWorkspace(fixture.root, fixture.trackedPaths),
           code: 'missing_required_path',
           messageFragment: 'tool/fixtures/ai_core_peer.dart',
+        );
+      });
+    },
+    'requires the Phase 2a protocol source lock and generator': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('tool/upstream/protocols/sources.json');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'tool/upstream/protocols/sources.json',
         );
       });
     },
@@ -406,6 +420,51 @@ dev_dependencies:
         );
       });
     },
+    'rejects a forbidden internal package dependency': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/protocol_utils/pubspec.yaml',
+          '''
+dependencies:
+  pigcode_ai_mcp: ^0.0.1
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_internal_dependency',
+          messageFragment: 'pigcode_ai_protocol_utils -> pigcode_ai_mcp',
+        );
+      });
+    },
+    'rejects dart:io in a portable protocol barrel': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/mcp/lib/pigcode_ai_mcp.dart',
+          "export 'dart:io';\n",
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'portable_barrel_io_dependency',
+          messageFragment: 'packages/mcp/lib/pigcode_ai_mcp.dart',
+        );
+      });
+    },
+    'rejects re-exporting the MCP IO entrypoint': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/mcp/lib/pigcode_ai_mcp.dart',
+          "export 'pigcode_ai_mcp_io.dart';\n",
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'portable_barrel_reexports_io',
+          messageFragment: 'packages/mcp/lib/pigcode_ai_mcp.dart',
+        );
+      });
+    },
     'rejects an escaped path source key in a dependency block': () {
       _withFixture((fixture) {
         fixture.appendTo(
@@ -660,6 +719,10 @@ final class _WorkspaceFixture {
         '{}\n',
       )
       ..writeTracked(
+        'compatibility/upstream/phase-2a-protocol-inventory.json',
+        '{}\n',
+      )
+      ..writeTracked(
         'compatibility/upstream/vercel-ai-7.0.35-paths.json',
         '{}\n',
       )
@@ -670,6 +733,41 @@ final class _WorkspaceFixture {
         '// Compatibility CLI fixture\n',
       )
       ..writeTracked('tool/check_workspace.dart', '// CLI fixture\n')
+      ..writeTracked('tool/conformance/mcp/package-lock.json', '{}\n')
+      ..writeTracked('tool/conformance/mcp/package.json', '{}\n')
+      ..writeTracked(
+        'tool/protocol_codegen.dart',
+        '// Protocol codegen CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/run_acp_peer_matrix.dart',
+        '// ACP peer matrix fixture\n',
+      )
+      ..writeTracked(
+        'tool/run_mcp_conformance.dart',
+        '// MCP conformance runner fixture\n',
+      )
+      ..writeTracked('tool/fixtures/acp_peer.dart', '// ACP peer fixture\n')
+      ..writeTracked(
+        'tool/fixtures/acp/rust/README.md',
+        '# Rust ACP fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/acp/typescript/README.md',
+        '# TypeScript ACP fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/acp/typescript/agent.mjs',
+        '// TypeScript ACP peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/acp/typescript/package-lock.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/acp/typescript/package.json',
+        '{}\n',
+      )
       ..writeTracked(
         'tool/fixtures/ai_core_peer.dart',
         '// Peer fixture\n',
@@ -677,6 +775,18 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/fixtures/anthropic_peer.dart',
         '// Anthropic peer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/mcp_conformance_client.dart',
+        '// MCP conformance client fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/mcp_conformance_server.dart',
+        '// MCP conformance server fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/mcp_stdio_peer.dart',
+        '// MCP stdio peer fixture\n',
       )
       ..writeTracked(
         'tool/fixtures/openai_compatible_peer.dart',
@@ -691,8 +801,24 @@ final class _WorkspaceFixture {
         '// Inventory generator fixture\n',
       )
       ..writeTracked(
+        'tool/src/acp_peer_harness.dart',
+        '// ACP peer harness fixture\n',
+      )
+      ..writeTracked(
         'tool/src/compatibility_manifest.dart',
         '// Compatibility contract fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/protocol_codegen.dart',
+        '// Protocol codegen fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/protocol_inventory.dart',
+        '// Protocol inventory fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/protocol_sources.dart',
+        '// Protocol source-lock fixture\n',
       )
       ..writeTracked(
         'tool/src/workspace_contract.dart',
@@ -711,12 +837,80 @@ final class _WorkspaceFixture {
         '// Cross-package scripted test fixture\n',
       )
       ..writeTracked(
+        'tool/test/acp_cross_process_test.dart',
+        '// ACP cross-process test fixture\n',
+      )
+      ..writeTracked(
         'tool/test/compatibility_manifest_test.dart',
         '// Compatibility test fixture\n',
       )
       ..writeTracked(
+        'tool/test/mcp_conformance_inventory_test.dart',
+        '// MCP conformance inventory test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/mcp_stdio_cross_process_test.dart',
+        '// MCP stdio cross-process test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/protocol_codegen_test.dart',
+        '// Protocol codegen test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/protocol_inventory_test.dart',
+        '// Protocol inventory test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/protocol_sources_test.dart',
+        '// Protocol source test fixture\n',
+      )
+      ..writeTracked(
         'tool/test/workspace_contract_test.dart',
         '// Test fixture\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/acp/LICENSE',
+        'Apache 2.0\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/acp/schema-v1.20.0/meta.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/acp/schema-v1.20.0/schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/mcp-conformance/LICENSE',
+        'Mixed license\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/mcp-conformance/v0.1.16/package.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/mcp-conformance/v0.1.16/scenarios.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/mcp/2025-11-25/schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/mcp/LICENSE',
+        'MIT\n',
+      )
+      ..writeTracked(
+        'tool/upstream/protocols/sources.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'packages/acp/lib/src/generated/acp_inventory.g.dart',
+        '// Generated ACP inventory\n',
+      )
+      ..writeTracked(
+        'packages/mcp/lib/src/generated/mcp_inventory.g.dart',
+        '// Generated MCP inventory\n',
       )
       ..writeTracked('.github/workflows/ci.yaml', 'name: CI\n')
       ..writeTracked('pubspec.yaml', _rootManifest());
@@ -816,6 +1010,9 @@ workspace:
   - packages/openai
   - packages/openai_compatible
   - packages/anthropic
+  - packages/protocol_utils
+  - packages/acp
+  - packages/mcp
 ''';
 
 String _packageManifest(String name) => '''

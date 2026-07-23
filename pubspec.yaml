@@ -11,8 +11,12 @@ workspace:
   - packages/openai
   - packages/openai_compatible
   - packages/anthropic
+  - packages/protocol_utils
+  - packages/acp
+  - packages/mcp
 
 dev_dependencies:
+  crypto: ^3.0.0
   melos: ^8.0.0
   yaml: ^3.1.3
 

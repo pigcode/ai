@@ -1,0 +1,1675 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "release": "2025-11-25",
+    "sha256": "1ffe4c5577974012f5fa02af14ea88df4b7146679df1abaaad497c8d9230ca8a"
+  },
+  "cases": [
+    {
+      "id": "request:client:completion/complete",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "completion/complete",
+      "definition": "CompleteRequest",
+      "envelope": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "method": "completion/complete",
+        "params": {
+          "argument": {
+            "name": "",
+            "value": ""
+          },
+          "ref": {
+            "name": "",
+            "type": "ref/prompt"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:client:completion/complete",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "completion/complete",
+      "definition": "CompleteResult",
+      "responseMethod": "completion/complete",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "completion": {
+            "values": []
+          }
+        }
+      }
+    },
+    {
+      "id": "request:server:elicitation/create",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "elicitation/create",
+      "definition": "ElicitRequest",
+      "envelope": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "elicitation/create",
+        "params": {
+          "elicitationId": "",
+          "message": "",
+          "mode": "url",
+          "url": ""
+        }
+      }
+    },
+    {
+      "id": "response:server:elicitation/create",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "elicitation/create",
+      "definition": "ElicitResult",
+      "responseMethod": "elicitation/create",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "action": "accept"
+        }
+      }
+    },
+    {
+      "id": "request:client:initialize",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "initialize",
+      "definition": "InitializeRequest",
+      "envelope": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "method": "initialize",
+        "params": {
+          "capabilities": {},
+          "clientInfo": {
+            "name": "",
+            "version": ""
+          },
+          "protocolVersion": "2025-11-25"
+        }
+      }
+    },
+    {
+      "id": "response:client:initialize",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "initialize",
+      "definition": "InitializeResult",
+      "responseMethod": "initialize",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "capabilities": {},
+          "protocolVersion": "",
+          "serverInfo": {
+            "name": "",
+            "version": ""
+          }
+        }
+      }
+    },
+    {
+      "id": "request:client:logging/setLevel",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "logging/setLevel",
+      "definition": "SetLevelRequest",
+      "envelope": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "method": "logging/setLevel",
+        "params": {
+          "level": "alert"
+        }
+      }
+    },
+    {
+      "id": "response:client:logging/setLevel",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "logging/setLevel",
+      "definition": "EmptyResult",
+      "responseMethod": "logging/setLevel",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": {}
+      }
+    },
+    {
+      "id": "notification:client:notifications/cancelled",
+      "kind": "notification",
+      "role": "clientNotification",
+      "sender": "client",
+      "method": "notifications/cancelled",
+      "definition": "CancelledNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/cancelled",
+        "params": {}
+      }
+    },
+    {
+      "id": "notification:server:notifications/cancelled",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/cancelled",
+      "definition": "CancelledNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/cancelled",
+        "params": {}
+      }
+    },
+    {
+      "id": "notification:server:notifications/elicitation/complete",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/elicitation/complete",
+      "definition": "ElicitationCompleteNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/elicitation/complete",
+        "params": {
+          "elicitationId": ""
+        }
+      }
+    },
+    {
+      "id": "notification:client:notifications/initialized",
+      "kind": "notification",
+      "role": "clientNotification",
+      "sender": "client",
+      "method": "notifications/initialized",
+      "definition": "InitializedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/initialized"
+      }
+    },
+    {
+      "id": "notification:server:notifications/message",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/message",
+      "definition": "LoggingMessageNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/message",
+        "params": {
+          "data": {},
+          "level": "alert"
+        }
+      }
+    },
+    {
+      "id": "notification:client:notifications/progress",
+      "kind": "notification",
+      "role": "clientNotification",
+      "sender": "client",
+      "method": "notifications/progress",
+      "definition": "ProgressNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/progress",
+        "params": {
+          "progress": 0.0,
+          "progressToken": ""
+        }
+      }
+    },
+    {
+      "id": "notification:server:notifications/progress",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/progress",
+      "definition": "ProgressNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/progress",
+        "params": {
+          "progress": 0.0,
+          "progressToken": ""
+        }
+      }
+    },
+    {
+      "id": "notification:server:notifications/prompts/list_changed",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/prompts/list_changed",
+      "definition": "PromptListChangedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/prompts/list_changed"
+      }
+    },
+    {
+      "id": "notification:server:notifications/resources/list_changed",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/resources/list_changed",
+      "definition": "ResourceListChangedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/resources/list_changed"
+      }
+    },
+    {
+      "id": "notification:server:notifications/resources/updated",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/resources/updated",
+      "definition": "ResourceUpdatedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/resources/updated",
+        "params": {
+          "uri": ""
+        }
+      }
+    },
+    {
+      "id": "notification:client:notifications/roots/list_changed",
+      "kind": "notification",
+      "role": "clientNotification",
+      "sender": "client",
+      "method": "notifications/roots/list_changed",
+      "definition": "RootsListChangedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/roots/list_changed"
+      }
+    },
+    {
+      "id": "notification:client:notifications/tasks/status",
+      "kind": "notification",
+      "role": "clientNotification",
+      "sender": "client",
+      "method": "notifications/tasks/status",
+      "definition": "TaskStatusNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/tasks/status",
+        "params": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "notification:server:notifications/tasks/status",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/tasks/status",
+      "definition": "TaskStatusNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/tasks/status",
+        "params": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "notification:server:notifications/tools/list_changed",
+      "kind": "notification",
+      "role": "serverNotification",
+      "sender": "server",
+      "method": "notifications/tools/list_changed",
+      "definition": "ToolListChangedNotification",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notifications/tools/list_changed"
+      }
+    },
+    {
+      "id": "request:client:ping",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "ping",
+      "definition": "PingRequest",
+      "envelope": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "method": "ping"
+      }
+    },
+    {
+      "id": "response:client:ping",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "ping",
+      "definition": "EmptyResult",
+      "responseMethod": "ping",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:server:ping",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "ping",
+      "definition": "PingRequest",
+      "envelope": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "method": "ping"
+      }
+    },
+    {
+      "id": "response:server:ping",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "ping",
+      "definition": "EmptyResult",
+      "responseMethod": "ping",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:client:prompts/get",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "prompts/get",
+      "definition": "GetPromptRequest",
+      "envelope": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "method": "prompts/get",
+        "params": {
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:prompts/get",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "prompts/get",
+      "definition": "GetPromptResult",
+      "responseMethod": "prompts/get",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "result": {
+          "messages": []
+        }
+      }
+    },
+    {
+      "id": "request:client:prompts/list",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "prompts/list",
+      "definition": "ListPromptsRequest",
+      "envelope": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "method": "prompts/list"
+      }
+    },
+    {
+      "id": "response:client:prompts/list",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "prompts/list",
+      "definition": "ListPromptsResult",
+      "responseMethod": "prompts/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 8,
+        "result": {
+          "prompts": []
+        }
+      }
+    },
+    {
+      "id": "request:client:resources/list",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "resources/list",
+      "definition": "ListResourcesRequest",
+      "envelope": {
+        "id": 9,
+        "jsonrpc": "2.0",
+        "method": "resources/list"
+      }
+    },
+    {
+      "id": "response:client:resources/list",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "resources/list",
+      "definition": "ListResourcesResult",
+      "responseMethod": "resources/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "result": {
+          "resources": []
+        }
+      }
+    },
+    {
+      "id": "request:client:resources/read",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "resources/read",
+      "definition": "ReadResourceRequest",
+      "envelope": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "method": "resources/read",
+        "params": {
+          "uri": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:resources/read",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "resources/read",
+      "definition": "ReadResourceResult",
+      "responseMethod": "resources/read",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "result": {
+          "contents": []
+        }
+      }
+    },
+    {
+      "id": "request:client:resources/subscribe",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "resources/subscribe",
+      "definition": "SubscribeRequest",
+      "envelope": {
+        "id": 11,
+        "jsonrpc": "2.0",
+        "method": "resources/subscribe",
+        "params": {
+          "uri": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:resources/subscribe",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "resources/subscribe",
+      "definition": "EmptyResult",
+      "responseMethod": "resources/subscribe",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:client:resources/templates/list",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "resources/templates/list",
+      "definition": "ListResourceTemplatesRequest",
+      "envelope": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "method": "resources/templates/list"
+      }
+    },
+    {
+      "id": "response:client:resources/templates/list",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "resources/templates/list",
+      "definition": "ListResourceTemplatesResult",
+      "responseMethod": "resources/templates/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 12,
+        "result": {
+          "resourceTemplates": []
+        }
+      }
+    },
+    {
+      "id": "request:client:resources/unsubscribe",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "resources/unsubscribe",
+      "definition": "UnsubscribeRequest",
+      "envelope": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "method": "resources/unsubscribe",
+        "params": {
+          "uri": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:resources/unsubscribe",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "resources/unsubscribe",
+      "definition": "EmptyResult",
+      "responseMethod": "resources/unsubscribe",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 13,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:server:roots/list",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "roots/list",
+      "definition": "ListRootsRequest",
+      "envelope": {
+        "id": 14,
+        "jsonrpc": "2.0",
+        "method": "roots/list"
+      }
+    },
+    {
+      "id": "response:server:roots/list",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "roots/list",
+      "definition": "ListRootsResult",
+      "responseMethod": "roots/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 14,
+        "result": {
+          "roots": []
+        }
+      }
+    },
+    {
+      "id": "request:server:sampling/createMessage",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "sampling/createMessage",
+      "definition": "CreateMessageRequest",
+      "envelope": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "method": "sampling/createMessage",
+        "params": {
+          "maxTokens": 0,
+          "messages": []
+        }
+      }
+    },
+    {
+      "id": "response:server:sampling/createMessage",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "sampling/createMessage",
+      "definition": "CreateMessageResult",
+      "responseMethod": "sampling/createMessage",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "result": {
+          "content": {
+            "text": "",
+            "type": "text"
+          },
+          "model": "",
+          "role": "assistant"
+        }
+      }
+    },
+    {
+      "id": "request:client:tasks/cancel",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tasks/cancel",
+      "definition": "CancelTaskRequest",
+      "envelope": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "method": "tasks/cancel",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:tasks/cancel",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tasks/cancel",
+      "definition": "CancelTaskResult",
+      "responseMethod": "tasks/cancel",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 16,
+        "result": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "request:server:tasks/cancel",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "tasks/cancel",
+      "definition": "CancelTaskRequest",
+      "envelope": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "tasks/cancel",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:server:tasks/cancel",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "tasks/cancel",
+      "definition": "CancelTaskResult",
+      "responseMethod": "tasks/cancel",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "request:client:tasks/get",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tasks/get",
+      "definition": "GetTaskRequest",
+      "envelope": {
+        "id": 18,
+        "jsonrpc": "2.0",
+        "method": "tasks/get",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:tasks/get",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tasks/get",
+      "definition": "GetTaskResult",
+      "responseMethod": "tasks/get",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 18,
+        "result": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "request:server:tasks/get",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "tasks/get",
+      "definition": "GetTaskRequest",
+      "envelope": {
+        "id": 19,
+        "jsonrpc": "2.0",
+        "method": "tasks/get",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:server:tasks/get",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "tasks/get",
+      "definition": "GetTaskResult",
+      "responseMethod": "tasks/get",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 19,
+        "result": {
+          "createdAt": "",
+          "lastUpdatedAt": "",
+          "status": "cancelled",
+          "taskId": "",
+          "ttl": 0
+        }
+      }
+    },
+    {
+      "id": "request:client:tasks/list",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tasks/list",
+      "definition": "ListTasksRequest",
+      "envelope": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "method": "tasks/list"
+      }
+    },
+    {
+      "id": "response:client:tasks/list",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tasks/list",
+      "definition": "ListTasksResult",
+      "responseMethod": "tasks/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 20,
+        "result": {
+          "tasks": []
+        }
+      }
+    },
+    {
+      "id": "request:server:tasks/list",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "tasks/list",
+      "definition": "ListTasksRequest",
+      "envelope": {
+        "id": 21,
+        "jsonrpc": "2.0",
+        "method": "tasks/list"
+      }
+    },
+    {
+      "id": "response:server:tasks/list",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "tasks/list",
+      "definition": "ListTasksResult",
+      "responseMethod": "tasks/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 21,
+        "result": {
+          "tasks": []
+        }
+      }
+    },
+    {
+      "id": "request:client:tasks/result",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tasks/result",
+      "definition": "GetTaskPayloadRequest",
+      "envelope": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "method": "tasks/result",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:tasks/result",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tasks/result",
+      "definition": "GetTaskPayloadResult",
+      "responseMethod": "tasks/result",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 22,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:server:tasks/result",
+      "kind": "request",
+      "role": "serverRequest",
+      "sender": "server",
+      "method": "tasks/result",
+      "definition": "GetTaskPayloadRequest",
+      "envelope": {
+        "id": 23,
+        "jsonrpc": "2.0",
+        "method": "tasks/result",
+        "params": {
+          "taskId": ""
+        }
+      }
+    },
+    {
+      "id": "response:server:tasks/result",
+      "kind": "response",
+      "role": "clientResult",
+      "sender": "client",
+      "method": "tasks/result",
+      "definition": "GetTaskPayloadResult",
+      "responseMethod": "tasks/result",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 23,
+        "result": {}
+      }
+    },
+    {
+      "id": "request:client:tools/call",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tools/call",
+      "definition": "CallToolRequest",
+      "envelope": {
+        "id": 24,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "response:client:tools/call",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tools/call",
+      "definition": "CallToolResult",
+      "responseMethod": "tools/call",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 24,
+        "result": {
+          "content": []
+        }
+      }
+    },
+    {
+      "id": "request:client:tools/list",
+      "kind": "request",
+      "role": "clientRequest",
+      "sender": "client",
+      "method": "tools/list",
+      "definition": "ListToolsRequest",
+      "envelope": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "method": "tools/list"
+      }
+    },
+    {
+      "id": "response:client:tools/list",
+      "kind": "response",
+      "role": "serverResult",
+      "sender": "server",
+      "method": "tools/list",
+      "definition": "ListToolsResult",
+      "responseMethod": "tools/list",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 25,
+        "result": {
+          "tools": []
+        }
+      }
+    }
+  ],
+  "definitionSamples": {
+    "Annotations": {},
+    "AudioContent": {
+      "data": "",
+      "mimeType": "",
+      "type": "audio"
+    },
+    "BaseMetadata": {
+      "name": ""
+    },
+    "BlobResourceContents": {
+      "blob": "",
+      "uri": ""
+    },
+    "BooleanSchema": {
+      "type": "boolean"
+    },
+    "CallToolRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tools/call",
+      "params": {
+        "name": ""
+      }
+    },
+    "CallToolRequestParams": {
+      "name": ""
+    },
+    "CallToolResult": {
+      "content": []
+    },
+    "CancelTaskRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tasks/cancel",
+      "params": {
+        "taskId": ""
+      }
+    },
+    "CancelTaskResult": {
+      "createdAt": "",
+      "lastUpdatedAt": "",
+      "status": "cancelled",
+      "taskId": "",
+      "ttl": 0
+    },
+    "CancelledNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/cancelled",
+      "params": {}
+    },
+    "CancelledNotificationParams": {},
+    "ClientCapabilities": {},
+    "ClientNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/cancelled",
+      "params": {}
+    },
+    "ClientRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "initialize",
+      "params": {
+        "capabilities": {},
+        "clientInfo": {
+          "name": "",
+          "version": ""
+        },
+        "protocolVersion": ""
+      }
+    },
+    "ClientResult": {},
+    "CompleteRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "completion/complete",
+      "params": {
+        "argument": {
+          "name": "",
+          "value": ""
+        },
+        "ref": {
+          "name": "",
+          "type": "ref/prompt"
+        }
+      }
+    },
+    "CompleteRequestParams": {
+      "argument": {
+        "name": "",
+        "value": ""
+      },
+      "ref": {
+        "name": "",
+        "type": "ref/prompt"
+      }
+    },
+    "CompleteResult": {
+      "completion": {
+        "values": []
+      }
+    },
+    "ContentBlock": {
+      "text": "",
+      "type": "text"
+    },
+    "CreateMessageRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "sampling/createMessage",
+      "params": {
+        "maxTokens": 0,
+        "messages": []
+      }
+    },
+    "CreateMessageRequestParams": {
+      "maxTokens": 0,
+      "messages": []
+    },
+    "CreateMessageResult": {
+      "content": {
+        "text": "",
+        "type": "text"
+      },
+      "model": "",
+      "role": "assistant"
+    },
+    "CreateTaskResult": {
+      "task": {
+        "createdAt": "",
+        "lastUpdatedAt": "",
+        "status": "cancelled",
+        "taskId": "",
+        "ttl": 0
+      }
+    },
+    "Cursor": "",
+    "ElicitRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "elicitation/create",
+      "params": {
+        "elicitationId": "",
+        "message": "",
+        "mode": "url",
+        "url": ""
+      }
+    },
+    "ElicitRequestFormParams": {
+      "message": "",
+      "requestedSchema": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "ElicitRequestParams": {
+      "elicitationId": "",
+      "message": "",
+      "mode": "url",
+      "url": ""
+    },
+    "ElicitRequestURLParams": {
+      "elicitationId": "",
+      "message": "",
+      "mode": "url",
+      "url": ""
+    },
+    "ElicitResult": {
+      "action": "accept"
+    },
+    "ElicitationCompleteNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/elicitation/complete",
+      "params": {
+        "elicitationId": ""
+      }
+    },
+    "EmbeddedResource": {
+      "resource": {
+        "text": "",
+        "uri": ""
+      },
+      "type": "resource"
+    },
+    "EmptyResult": {},
+    "EnumSchema": {
+      "enum": [],
+      "type": "string"
+    },
+    "Error": {
+      "code": 0,
+      "message": ""
+    },
+    "GetPromptRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "prompts/get",
+      "params": {
+        "name": ""
+      }
+    },
+    "GetPromptRequestParams": {
+      "name": ""
+    },
+    "GetPromptResult": {
+      "messages": []
+    },
+    "GetTaskPayloadRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tasks/result",
+      "params": {
+        "taskId": ""
+      }
+    },
+    "GetTaskPayloadResult": {},
+    "GetTaskRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tasks/get",
+      "params": {
+        "taskId": ""
+      }
+    },
+    "GetTaskResult": {
+      "createdAt": "",
+      "lastUpdatedAt": "",
+      "status": "cancelled",
+      "taskId": "",
+      "ttl": 0
+    },
+    "Icon": {
+      "src": ""
+    },
+    "Icons": {},
+    "ImageContent": {
+      "data": "",
+      "mimeType": "",
+      "type": "image"
+    },
+    "Implementation": {
+      "name": "",
+      "version": ""
+    },
+    "InitializeRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "initialize",
+      "params": {
+        "capabilities": {},
+        "clientInfo": {
+          "name": "",
+          "version": ""
+        },
+        "protocolVersion": ""
+      }
+    },
+    "InitializeRequestParams": {
+      "capabilities": {},
+      "clientInfo": {
+        "name": "",
+        "version": ""
+      },
+      "protocolVersion": ""
+    },
+    "InitializeResult": {
+      "capabilities": {},
+      "protocolVersion": "",
+      "serverInfo": {
+        "name": "",
+        "version": ""
+      }
+    },
+    "InitializedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/initialized"
+    },
+    "JSONRPCErrorResponse": {
+      "error": {
+        "code": 0,
+        "message": ""
+      },
+      "jsonrpc": "2.0"
+    },
+    "JSONRPCMessage": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": ""
+    },
+    "JSONRPCNotification": {
+      "jsonrpc": "2.0",
+      "method": ""
+    },
+    "JSONRPCRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": ""
+    },
+    "JSONRPCResponse": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "result": {}
+    },
+    "JSONRPCResultResponse": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "result": {}
+    },
+    "LegacyTitledEnumSchema": {
+      "enum": [],
+      "type": "string"
+    },
+    "ListPromptsRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "prompts/list"
+    },
+    "ListPromptsResult": {
+      "prompts": []
+    },
+    "ListResourceTemplatesRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "resources/templates/list"
+    },
+    "ListResourceTemplatesResult": {
+      "resourceTemplates": []
+    },
+    "ListResourcesRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "resources/list"
+    },
+    "ListResourcesResult": {
+      "resources": []
+    },
+    "ListRootsRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "roots/list"
+    },
+    "ListRootsResult": {
+      "roots": []
+    },
+    "ListTasksRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tasks/list"
+    },
+    "ListTasksResult": {
+      "tasks": []
+    },
+    "ListToolsRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "tools/list"
+    },
+    "ListToolsResult": {
+      "tools": []
+    },
+    "LoggingLevel": "alert",
+    "LoggingMessageNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/message",
+      "params": {
+        "data": {},
+        "level": "alert"
+      }
+    },
+    "LoggingMessageNotificationParams": {
+      "data": {},
+      "level": "alert"
+    },
+    "ModelHint": {},
+    "ModelPreferences": {},
+    "MultiSelectEnumSchema": {
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "Notification": {
+      "method": ""
+    },
+    "NotificationParams": {},
+    "NumberSchema": {
+      "type": "integer"
+    },
+    "PaginatedRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": ""
+    },
+    "PaginatedRequestParams": {},
+    "PaginatedResult": {},
+    "PingRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "ping"
+    },
+    "PrimitiveSchemaDefinition": {
+      "type": "string"
+    },
+    "ProgressNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/progress",
+      "params": {
+        "progress": 0.0,
+        "progressToken": ""
+      }
+    },
+    "ProgressNotificationParams": {
+      "progress": 0.0,
+      "progressToken": ""
+    },
+    "ProgressToken": "",
+    "Prompt": {
+      "name": ""
+    },
+    "PromptArgument": {
+      "name": ""
+    },
+    "PromptListChangedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/prompts/list_changed"
+    },
+    "PromptMessage": {
+      "content": {
+        "text": "",
+        "type": "text"
+      },
+      "role": "assistant"
+    },
+    "PromptReference": {
+      "name": "",
+      "type": "ref/prompt"
+    },
+    "ReadResourceRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "resources/read",
+      "params": {
+        "uri": ""
+      }
+    },
+    "ReadResourceRequestParams": {
+      "uri": ""
+    },
+    "ReadResourceResult": {
+      "contents": []
+    },
+    "RelatedTaskMetadata": {
+      "taskId": ""
+    },
+    "Request": {
+      "method": ""
+    },
+    "RequestId": "",
+    "RequestParams": {},
+    "Resource": {
+      "name": "",
+      "uri": ""
+    },
+    "ResourceContents": {
+      "uri": ""
+    },
+    "ResourceLink": {
+      "name": "",
+      "type": "resource_link",
+      "uri": ""
+    },
+    "ResourceListChangedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/resources/list_changed"
+    },
+    "ResourceRequestParams": {
+      "uri": ""
+    },
+    "ResourceTemplate": {
+      "name": "",
+      "uriTemplate": ""
+    },
+    "ResourceTemplateReference": {
+      "type": "ref/resource",
+      "uri": ""
+    },
+    "ResourceUpdatedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/resources/updated",
+      "params": {
+        "uri": ""
+      }
+    },
+    "ResourceUpdatedNotificationParams": {
+      "uri": ""
+    },
+    "Result": {},
+    "Role": "assistant",
+    "Root": {
+      "uri": ""
+    },
+    "RootsListChangedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/roots/list_changed"
+    },
+    "SamplingMessage": {
+      "content": {
+        "text": "",
+        "type": "text"
+      },
+      "role": "assistant"
+    },
+    "SamplingMessageContentBlock": {
+      "text": "",
+      "type": "text"
+    },
+    "ServerCapabilities": {},
+    "ServerNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/cancelled",
+      "params": {}
+    },
+    "ServerRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "ping"
+    },
+    "ServerResult": {},
+    "SetLevelRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "logging/setLevel",
+      "params": {
+        "level": "alert"
+      }
+    },
+    "SetLevelRequestParams": {
+      "level": "alert"
+    },
+    "SingleSelectEnumSchema": {
+      "enum": [],
+      "type": "string"
+    },
+    "StringSchema": {
+      "type": "string"
+    },
+    "SubscribeRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "resources/subscribe",
+      "params": {
+        "uri": ""
+      }
+    },
+    "SubscribeRequestParams": {
+      "uri": ""
+    },
+    "Task": {
+      "createdAt": "",
+      "lastUpdatedAt": "",
+      "status": "cancelled",
+      "taskId": "",
+      "ttl": 0
+    },
+    "TaskAugmentedRequestParams": {},
+    "TaskMetadata": {},
+    "TaskStatus": "cancelled",
+    "TaskStatusNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/tasks/status",
+      "params": {
+        "createdAt": "",
+        "lastUpdatedAt": "",
+        "status": "cancelled",
+        "taskId": "",
+        "ttl": 0
+      }
+    },
+    "TaskStatusNotificationParams": {
+      "createdAt": "",
+      "lastUpdatedAt": "",
+      "status": "cancelled",
+      "taskId": "",
+      "ttl": 0
+    },
+    "TextContent": {
+      "text": "",
+      "type": "text"
+    },
+    "TextResourceContents": {
+      "text": "",
+      "uri": ""
+    },
+    "TitledMultiSelectEnumSchema": {
+      "items": {
+        "anyOf": []
+      },
+      "type": "array"
+    },
+    "TitledSingleSelectEnumSchema": {
+      "oneOf": [],
+      "type": "string"
+    },
+    "Tool": {
+      "inputSchema": {
+        "type": "object"
+      },
+      "name": ""
+    },
+    "ToolAnnotations": {},
+    "ToolChoice": {},
+    "ToolExecution": {},
+    "ToolListChangedNotification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/tools/list_changed"
+    },
+    "ToolResultContent": {
+      "content": [],
+      "toolUseId": "",
+      "type": "tool_result"
+    },
+    "ToolUseContent": {
+      "id": "",
+      "input": {},
+      "name": "",
+      "type": "tool_use"
+    },
+    "URLElicitationRequiredError": {
+      "error": {
+        "code": -32042,
+        "message": "",
+        "data": {
+          "elicitations": []
+        }
+      },
+      "jsonrpc": "2.0"
+    },
+    "UnsubscribeRequest": {
+      "id": "",
+      "jsonrpc": "2.0",
+      "method": "resources/unsubscribe",
+      "params": {
+        "uri": ""
+      }
+    },
+    "UnsubscribeRequestParams": {
+      "uri": ""
+    },
+    "UntitledMultiSelectEnumSchema": {
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "UntitledSingleSelectEnumSchema": {
+      "enum": [],
+      "type": "string"
+    }
+  }
+}
