@@ -1,0 +1,1561 @@
+{
+  "$schema": "./schema/protocol-foundation-compatibility.schema.json",
+  "formatVersion": 1,
+  "phase": "phase-2a-protocol-foundation",
+  "implementationCommit": "pending-main-merge",
+  "dartSdkConstraint": "^3.6.0",
+  "sources": [
+    {
+      "sourceId": "acp-v1",
+      "release": "schema-v1.20.0",
+      "revision": "5e89c71497fe07dd4ae633c181a17224f4a8956d",
+      "wireVersion": "1",
+      "artifactRefs": [
+        "acp-schema-v1",
+        "acp-meta-v1",
+        "acp-license"
+      ]
+    },
+    {
+      "sourceId": "mcp-2025-11-25",
+      "release": "2025-11-25",
+      "revision": "38c84e9f93ad191d9eb26d92b945d17bd0efcaf3",
+      "wireVersion": "2025-11-25",
+      "artifactRefs": [
+        "mcp-schema-2025-11-25",
+        "mcp-license"
+      ]
+    },
+    {
+      "sourceId": "mcp-conformance-v0.1.16",
+      "release": "v0.1.16",
+      "revision": "21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0",
+      "wireVersion": "2025-11-25",
+      "artifactRefs": [
+        "mcp-conformance-package",
+        "mcp-conformance-scenarios",
+        "mcp-conformance-license"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "P2A-UTIL-01",
+      "protocol": "protocol-utils",
+      "level": "implemented",
+      "summary": "Strict JSON-safe values and JSON-RPC 2.0 envelopes.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-UTIL-01"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-JSONRPC-BATCH"
+      ]
+    },
+    {
+      "id": "P2A-UTIL-02",
+      "protocol": "protocol-utils",
+      "level": "implemented",
+      "summary": "Bounded NDJSON, Content-Length, and SSE framing.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-UTIL-02"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-UTIL-03",
+      "protocol": "protocol-utils",
+      "level": "implemented",
+      "summary": "Correlation, dispatch, cancellation, races, and backpressure.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-UTIL-03"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-01",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Pinned source lock, 142 definitions, 23 methods, and roots.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-01"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-ACP-DRAFTS"
+      ]
+    },
+    {
+      "id": "P2A-ACP-02",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Generated stable models, role codec, golden, and rejection gates.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-02"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-03",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Initialize, version, capability, and lifecycle negotiation.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-03"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-04",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Session creation, modes, configuration, listing, deletion, close, and logout.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-04"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-05",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Prompt content, updates, tools, plans, usage, and terminal ordering.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-05"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-06",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Client reverse filesystem, terminal, and permission requests.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-06"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-ACP-07",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Session and request cancellation, late updates, and terminal barriers.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-07"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-08",
+      "protocol": "acp",
+      "level": "implemented",
+      "summary": "Historical load replay and resume without false active-attach claims.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-08"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-ACP-ACTIVE-ATTACH"
+      ]
+    },
+    {
+      "id": "P2A-ACP-09",
+      "protocol": "acp",
+      "level": "verified",
+      "summary": "Scripted peer chaos and bounded observational record/replay.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-09"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-ACP-10",
+      "protocol": "acp",
+      "level": "verified",
+      "summary": "Fixed real-process Dart, TypeScript, and Rust peer tuples.",
+      "sourceRefs": [
+        "acp-v1"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-ACP-10"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-ACP-CONFORMANCE"
+      ]
+    },
+    {
+      "id": "P2A-MCP-01",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Pinned source lock, 145 definitions, and complete role/method inventory.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-01"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-02",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Generated models, role codec, schema, golden, and unknown-value gates.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-02"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-03",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Initialize, fixed version, capability, lifecycle, and reconnect behavior.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-03"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-04",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Tools, resources, prompts, completion, logging, and pagination.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-04"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-05",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Reverse sampling, roots, and elicitation requests.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-05"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-06",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Progress, cancellation, tasks, late responses, and terminal races.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-06"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-07",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Stdio framing, scripted peer, stderr, and process-exit handling.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-07"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-MCP-08",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Streamable HTTP POST, GET, DELETE, sessions, SSE, and resumption.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-08"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-MCP-09",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "OAuth metadata, PKCE, registration, scopes, token binding, and retries.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-09"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-MCP-10",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "MCP tool to neutral AI mapping with schema, error, task, and collision coverage.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-10"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-MCP-MAPPING-UNKNOWN"
+      ]
+    },
+    {
+      "id": "P2A-MCP-11",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Resource and prompt mapping with strict and preserve policies.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-11"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-MCP-MAPPING-UNKNOWN"
+      ]
+    },
+    {
+      "id": "P2A-MCP-12",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Bounded redacted record/replay with framing recomputation.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-12"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-13",
+      "protocol": "mcp",
+      "level": "verified",
+      "summary": "Fixed real-process MCP stdio client/server tuple.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-13"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-MCP-STDIO-CONFORMANCE"
+      ]
+    },
+    {
+      "id": "P2A-MCP-14",
+      "protocol": "mcp",
+      "level": "conformant",
+      "summary": "Official MCP Streamable HTTP client-role conformance.",
+      "sourceRefs": [
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-14"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-15",
+      "protocol": "mcp",
+      "level": "conformant",
+      "summary": "Official MCP Streamable HTTP server-role conformance.",
+      "sourceRefs": [
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-15"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-MCP-16",
+      "protocol": "mcp",
+      "level": "implemented",
+      "summary": "Portable default/HTTP barrels and isolated VM-only IO entrypoint.",
+      "sourceRefs": [
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-MCP-16"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-CROSS-01",
+      "protocol": "cross-package",
+      "level": "implemented",
+      "summary": "Nine-package workspace, dependency, and public barrel contract.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-CROSS-01"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-CROSS-02",
+      "protocol": "cross-package",
+      "level": "implemented",
+      "summary": "Generated source zero-diff and stable inventory classification.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-CROSS-02"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-CROSS-03",
+      "protocol": "cross-package",
+      "level": "implemented",
+      "summary": "Source, claim, evidence, and limitation reference closure.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-CROSS-03"
+      ],
+      "knownUnsupportedRefs": []
+    },
+    {
+      "id": "P2A-CROSS-04",
+      "protocol": "cross-package",
+      "level": "implemented",
+      "summary": "README, examples, and support matrix remain within manifest claims.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-CROSS-04"
+      ],
+      "knownUnsupportedRefs": [
+        "KU-CALLER-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "P2A-CROSS-05",
+      "protocol": "cross-package",
+      "level": "verified",
+      "summary": "Full format, analyze, test, platform, real-process, and conformance gates.",
+      "sourceRefs": [
+        "acp-v1",
+        "mcp-2025-11-25",
+        "mcp-conformance-v0.1.16"
+      ],
+      "evidenceRefs": [
+        "EV-P2A-CROSS-05"
+      ],
+      "knownUnsupportedRefs": []
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-P2A-UTIL-01",
+      "claimId": "P2A-UTIL-01",
+      "claimLevel": "implemented",
+      "kind": "unit-test",
+      "role": "shared",
+      "transport": "in-memory",
+      "version": "json-rpc-2.0",
+      "capabilityProfile": "strict-envelope",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "protocol utility codec test",
+        "path": "packages/protocol_utils/test/json_rpc/codec_test.dart",
+        "sha256": "41c92194de01817ef11a51b342de511f892bdd7d48cba550c033a0a099b0e328"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "protocol utility codec test",
+        "path": "packages/protocol_utils/test/json_rpc/codec_test.dart",
+        "sha256": "41c92194de01817ef11a51b342de511f892bdd7d48cba550c033a0a099b0e328"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-UTIL-02",
+      "claimId": "P2A-UTIL-02",
+      "claimLevel": "implemented",
+      "kind": "unit-test",
+      "role": "shared",
+      "transport": "byte-stream",
+      "version": "ndjson-content-length-sse",
+      "capabilityProfile": "bounded-framing",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "SSE framing test",
+        "path": "packages/protocol_utils/test/framing/sse_test.dart",
+        "sha256": "56162c95f11ce2fb072a90160d3e46586d17c3b0d4591a391ae064f38f1c790f"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "SSE framing test",
+        "path": "packages/protocol_utils/test/framing/sse_test.dart",
+        "sha256": "56162c95f11ce2fb072a90160d3e46586d17c3b0d4591a391ae064f38f1c790f"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-UTIL-03",
+      "claimId": "P2A-UTIL-03",
+      "claimLevel": "implemented",
+      "kind": "unit-test",
+      "role": "shared",
+      "transport": "message",
+      "version": "json-rpc-2.0",
+      "capabilityProfile": "correlation-cancellation-races",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "JSON-RPC peer race test",
+        "path": "packages/protocol_utils/test/json_rpc/peer_race_test.dart",
+        "sha256": "25f6a3d75276bc464feab52e00189696f4579ac432956ccf5562677b14ee5a89"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "JSON-RPC peer race test",
+        "path": "packages/protocol_utils/test/json_rpc/peer_race_test.dart",
+        "sha256": "25f6a3d75276bc464feab52e00189696f4579ac432956ccf5562677b14ee5a89"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-01",
+      "claimId": "P2A-ACP-01",
+      "claimLevel": "implemented",
+      "kind": "schema-test",
+      "role": "client-agent",
+      "transport": "schema",
+      "version": "schema-v1.20.0",
+      "capabilityProfile": "stable-inventory",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP inventory test",
+        "path": "packages/acp/test/schema/inventory_test.dart",
+        "sha256": "8ee45fb9c558b192b6bcb5f45c336d89c1228efaece8178a6c66d15352458bf5"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP inventory test",
+        "path": "packages/acp/test/schema/inventory_test.dart",
+        "sha256": "8ee45fb9c558b192b6bcb5f45c336d89c1228efaece8178a6c66d15352458bf5"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "definitions": 142,
+        "methods": 23,
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-02",
+      "claimId": "P2A-ACP-02",
+      "claimLevel": "implemented",
+      "kind": "schema-test",
+      "role": "client-agent",
+      "transport": "json-rpc",
+      "version": "1",
+      "capabilityProfile": "generated-codec",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP codec golden test",
+        "path": "packages/acp/test/schema/codec_golden_test.dart",
+        "sha256": "a6d743e0330a5a37fa6dabe9ab95c9c3b167ac4fed86ac5c4ad57eaf9f5b2d8d"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP codec golden test",
+        "path": "packages/acp/test/schema/codec_golden_test.dart",
+        "sha256": "a6d743e0330a5a37fa6dabe9ab95c9c3b167ac4fed86ac5c4ad57eaf9f5b2d8d"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-03",
+      "claimId": "P2A-ACP-03",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "initialize",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP initialize test",
+        "path": "packages/acp/test/initialize_test.dart",
+        "sha256": "b9f99cb85a58b559419febaaf5ea51f6fb88ba730de1a21a2349d6ee197dd185"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP initialize test",
+        "path": "packages/acp/test/initialize_test.dart",
+        "sha256": "b9f99cb85a58b559419febaaf5ea51f6fb88ba730de1a21a2349d6ee197dd185"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-04",
+      "claimId": "P2A-ACP-04",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "session-lifecycle",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP session lifecycle test",
+        "path": "packages/acp/test/session_lifecycle_test.dart",
+        "sha256": "6d0b6fef097322f14938c8cfc3c3c9337ae13a36dd3be4c2717b99f76d3836e7"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP session lifecycle test",
+        "path": "packages/acp/test/session_lifecycle_test.dart",
+        "sha256": "6d0b6fef097322f14938c8cfc3c3c9337ae13a36dd3be4c2717b99f76d3836e7"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-05",
+      "claimId": "P2A-ACP-05",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "prompt-updates",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP prompt update test",
+        "path": "packages/acp/test/prompt_update_test.dart",
+        "sha256": "4f32f0df08152df9760057883b67842e8318f9dfbd993380da517cdbdc7aa109"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP prompt update test",
+        "path": "packages/acp/test/prompt_update_test.dart",
+        "sha256": "4f32f0df08152df9760057883b67842e8318f9dfbd993380da517cdbdc7aa109"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-06",
+      "claimId": "P2A-ACP-06",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "reverse-requests",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP reverse request test",
+        "path": "packages/acp/test/reverse_request_test.dart",
+        "sha256": "54a56573a508227b9b7b97f8007ff8b96b5c1fccc75389c64d9aa2a3b2c3c2de"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP reverse request test",
+        "path": "packages/acp/test/reverse_request_test.dart",
+        "sha256": "54a56573a508227b9b7b97f8007ff8b96b5c1fccc75389c64d9aa2a3b2c3c2de"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-07",
+      "claimId": "P2A-ACP-07",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "cancellation",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP cancellation test",
+        "path": "packages/acp/test/cancellation_test.dart",
+        "sha256": "eee0f8fec4523922d2fa096f1f66323ffb219da801a998b2b236019f9a82be02"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP cancellation test",
+        "path": "packages/acp/test/cancellation_test.dart",
+        "sha256": "eee0f8fec4523922d2fa096f1f66323ffb219da801a998b2b236019f9a82be02"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-08",
+      "claimId": "P2A-ACP-08",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-agent",
+      "transport": "message",
+      "version": "1",
+      "capabilityProfile": "history-resume",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "ACP history test",
+        "path": "packages/acp/test/history_test.dart",
+        "sha256": "bfbf241b77c5e219ef1ea9b262ea9016b78ca50ec0bf111058d2114c919efee7"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP history test",
+        "path": "packages/acp/test/history_test.dart",
+        "sha256": "bfbf241b77c5e219ef1ea9b262ea9016b78ca50ec0bf111058d2114c919efee7"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-09",
+      "claimId": "P2A-ACP-09",
+      "claimLevel": "verified",
+      "kind": "scripted-peer",
+      "role": "client-agent",
+      "transport": "chaotic-ndjson",
+      "version": "1",
+      "capabilityProfile": "scripted-record-replay",
+      "platform": "dart-vm",
+      "peer": {
+        "name": "ACP scripted peer",
+        "path": "packages/acp/test/scripted_peer_test.dart",
+        "sha256": "ca987886e01ee2a8220ec301330f9b3e2813ba2c671ff76e3a33d384bd074b44"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP scripted peer test",
+        "path": "packages/acp/test/scripted_peer_test.dart",
+        "sha256": "ca987886e01ee2a8220ec301330f9b3e2813ba2c671ff76e3a33d384bd074b44"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-ACP-10",
+      "claimId": "P2A-ACP-10",
+      "claimLevel": "verified",
+      "kind": "real-process",
+      "role": "client-agent",
+      "transport": "stdio-ndjson",
+      "version": "1",
+      "capabilityProfile": "fixed-peer-matrix",
+      "platform": "macos-dart-vm",
+      "peer": {
+        "name": "ACP fixed peer matrix runner",
+        "path": "tool/run_acp_peer_matrix.dart",
+        "sha256": "3ff16dbbf1dd6a53a8913b36483f62f73bdc7769a02e7f4582ce32ef8ca596b4"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "ACP fixed peer matrix runner",
+        "path": "tool/run_acp_peer_matrix.dart",
+        "sha256": "3ff16dbbf1dd6a53a8913b36483f62f73bdc7769a02e7f4582ce32ef8ca596b4"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed",
+        "peers": [
+          "dart",
+          "typescript-sdk-1.3.0",
+          "rust-sdk-v2.0.0"
+        ]
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-01",
+      "claimId": "P2A-MCP-01",
+      "claimLevel": "implemented",
+      "kind": "schema-test",
+      "role": "client-server",
+      "transport": "schema",
+      "version": "2025-11-25",
+      "capabilityProfile": "stable-inventory",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP inventory test",
+        "path": "packages/mcp/test/schema/inventory_test.dart",
+        "sha256": "6bc78de7f9d03a076a0fe7807fa0eab35f676a738f26a34a5313d5d0f36e3a08"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP inventory test",
+        "path": "packages/mcp/test/schema/inventory_test.dart",
+        "sha256": "6bc78de7f9d03a076a0fe7807fa0eab35f676a738f26a34a5313d5d0f36e3a08"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "definitions": 145,
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-02",
+      "claimId": "P2A-MCP-02",
+      "claimLevel": "implemented",
+      "kind": "schema-test",
+      "role": "client-server",
+      "transport": "json-rpc",
+      "version": "2025-11-25",
+      "capabilityProfile": "generated-codec",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP codec golden test",
+        "path": "packages/mcp/test/schema/codec_golden_test.dart",
+        "sha256": "1ab8f7f22d8c7adc290c7a7327c85f80e641f6115cbf057556cd03bd99731675"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP codec golden test",
+        "path": "packages/mcp/test/schema/codec_golden_test.dart",
+        "sha256": "1ab8f7f22d8c7adc290c7a7327c85f80e641f6115cbf057556cd03bd99731675"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-03",
+      "claimId": "P2A-MCP-03",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "message",
+      "version": "2025-11-25",
+      "capabilityProfile": "initialize",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP initialize test",
+        "path": "packages/mcp/test/initialize_test.dart",
+        "sha256": "337e37454c9a7b9ebff41aa40e5b0251ed8b0f5a680837b90db33eceb4f610f0"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP initialize test",
+        "path": "packages/mcp/test/initialize_test.dart",
+        "sha256": "337e37454c9a7b9ebff41aa40e5b0251ed8b0f5a680837b90db33eceb4f610f0"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-04",
+      "claimId": "P2A-MCP-04",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "message",
+      "version": "2025-11-25",
+      "capabilityProfile": "core-feature-families",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP tools test",
+        "path": "packages/mcp/test/tools_test.dart",
+        "sha256": "45624a9e66609d8995ae45d79c1e2443a8b8e06938dd9f39b1406eb2dce5ac91"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP tools test",
+        "path": "packages/mcp/test/tools_test.dart",
+        "sha256": "45624a9e66609d8995ae45d79c1e2443a8b8e06938dd9f39b1406eb2dce5ac91"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-05",
+      "claimId": "P2A-MCP-05",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "message",
+      "version": "2025-11-25",
+      "capabilityProfile": "reverse-requests",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP reverse request test",
+        "path": "packages/mcp/test/reverse_requests_test.dart",
+        "sha256": "cb234bbad3c1f2e9665ec21db6411f9a144b97a26fea96bf3e73fa7cebaf15cd"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP reverse request test",
+        "path": "packages/mcp/test/reverse_requests_test.dart",
+        "sha256": "cb234bbad3c1f2e9665ec21db6411f9a144b97a26fea96bf3e73fa7cebaf15cd"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-06",
+      "claimId": "P2A-MCP-06",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "message",
+      "version": "2025-11-25",
+      "capabilityProfile": "tasks-cancellation-races",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP task race test",
+        "path": "packages/mcp/test/task_race_test.dart",
+        "sha256": "fd684cead066024b1f249d1b987d17c00ad8fefd0411b0442d682a6b40b7dc4a"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP task race test",
+        "path": "packages/mcp/test/task_race_test.dart",
+        "sha256": "fd684cead066024b1f249d1b987d17c00ad8fefd0411b0442d682a6b40b7dc4a"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-07",
+      "claimId": "P2A-MCP-07",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "stdio",
+      "version": "2025-11-25",
+      "capabilityProfile": "scripted-stdio",
+      "platform": "dart-vm",
+      "peer": {
+        "name": "MCP stdio transport test",
+        "path": "packages/mcp/test/stdio_transport_test.dart",
+        "sha256": "ca243c948f5cdc2632f26e8ba296ba11fe2d9f80cabccb325728ea8894d0d847"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP stdio transport test",
+        "path": "packages/mcp/test/stdio_transport_test.dart",
+        "sha256": "ca243c948f5cdc2632f26e8ba296ba11fe2d9f80cabccb325728ea8894d0d847"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-08",
+      "claimId": "P2A-MCP-08",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "streamable-http",
+      "version": "2025-11-25",
+      "capabilityProfile": "sessions-sse-resumption",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP HTTP endpoint test",
+        "path": "packages/mcp/test/http/endpoint_test.dart",
+        "sha256": "e2e0c369d7e8f5bf43b7972d6b131b4db17329a9be02846471e94c9cb787d208"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP HTTP endpoint test",
+        "path": "packages/mcp/test/http/endpoint_test.dart",
+        "sha256": "e2e0c369d7e8f5bf43b7972d6b131b4db17329a9be02846471e94c9cb787d208"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-09",
+      "claimId": "P2A-MCP-09",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client",
+      "transport": "streamable-http",
+      "version": "2025-11-25",
+      "capabilityProfile": "oauth",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP OAuth authorization-code test",
+        "path": "packages/mcp/test/auth/authorization_code_test.dart",
+        "sha256": "fdbd3ecae28a803fea71ff1a676a96108f4211b83a3f5b2a73ae53b2df2784ab"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP OAuth authorization-code test",
+        "path": "packages/mcp/test/auth/authorization_code_test.dart",
+        "sha256": "fdbd3ecae28a803fea71ff1a676a96108f4211b83a3f5b2a73ae53b2df2784ab"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-10",
+      "claimId": "P2A-MCP-10",
+      "claimLevel": "implemented",
+      "kind": "mapping-test",
+      "role": "adapter",
+      "transport": "in-memory",
+      "version": "2025-11-25",
+      "capabilityProfile": "tool-mapping",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP tool mapping test",
+        "path": "packages/mcp/test/ai/tool_mapping_test.dart",
+        "sha256": "f67196e83291d1e745ab25d20cab2f3d0e5f3f1d00233d29b9fd9cac8c09c81c"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP tool mapping test",
+        "path": "packages/mcp/test/ai/tool_mapping_test.dart",
+        "sha256": "f67196e83291d1e745ab25d20cab2f3d0e5f3f1d00233d29b9fd9cac8c09c81c"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-11",
+      "claimId": "P2A-MCP-11",
+      "claimLevel": "implemented",
+      "kind": "mapping-test",
+      "role": "adapter",
+      "transport": "in-memory",
+      "version": "2025-11-25",
+      "capabilityProfile": "resource-prompt-mapping",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP resource mapping test",
+        "path": "packages/mcp/test/ai/resource_mapping_test.dart",
+        "sha256": "ae8e2436ca655aa5377fe61fd806bdf52e8c4f466cbd77496e8cfeb9688b5714"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP resource mapping test",
+        "path": "packages/mcp/test/ai/resource_mapping_test.dart",
+        "sha256": "ae8e2436ca655aa5377fe61fd806bdf52e8c4f466cbd77496e8cfeb9688b5714"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-12",
+      "claimId": "P2A-MCP-12",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "recording",
+      "version": "2025-11-25",
+      "capabilityProfile": "record-replay",
+      "platform": "portable-vm",
+      "peer": {
+        "name": "MCP record/replay test",
+        "path": "packages/mcp/test/record_replay_test.dart",
+        "sha256": "56c2dcd557dea24f26ea1271e9fe801d1f24b711fb33b18c29b9d285e3c59ff1"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP record/replay test",
+        "path": "packages/mcp/test/record_replay_test.dart",
+        "sha256": "56c2dcd557dea24f26ea1271e9fe801d1f24b711fb33b18c29b9d285e3c59ff1"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-13",
+      "claimId": "P2A-MCP-13",
+      "claimLevel": "verified",
+      "kind": "real-process",
+      "role": "client-server",
+      "transport": "stdio",
+      "version": "2025-11-25",
+      "capabilityProfile": "fixed-real-process",
+      "platform": "macos-dart-vm",
+      "peer": {
+        "name": "MCP stdio cross-process test",
+        "path": "tool/test/mcp_stdio_cross_process_test.dart",
+        "sha256": "5e4e28ad732a49f108fbaa9185a2d8cc04ac9ab7497e73d1af310b15b0d8f562"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP stdio cross-process test",
+        "path": "tool/test/mcp_stdio_cross_process_test.dart",
+        "sha256": "5e4e28ad732a49f108fbaa9185a2d8cc04ac9ab7497e73d1af310b15b0d8f562"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-14",
+      "claimId": "P2A-MCP-14",
+      "claimLevel": "conformant",
+      "kind": "official-conformance",
+      "role": "client",
+      "transport": "streamable-http",
+      "version": "2025-11-25",
+      "capabilityProfile": "official-suite-all",
+      "platform": "ubuntu-dart-vm-node-22",
+      "peer": {
+        "name": "Pigcode MCP conformance client",
+        "path": "tool/fixtures/mcp_conformance_client.dart",
+        "sha256": "c8b8fefc968743a6581719033e9ce9ae57472376b5d7f7c204dc8f00569fe245"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "Pigcode MCP conformance client",
+        "path": "tool/fixtures/mcp_conformance_client.dart",
+        "sha256": "c8b8fefc968743a6581719033e9ce9ae57472376b5d7f7c204dc8f00569fe245"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "harnessVersion": "v0.1.16",
+        "specVersion": "2025-11-25",
+        "suite": "all",
+        "role": "client",
+        "scenarios": [
+          "initialize",
+          "tools_call",
+          "elicitation-sep1034-client-defaults",
+          "sse-retry",
+          "auth/metadata-default",
+          "auth/metadata-var1",
+          "auth/metadata-var2",
+          "auth/metadata-var3",
+          "auth/basic-cimd",
+          "auth/scope-from-www-authenticate",
+          "auth/scope-from-scopes-supported",
+          "auth/scope-omitted-when-undefined",
+          "auth/scope-step-up",
+          "auth/scope-retry-limit",
+          "auth/token-endpoint-auth-basic",
+          "auth/token-endpoint-auth-post",
+          "auth/token-endpoint-auth-none",
+          "auth/pre-registration"
+        ],
+        "applicable": 18,
+        "passed": 18,
+        "failed": 0,
+        "skipped": 0,
+        "expectedFailures": 0
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-15",
+      "claimId": "P2A-MCP-15",
+      "claimLevel": "conformant",
+      "kind": "official-conformance",
+      "role": "server",
+      "transport": "streamable-http",
+      "version": "2025-11-25",
+      "capabilityProfile": "official-suite-all",
+      "platform": "ubuntu-dart-vm-node-22",
+      "peer": {
+        "name": "Pigcode MCP conformance server",
+        "path": "tool/fixtures/mcp_conformance_server.dart",
+        "sha256": "baeac8624dab183b05b1466c9247417833beecf39057d76e420b6e471b3b7e3c"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "Pigcode MCP conformance server",
+        "path": "tool/fixtures/mcp_conformance_server.dart",
+        "sha256": "baeac8624dab183b05b1466c9247417833beecf39057d76e420b6e471b3b7e3c"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "harnessVersion": "v0.1.16",
+        "specVersion": "2025-11-25",
+        "suite": "all",
+        "role": "server",
+        "scenarios": [
+          "server-initialize",
+          "logging-set-level",
+          "ping",
+          "completion-complete",
+          "tools-list",
+          "tools-call-simple-text",
+          "tools-call-image",
+          "tools-call-audio",
+          "tools-call-embedded-resource",
+          "tools-call-mixed-content",
+          "tools-call-with-logging",
+          "tools-call-error",
+          "tools-call-with-progress",
+          "tools-call-sampling",
+          "tools-call-elicitation",
+          "json-schema-2020-12",
+          "elicitation-sep1034-defaults",
+          "server-sse-polling",
+          "server-sse-multiple-streams",
+          "elicitation-sep1330-enums",
+          "resources-list",
+          "resources-read-text",
+          "resources-read-binary",
+          "resources-templates-read",
+          "resources-subscribe",
+          "resources-unsubscribe",
+          "prompts-list",
+          "prompts-get-simple",
+          "prompts-get-with-args",
+          "prompts-get-embedded-resource",
+          "prompts-get-with-image",
+          "dns-rebinding-protection"
+        ],
+        "applicable": 32,
+        "passed": 32,
+        "failed": 0,
+        "skipped": 0,
+        "expectedFailures": 0
+      }
+    },
+    {
+      "id": "EV-P2A-MCP-16",
+      "claimId": "P2A-MCP-16",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "client-server",
+      "transport": "public-entrypoints",
+      "version": "2025-11-25",
+      "capabilityProfile": "portable-and-io-boundary",
+      "platform": "vm-chrome-js-wasm",
+      "peer": {
+        "name": "MCP portable compile smoke",
+        "path": "packages/mcp/test/portable_compile_smoke.dart",
+        "sha256": "cde6c43fc8b7ad9d3d405c3a6f459f9312314b9415c3028e5fcd711e7df46ac1"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "MCP portable compile smoke",
+        "path": "packages/mcp/test/portable_compile_smoke.dart",
+        "sha256": "cde6c43fc8b7ad9d3d405c3a6f459f9312314b9415c3028e5fcd711e7df46ac1"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-CROSS-01",
+      "claimId": "P2A-CROSS-01",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "workspace",
+      "transport": "package-graph",
+      "version": "9-packages",
+      "capabilityProfile": "workspace-contract",
+      "platform": "dart-vm",
+      "peer": {
+        "name": "workspace contract test",
+        "path": "tool/test/workspace_contract_test.dart",
+        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "workspace contract test",
+        "path": "tool/test/workspace_contract_test.dart",
+        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-CROSS-02",
+      "claimId": "P2A-CROSS-02",
+      "claimLevel": "implemented",
+      "kind": "schema-test",
+      "role": "workspace",
+      "transport": "codegen",
+      "version": "format-1",
+      "capabilityProfile": "zero-diff-inventory",
+      "platform": "dart-vm",
+      "peer": {
+        "name": "protocol codegen test",
+        "path": "tool/test/protocol_codegen_test.dart",
+        "sha256": "93086b7c3152815dfd80abc2c5f19e595f1b506e0e83c37305062a760de53f1b"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "protocol codegen test",
+        "path": "tool/test/protocol_codegen_test.dart",
+        "sha256": "93086b7c3152815dfd80abc2c5f19e595f1b506e0e83c37305062a760de53f1b"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-CROSS-03",
+      "claimId": "P2A-CROSS-03",
+      "claimLevel": "implemented",
+      "kind": "integration-test",
+      "role": "workspace",
+      "transport": "manifest",
+      "version": "format-1",
+      "capabilityProfile": "reference-closure",
+      "platform": "dart-vm",
+      "peer": {
+        "name": "protocol compatibility checker",
+        "path": "tool/check_protocol_compatibility.dart",
+        "sha256": "4606ad91dc94e69032cf7a8898d0c61ae5da4b70c4d57fea2adf0577bd146667"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "protocol compatibility checker",
+        "path": "tool/check_protocol_compatibility.dart",
+        "sha256": "4606ad91dc94e69032cf7a8898d0c61ae5da4b70c4d57fea2adf0577bd146667"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-CROSS-04",
+      "claimId": "P2A-CROSS-04",
+      "claimLevel": "implemented",
+      "kind": "docs-check",
+      "role": "workspace",
+      "transport": "documentation",
+      "version": "phase-2a",
+      "capabilityProfile": "support-matrix-examples",
+      "platform": "portable",
+      "peer": {
+        "name": "protocol support matrix",
+        "path": "docs/protocol-support.md",
+        "sha256": "1b7452d9e2445a441824b31cde7343d1a2aad7522cc603f3260db38da5f94408"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "protocol support matrix",
+        "path": "docs/protocol-support.md",
+        "sha256": "1b7452d9e2445a441824b31cde7343d1a2aad7522cc603f3260db38da5f94408"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed"
+      }
+    },
+    {
+      "id": "EV-P2A-CROSS-05",
+      "claimId": "P2A-CROSS-05",
+      "claimLevel": "verified",
+      "kind": "full-gate",
+      "role": "workspace",
+      "transport": "ci",
+      "version": "github-actions",
+      "capabilityProfile": "full-phase-2a-boundary",
+      "platform": "ubuntu-dart-3.12.2-node-22",
+      "peer": {
+        "name": "workspace CI workflow",
+        "path": ".github/workflows/ci.yml",
+        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
+      },
+      "dartSdkConstraint": "^3.6.0",
+      "evidenceCommit": "pending-main-merge",
+      "artifact": {
+        "name": "workspace CI workflow",
+        "path": ".github/workflows/ci.yml",
+        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
+      },
+      "verifiedAt": "2026-07-23T20:00:02Z",
+      "result": {
+        "status": "passed",
+        "implementationRunId": 30039820415
+      }
+    }
+  ],
+  "knownUnsupported": [
+    {
+      "id": "KU-JSONRPC-BATCH",
+      "scope": "protocol-utils",
+      "summary": "JSON-RPC batch envelopes are deliberately rejected."
+    },
+    {
+      "id": "KU-ACP-DRAFTS",
+      "scope": "acp",
+      "summary": "ACP draft or experimental artifacts outside stable schema-v1.20.0 are not public claims."
+    },
+    {
+      "id": "KU-ACP-ACTIVE-ATTACH",
+      "scope": "acp",
+      "summary": "ACP session resume does not claim live runtime attach or durable checkpoint recovery."
+    },
+    {
+      "id": "KU-ACP-CONFORMANCE",
+      "scope": "acp",
+      "summary": "ACP has no official conformance harness, so its maximum claim level is verified."
+    },
+    {
+      "id": "KU-MCP-STDIO-CONFORMANCE",
+      "scope": "mcp-stdio",
+      "summary": "The pinned official MCP harness covers Streamable HTTP, not stdio; stdio remains verified."
+    },
+    {
+      "id": "KU-MCP-MAPPING-UNKNOWN",
+      "scope": "mcp-ai-mapping",
+      "summary": "Unknown content and prompt mapping variants are rejected by the strict policy."
+    },
+    {
+      "id": "KU-CALLER-OWNERSHIP",
+      "scope": "protocol-host-boundary",
+      "summary": "Process, socket, browser, credential, workspace, authorization, and sandbox ownership remain with the caller."
+    }
+  ]
+}

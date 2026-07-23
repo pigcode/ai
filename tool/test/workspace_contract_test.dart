@@ -715,7 +715,15 @@ final class _WorkspaceFixture {
       ..writeTracked('README.md', '# Pigcode AI\n')
       ..writeTracked('THIRD_PARTY_NOTICES.md', '# Third-party notices\n')
       ..writeTracked(
+        'compatibility/phase-2a-protocol-foundation.json',
+        '{}\n',
+      )
+      ..writeTracked(
         'compatibility/schema/ai-core-compatibility.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'compatibility/schema/protocol-foundation-compatibility.schema.json',
         '{}\n',
       )
       ..writeTracked(
@@ -727,10 +735,15 @@ final class _WorkspaceFixture {
         '{}\n',
       )
       ..writeTracked('compatibility/vercel-ai-7.0.35.json', '{}\n')
+      ..writeTracked('docs/protocol-support.md', '# Protocol support\n')
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
       ..writeTracked(
         'tool/check_compatibility.dart',
         '// Compatibility CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/check_protocol_compatibility.dart',
+        '// Protocol compatibility CLI fixture\n',
       )
       ..writeTracked('tool/check_workspace.dart', '// CLI fixture\n')
       ..writeTracked('tool/conformance/mcp/package-lock.json', '{}\n')
@@ -809,6 +822,10 @@ final class _WorkspaceFixture {
         '// Compatibility contract fixture\n',
       )
       ..writeTracked(
+        'tool/src/protocol_compatibility_manifest.dart',
+        '// Protocol compatibility contract fixture\n',
+      )
+      ..writeTracked(
         'tool/src/protocol_codegen.dart',
         '// Protocol codegen fixture\n',
       )
@@ -855,6 +872,14 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/test/protocol_codegen_test.dart',
         '// Protocol codegen test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/protocol_compatibility_manifest_test.dart',
+        '// Protocol compatibility test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/protocol_fixture_coverage_test.dart',
+        '// Protocol fixture coverage test fixture\n',
       )
       ..writeTracked(
         'tool/test/protocol_inventory_test.dart',
@@ -909,8 +934,44 @@ final class _WorkspaceFixture {
         '// Generated ACP inventory\n',
       )
       ..writeTracked(
+        'packages/acp/example/client_agent.dart',
+        '// ACP example\n',
+      )
+      ..writeTracked(
+        'packages/acp/test/example_compile_test.dart',
+        '// ACP example compile test\n',
+      )
+      ..writeTracked(
         'packages/mcp/lib/src/generated/mcp_inventory.g.dart',
         '// Generated MCP inventory\n',
+      )
+      ..writeTracked(
+        'packages/mcp/example/portable_client_server.dart',
+        '// MCP portable example\n',
+      )
+      ..writeTracked(
+        'packages/mcp/example/stdio_io.dart',
+        '// MCP stdio example\n',
+      )
+      ..writeTracked(
+        'packages/mcp/example/streamable_http_io.dart',
+        '// MCP HTTP IO example\n',
+      )
+      ..writeTracked(
+        'packages/mcp/test/example_compile_test.dart',
+        '// MCP example compile test\n',
+      )
+      ..writeTracked(
+        'packages/mcp/test/io_example_compile_test.dart',
+        '// MCP IO example compile test\n',
+      )
+      ..writeTracked(
+        'packages/protocol_utils/example/json_rpc_peer.dart',
+        '// Protocol utilities example\n',
+      )
+      ..writeTracked(
+        'packages/protocol_utils/test/example_compile_test.dart',
+        '// Protocol utilities example compile test\n',
       )
       ..writeTracked('.github/workflows/ci.yaml', 'name: CI\n')
       ..writeTracked('pubspec.yaml', _rootManifest());

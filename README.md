@@ -32,6 +32,7 @@ separately.
 dart pub get
 dart run tool/check_workspace.dart
 dart run tool/protocol_codegen.dart --check
+dart run tool/check_protocol_compatibility.dart
 dart run melos format
 dart run melos analyze
 dart run melos test
@@ -54,6 +55,9 @@ The pinned source identities and complete scenario inventory live in
 [`tool/upstream/protocols/sources.json`](tool/upstream/protocols/sources.json)
 and
 [`compatibility/upstream/phase-2a-protocol-inventory.json`](compatibility/upstream/phase-2a-protocol-inventory.json).
+Claim levels, complete evidence tuples, and known limitations are recorded in
+[`compatibility/phase-2a-protocol-foundation.json`](compatibility/phase-2a-protocol-foundation.json)
+and summarized in [Protocol support](docs/protocol-support.md).
 Install the official MCP harness and reproduce the evidence with:
 
 ```bash
