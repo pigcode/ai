@@ -10,9 +10,9 @@ const protocolCompatibilityManifestPath =
 const protocolCompatibilitySchemaPath =
     'compatibility/schema/protocol-foundation-compatibility.schema.json';
 
-// The implementation PR must use this sentinel. Task 26 replaces it with the
-// completion PR's main-bound squash merge commit.
-const phase2aProtocolEvidenceCommit = 'pending-main-merge';
+// Main-bound squash merge commit for the completed Phase 2a evidence surface.
+const phase2aProtocolEvidenceCommit =
+    'b286630a5870830141394a415144c93c500598f1';
 
 const phase2aProtocolFixtureIds = <String>{
   'P2A-UTIL-01',
