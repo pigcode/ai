@@ -286,7 +286,11 @@ List<CompatibilityViolation> validateCompatibilityManifest({
     );
   }
 
-  _validateNotApplicable(manifest['notApplicable'], violations);
+  _validateNotApplicable(
+    manifest['notApplicable'],
+    inventory,
+    violations,
+  );
   return violations;
 }
 
@@ -1114,6 +1118,7 @@ bool _isAllowedTestPath(String path, String package, _SourcePin pin) {
 
 void _validateNotApplicable(
   Object? value,
+  Map<String, Set<String>> inventory,
   List<CompatibilityViolation> violations,
 ) {
   final records = _objectList(
@@ -1156,12 +1161,16 @@ void _validateNotApplicable(
     }
     final expectedBoundary =
         id is String ? phase1NotApplicableBoundaries[id] : null;
+    final upstreamPath = record['upstreamPath'];
+    final pathExists = upstreamPath is String &&
+        inventory.values.any((paths) => paths.contains(upstreamPath));
     if (expectedBoundary == null ||
         boundary != expectedBoundary ||
         record['upstreamCommit'] != phase1TargetCommit ||
-        record['upstreamPath'] is! String ||
-        !_isCanonicalRepoPath(record['upstreamPath'] as String) ||
-        !(record['upstreamPath'] as String).startsWith('packages/') ||
+        upstreamPath is! String ||
+        !_isCanonicalRepoPath(upstreamPath) ||
+        !upstreamPath.startsWith('packages/') ||
+        !pathExists ||
         !_isNonEmptyString(record['reason'])) {
       violations.add(
         CompatibilityViolation(

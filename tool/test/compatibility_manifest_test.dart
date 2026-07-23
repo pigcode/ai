@@ -317,6 +317,11 @@ void main() {
         record['reason'] = '';
         _expectViolation(fixture.validate(), 'invalid_not_applicable');
       });
+      _withFixture((fixture) {
+        final record = (fixture.manifest['notApplicable'] as List).first as Map;
+        record['upstreamPath'] = 'packages/provider-utils/src/typo.ts';
+        _expectViolation(fixture.validate(), 'invalid_not_applicable');
+      });
     },
     'fixture coverage scans unit scripted and process sets independently': () {
       _withFixture((fixture) {
@@ -439,17 +444,18 @@ final class _ManifestFixture {
           _notApplicable(
             'P1-NA-01',
             'javascript-callable-object',
-            'packages/provider-utils/src/standard-schema-v1.ts',
+            'packages/provider-utils/src/schema.ts',
           ),
           _notApplicable(
             'P1-NA-02',
             'node-express-server-response',
-            'packages/ai/src/util/pipe-text-stream-to-response.ts',
+            'packages/ai/src/text-stream/pipe-text-stream-to-response.ts',
           ),
           _notApplicable(
             'P1-NA-03',
             'typescript-zod-ecosystem',
-            'packages/provider-utils/src/schema/zod-schema.ts',
+            'packages/provider-utils/src/to-json-schema/'
+                'zod3-to-json-schema/zod3-to-json-schema.ts',
           ),
           _notApplicable(
             'P1-NA-04',
@@ -638,10 +644,25 @@ Map<String, Object?> _inventory() => <String, Object?>{
               'packageVersion': entry.value['packageVersion'],
               'tree': entry.value['tree'],
               'root': _upstreamRoot(entry.value['path']!),
-              'paths': <String>[entry.value['path']!],
+              'paths': <String>[
+                entry.value['path']!,
+                ...?_notApplicablePaths[entry.key],
+              ]..sort(),
             },
       ],
     };
+
+const _notApplicablePaths = <String, List<String>>{
+  'pigcode_ai_provider_utils': <String>[
+    'packages/provider-utils/src/schema.ts',
+    'packages/provider-utils/src/to-json-schema/'
+        'zod3-to-json-schema/zod3-to-json-schema.ts',
+  ],
+  'pigcode_ai': <String>[
+    'packages/ai/src/text-stream/pipe-text-stream-to-response.ts',
+    'packages/ai/src/ui/chat.ts',
+  ],
+};
 
 String _upstreamRoot(String upstreamPath) =>
     upstreamPath.split('/').take(2).join('/');
