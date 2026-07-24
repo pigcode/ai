@@ -9,7 +9,8 @@ const kernelStoreCompatibilitySchemaPath =
     'compatibility/schema/kernel-store-compatibility.schema.json';
 
 // Replaced with the main merge SHA in the dedicated evidence-closure PR.
-const phase3KernelStoreEvidenceCommit = 'pending-main-merge';
+const phase3KernelStoreEvidenceCommit =
+    '0cc6ca3d0d8aa37e3a330f13e042c15270c8b500';
 
 const phase3KernelStoreClaimIds = <String>{
   'P3-KERNEL-01',
