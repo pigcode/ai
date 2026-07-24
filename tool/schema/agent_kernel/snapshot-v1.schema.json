@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/tool/schema/agent_kernel/snapshot-v1.schema.json",
+  "title": "Pigcode AgentStore snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sessionId",
+    "snapshotId",
+    "snapshotFormatVersion",
+    "reducerSchemaVersion",
+    "sequence",
+    "journalHeadDigest",
+    "historyFloorSequence",
+    "identityRegistryRootDigest",
+    "commandRegistryRootDigest",
+    "canonicalProjection",
+    "projectionDigest"
+  ],
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "pattern": "^ses_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "snapshotId": {
+      "type": "string",
+      "pattern": "^snp_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "snapshotFormatVersion": {
+      "const": 1
+    },
+    "reducerSchemaVersion": {
+      "const": 1
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "journalHeadDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "historyFloorSequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "identityRegistryRootDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "commandRegistryRootDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "canonicalProjection": {
+      "type": "object"
+    },
+    "projectionDigest": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

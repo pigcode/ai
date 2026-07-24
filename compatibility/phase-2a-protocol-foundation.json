@@ -1397,14 +1397,14 @@
       "peer": {
         "name": "workspace contract test",
         "path": "tool/test/workspace_contract_test.dart",
-        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
+        "sha256": "db06894c7b62a98416d475e0c5a226272670e7ea97bfa8a5acf002ac31cc4ccd"
       },
       "dartSdkConstraint": "^3.6.0",
       "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace contract test",
         "path": "tool/test/workspace_contract_test.dart",
-        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
+        "sha256": "db06894c7b62a98416d475e0c5a226272670e7ea97bfa8a5acf002ac31cc4ccd"
       },
       "verifiedAt": "2026-07-23T20:00:02Z",
       "result": {
@@ -1505,14 +1505,14 @@
       "peer": {
         "name": "workspace CI workflow",
         "path": ".github/workflows/ci.yml",
-        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
+        "sha256": "46b10e0290b93ad23f7351acb28ee5753770cb14e9e132633337aa506a5a14a4"
       },
       "dartSdkConstraint": "^3.6.0",
       "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace CI workflow",
         "path": ".github/workflows/ci.yml",
-        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
+        "sha256": "46b10e0290b93ad23f7351acb28ee5753770cb14e9e132633337aa506a5a14a4"
       },
       "verifiedAt": "2026-07-23T20:00:02Z",
       "result": {

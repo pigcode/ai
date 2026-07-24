@@ -1,0 +1,446 @@
+{
+  "formatVersion": 1,
+  "schemaVersion": 1,
+  "events": [
+    {
+      "type": "session.created",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": ["sessionId"],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "session.capabilitiesPinned",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "session.attachmentChanged",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "session.runtimeLivenessChanged",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "session.resumeStateStored",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "session.tombstoned",
+      "family": "session",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/sessionPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "run.created",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": ["runId"],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.inputRecorded",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.attemptStarted",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId", "attemptId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": ["attemptId"],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.started",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId", "attemptId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.cancelRequested",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.suspendRequested",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.suspended",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId", "attemptId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.resumeRequested",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.reconciling",
+      "family": "run",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.completed",
+      "family": "runTerminal",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": true,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.failed",
+      "family": "runTerminal",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": true,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.cancelled",
+      "family": "runTerminal",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": true,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "run.interrupted",
+      "family": "runTerminal",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/runPayload",
+      "introducedIdPaths": [],
+      "terminal": true,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.proposed",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": ["workItemId"],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.policyEvaluated",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.approvalRequested",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": ["payload.approvalId"],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.approvalResolved",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.executionStarted",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.cancellationRequested",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.succeeded",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.failed",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.cancelled",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "work.outcomeUnknown",
+      "family": "work",
+      "requiredContextIds": ["sessionId", "runId", "workItemId"],
+      "payloadSchemaRef": "#/$defs/workPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.created",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": ["payload.deferredOperationId"],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.ownershipTransferred",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId", "payload.deferredOperationId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.completed",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId", "payload.deferredOperationId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.failed",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId", "payload.deferredOperationId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.cancelled",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId", "payload.deferredOperationId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "deferred.outcomeUnknown",
+      "family": "deferred",
+      "requiredContextIds": ["sessionId", "runId", "payload.deferredOperationId"],
+      "payloadSchemaRef": "#/$defs/deferredPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "resource.registered",
+      "family": "resource",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/resourcePayload",
+      "introducedIdPaths": ["payload.runtimeResourceId"],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "resource.ownershipTransferred",
+      "family": "resource",
+      "requiredContextIds": ["sessionId", "payload.runtimeResourceId"],
+      "payloadSchemaRef": "#/$defs/resourcePayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "resource.updated",
+      "family": "resource",
+      "requiredContextIds": ["sessionId", "payload.runtimeResourceId"],
+      "payloadSchemaRef": "#/$defs/resourcePayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "resource.released",
+      "family": "resource",
+      "requiredContextIds": ["sessionId", "payload.runtimeResourceId"],
+      "payloadSchemaRef": "#/$defs/resourcePayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "resource.outcomeUnknown",
+      "family": "resource",
+      "requiredContextIds": ["sessionId", "payload.runtimeResourceId"],
+      "payloadSchemaRef": "#/$defs/resourcePayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "driver.proposalRejected",
+      "family": "driverAudit",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/auditPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "driver.sourceDrained",
+      "family": "driverAudit",
+      "requiredContextIds": ["sessionId", "runId"],
+      "payloadSchemaRef": "#/$defs/auditPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": true,
+      "allowedAfterRunTerminal": false
+    },
+    {
+      "type": "effect.observed",
+      "family": "driverAudit",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/auditPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    },
+    {
+      "type": "history.imported",
+      "family": "driverAudit",
+      "requiredContextIds": ["sessionId"],
+      "payloadSchemaRef": "#/$defs/auditPayload",
+      "introducedIdPaths": [],
+      "terminal": false,
+      "runBusinessEvent": false,
+      "allowedAfterRunTerminal": true
+    }
+  ]
+}

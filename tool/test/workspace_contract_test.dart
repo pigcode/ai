@@ -14,6 +14,8 @@ const _packageNames = <String, String>{
   'protocol_utils': 'pigcode_ai_protocol_utils',
   'acp': 'pigcode_ai_acp',
   'mcp': 'pigcode_ai_mcp',
+  'agent_kernel': 'pigcode_ai_agent_kernel',
+  'agent_io': 'pigcode_ai_agent_io',
 };
 
 void main() {
@@ -61,6 +63,50 @@ void main() {
           validateWorkspace(fixture.root, fixture.trackedPaths),
           code: 'missing_required_path',
           messageFragment: 'tool/upstream/protocols/sources.json',
+        );
+      });
+    },
+    'requires the Phase 3 Agent Store crash matrix': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('tool/run_agent_store_crash_matrix.dart');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'tool/run_agent_store_crash_matrix.dart',
+        );
+      });
+    },
+    'requires the Phase 3 security and secret gates': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('tool/test/agent_kernel_secret_scan_test.dart');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'tool/test/agent_kernel_secret_scan_test.dart',
+        );
+      });
+    },
+    'requires the Phase 3 compatibility evidence gate': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('compatibility/phase-3-kernel-store.json');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'compatibility/phase-3-kernel-store.json',
+        );
+      });
+    },
+    'requires the Phase 3 public support matrix and examples': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('docs/kernel-store-support.md');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'docs/kernel-store-support.md',
         );
       });
     },
@@ -437,6 +483,54 @@ dependencies:
         );
       });
     },
+    'rejects an internal dependency from the portable agent kernel': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/agent_kernel/pubspec.yaml',
+          '''
+dependencies:
+  pigcode_ai: ^0.0.1
+''',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_internal_dependency',
+          messageFragment: 'pigcode_ai_agent_kernel -> pigcode_ai',
+        );
+      });
+    },
+    'allows agent IO to depend only on the agent kernel': () {
+      _withFixture((fixture) {
+        fixture.replaceIn(
+          'packages/agent_io/pubspec.yaml',
+          '  pigcode_ai_agent_kernel: ^0.0.1\n',
+          '  pigcode_ai_agent_kernel: ^0.0.1\n'
+              '  pigcode_ai_protocol_utils: ^0.0.1\n',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_internal_dependency',
+          messageFragment: 'pigcode_ai_agent_io -> pigcode_ai_protocol_utils',
+        );
+      });
+    },
+    'rejects dart:io in the portable agent kernel barrel': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/agent_kernel/lib/pigcode_ai_agent_kernel.dart',
+          "export 'dart:io';\n",
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'portable_barrel_io_dependency',
+          messageFragment:
+              'packages/agent_kernel/lib/pigcode_ai_agent_kernel.dart',
+        );
+      });
+    },
     'rejects dart:io in a portable protocol barrel': () {
       _withFixture((fixture) {
         fixture.appendTo(
@@ -736,10 +830,26 @@ final class _WorkspaceFixture {
       )
       ..writeTracked('compatibility/vercel-ai-7.0.35.json', '{}\n')
       ..writeTracked('docs/protocol-support.md', '# Protocol support\n')
+      ..writeTracked(
+        'docs/kernel-store-support.md',
+        '# Kernel and Store support\n',
+      )
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
       ..writeTracked(
         'tool/check_compatibility.dart',
         '// Compatibility CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/check_agent_kernel_schema.dart',
+        '// Agent Kernel schema CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/check_kernel_store_compatibility.dart',
+        '// Agent Kernel and Store compatibility CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/run_agent_store_crash_matrix.dart',
+        '// Agent Store crash matrix CLI fixture\n',
       )
       ..writeTracked(
         'tool/check_protocol_compatibility.dart',
@@ -818,8 +928,24 @@ final class _WorkspaceFixture {
         '// ACP peer harness fixture\n',
       )
       ..writeTracked(
+        'tool/src/agent_kernel_schema.dart',
+        '// Agent Kernel schema fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/agent_store_crash_harness.dart',
+        '// Agent Store crash harness fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/agent_store_writer_fixture.dart',
+        '// Agent Store writer fixture\n',
+      )
+      ..writeTracked(
         'tool/src/compatibility_manifest.dart',
         '// Compatibility contract fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/kernel_store_compatibility_manifest.dart',
+        '// Agent Kernel and Store compatibility fixture\n',
       )
       ..writeTracked(
         'tool/src/protocol_compatibility_manifest.dart',
@@ -846,6 +972,22 @@ final class _WorkspaceFixture {
         '// Peer test fixture\n',
       )
       ..writeTracked(
+        'tool/test/agent_kernel_schema_test.dart',
+        '// Agent Kernel schema test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/agent_kernel_secret_scan_test.dart',
+        '// Agent Kernel secret scan fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/agent_store_crash_matrix_test.dart',
+        '// Agent Store crash matrix test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/agent_store_multi_process_test.dart',
+        '// Agent Store multi-process test fixture\n',
+      )
+      ..writeTracked(
         'tool/test/ai_core_cross_process_test.dart',
         '// Cross-process test fixture\n',
       )
@@ -860,6 +1002,14 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/test/compatibility_manifest_test.dart',
         '// Compatibility test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/kernel_store_compatibility_manifest_test.dart',
+        '// Agent Kernel and Store compatibility test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/kernel_store_fixture_coverage_test.dart',
+        '// Agent Kernel and Store fixture coverage fixture\n',
       )
       ..writeTracked(
         'tool/test/mcp_conformance_inventory_test.dart',
@@ -930,6 +1080,106 @@ final class _WorkspaceFixture {
         '{}\n',
       )
       ..writeTracked(
+        'tool/schema/agent_kernel/agent-event-v1.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/schema/agent_kernel/store-transaction-v1.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/schema/agent_kernel/snapshot-v1.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/schema/agent_kernel/store-manifest-v1.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/schema/agent_kernel/event-inventory-v1.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'compatibility/phase-3-kernel-store.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'compatibility/schema/kernel-store-compatibility.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_kernel/schema/valid-event.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_kernel/schema/valid-root-manifest.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_kernel/schema/valid-session-manifest.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_kernel/schema/invalid-event-missing-id.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_kernel/schema/invalid-event-version.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_store_crash_writer.dart',
+        '// Agent Store crash writer fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_store_writer.dart',
+        '// Agent Store writer fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_kernel/test/security/approval_principal_test.dart',
+        '// Approval principal security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_kernel/test/security/capability_no_escalation_test.dart',
+        '// Capability security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_kernel/test/security/secret_rejection_test.dart',
+        '// Secret rejection fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/test/security/private_root_test.dart',
+        '// Private root security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/test/security/resource_limit_test.dart',
+        '// Resource limit security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/test/security/store_path_test.dart',
+        '// Store path security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/test/security/symlink_test.dart',
+        '// Symlink security fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_kernel/example/session_run.dart',
+        '// Agent Kernel example fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_kernel/test/example_compile_test.dart',
+        '// Agent Kernel example test fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/example/durable_store.dart',
+        '// Agent Store example fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/test/example_compile_test.dart',
+        '// Agent Store example test fixture\n',
+      )
+      ..writeTracked(
         'packages/acp/lib/src/generated/acp_inventory.g.dart',
         '// Generated ACP inventory\n',
       )
@@ -987,7 +1237,14 @@ final class _WorkspaceFixture {
         )
         ..writeTracked(
           '$packagePath/pubspec.yaml',
-          _packageManifest(entry.value),
+          _packageManifest(
+            entry.value,
+            dependencies: entry.key == 'agent_io'
+                ? const <String, String>{
+                    'pigcode_ai_agent_kernel': '^0.0.1',
+                  }
+                : const <String, String>{},
+          ),
         );
     }
 
@@ -1074,9 +1331,18 @@ workspace:
   - packages/protocol_utils
   - packages/acp
   - packages/mcp
+  - packages/agent_kernel
+  - packages/agent_io
 ''';
 
-String _packageManifest(String name) => '''
+String _packageManifest(
+  String name, {
+  Map<String, String> dependencies = const <String, String>{},
+}) {
+  final dependencyBlock = dependencies.isEmpty
+      ? ''
+      : '\ndependencies:\n${dependencies.entries.map((entry) => '  ${entry.key}: ${entry.value}').join('\n')}\n';
+  return '''
 name: $name
 version: 0.0.1
 publish_to: none
@@ -1087,4 +1353,5 @@ environment:
 resolution: workspace
 repository: https://github.com/pigcode/ai
 issue_tracker: https://github.com/pigcode/ai/issues
-''';
+$dependencyBlock''';
+}

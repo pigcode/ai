@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/tool/schema/agent_kernel/agent-event-v1.schema.json",
+  "title": "Pigcode AgentEvent v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "schemaVersion",
+    "sessionId",
+    "sequence",
+    "recordedAt",
+    "type",
+    "causationId",
+    "payload",
+    "metadata"
+  ],
+  "properties": {
+    "eventId": {
+      "$ref": "#/$defs/eventId"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sessionId": {
+      "$ref": "#/$defs/sessionId"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "type": {
+      "enum": [
+        "session.created",
+        "session.capabilitiesPinned",
+        "session.attachmentChanged",
+        "session.runtimeLivenessChanged",
+        "session.resumeStateStored",
+        "session.tombstoned",
+        "run.created",
+        "run.inputRecorded",
+        "run.attemptStarted",
+        "run.started",
+        "run.cancelRequested",
+        "run.suspendRequested",
+        "run.suspended",
+        "run.resumeRequested",
+        "run.reconciling",
+        "run.completed",
+        "run.failed",
+        "run.cancelled",
+        "run.interrupted",
+        "work.proposed",
+        "work.policyEvaluated",
+        "work.approvalRequested",
+        "work.approvalResolved",
+        "work.executionStarted",
+        "work.cancellationRequested",
+        "work.succeeded",
+        "work.failed",
+        "work.cancelled",
+        "work.outcomeUnknown",
+        "deferred.created",
+        "deferred.ownershipTransferred",
+        "deferred.completed",
+        "deferred.failed",
+        "deferred.cancelled",
+        "deferred.outcomeUnknown",
+        "resource.registered",
+        "resource.ownershipTransferred",
+        "resource.updated",
+        "resource.released",
+        "resource.outcomeUnknown",
+        "driver.proposalRejected",
+        "driver.sourceDrained",
+        "effect.observed",
+        "history.imported"
+      ]
+    },
+    "runId": {
+      "$ref": "#/$defs/runId"
+    },
+    "attemptId": {
+      "$ref": "#/$defs/attemptId"
+    },
+    "workItemId": {
+      "$ref": "#/$defs/workItemId"
+    },
+    "causationId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/commandId"
+        },
+        {
+          "$ref": "#/$defs/eventId"
+        }
+      ]
+    },
+    "payload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "metadata": {
+      "$ref": "#/$defs/domainObject"
+    }
+  },
+  "$defs": {
+    "opaquePayload": {
+      "type": "string",
+      "pattern": "^[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^evt_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^ses_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "runId": {
+      "type": "string",
+      "pattern": "^run_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "attemptId": {
+      "type": "string",
+      "pattern": "^att_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "workItemId": {
+      "type": "string",
+      "pattern": "^wrk_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "commandId": {
+      "type": "string",
+      "pattern": "^cmd_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "safeInteger": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "domainNumber": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/safeInteger"
+        },
+        {
+          "type": "number",
+          "not": {
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "jsonValue": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/domainNumber"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "$ref": "#/$defs/domainObject"
+        }
+      ]
+    },
+    "domainObject": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "sessionPayload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "runPayload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "workPayload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "deferredPayload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "resourcePayload": {
+      "$ref": "#/$defs/domainObject"
+    },
+    "auditPayload": {
+      "$ref": "#/$defs/domainObject"
+    }
+  }
+}

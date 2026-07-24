@@ -1,0 +1,13 @@
+{
+  "eventId": "evt_00000000000000000000000000000000",
+  "schemaVersion": 2,
+  "sessionId": "ses_00000000000000000000000000000000",
+  "sequence": 1,
+  "recordedAt": "2026-07-24T00:00:00.000Z",
+  "type": "session.created",
+  "causationId": "cmd_00000000000000000000000000000000",
+  "payload": {
+    "definitionRef": "agent:test"
+  },
+  "metadata": {}
+}
