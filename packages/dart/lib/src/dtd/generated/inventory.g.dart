@@ -1,0 +1,22 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND.
+// Source: pinned DTD documents plus dtd-method-inventory.json.
+
+const dtdGeneratedInventoryRevision = 'dtd-fixed-inventory-v1';
+const dtdGeneratedInventorySha256 =
+    'f76a7f5a18251640a19bb5be1dfa7304f7d10b7b4237fe66bfccbf6e118e06d3';
+const dtdGeneratedMinimumSdkRelease = '3.6.0';
+const dtdGeneratedMinimumSdkRevision =
+    'ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04';
+const dtdGeneratedMinimumPackageRevision =
+    '711c998bb532d60c992bf48a780ab5c6595447d9';
+const dtdGeneratedMinimumDocumentSha256 =
+    '02c73206e28998486a62c3453399ff2bb1aa225be335140241219f66f639529f';
+const dtdGeneratedCurrentSdkRelease = '3.12.2';
+const dtdGeneratedCurrentSdkRevision =
+    'd684a576a6aa954ae107a03b2b4e1d61c3bebe93';
+const dtdGeneratedCurrentPackageRevision =
+    'fa063f322c03cc7a690d819db124c196a69cff56';
+const dtdGeneratedCurrentDocumentSha256 =
+    'eb97d36feb8e0cb9ed0362775d4f606ea6f8ea982491c19055627253087a0fb2';
+const dtdGeneratedInventoryJson =
+    r'''{"formatVersion":1,"inventoryRevision":"dtd-fixed-inventory-v1","inventorySha256":"f76a7f5a18251640a19bb5be1dfa7304f7d10b7b4237fe66bfccbf6e118e06d3","sources":[{"sdkRole":"current","sdkRelease":"3.12.2","sdkRevision":"d684a576a6aa954ae107a03b2b4e1d61c3bebe93","dtdPackage":"4.0.0","packageRevision":"fa063f322c03cc7a690d819db124c196a69cff56","documentSha256":"eb97d36feb8e0cb9ed0362775d4f606ea6f8ea982491c19055627253087a0fb2"},{"sdkRole":"minimum","sdkRelease":"3.6.0","sdkRevision":"ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04","dtdPackage":"2.4.1-wip","packageRevision":"711c998bb532d60c992bf48a780ab5c6595447d9","documentSha256":"02c73206e28998486a62c3453399ff2bb1aa225be335140241219f66f639529f"}],"methods":{"FileSystem.getIDEWorkspaceRoots":{"kind":"request","documentationToken":"#### getIDEWorkspaceRoots","params":{},"resultType":"IDEWorkspaceRoots"},"FileSystem.getProjectRoots":{"kind":"request","documentationToken":"#### getProjectRoots","params":{"depth":{"type":"int","required":false}},"resultType":"UriList"},"FileSystem.listDirectoryContents":{"kind":"request","documentationToken":"### listDirectoryContents","params":{"uri":{"type":"string","required":true}},"resultType":"UriList"},"FileSystem.readFileAsString":{"kind":"request","documentationToken":"### readFileAsString","params":{"uri":{"type":"string","required":true}},"resultType":"FileContent"},"FileSystem.setIDEWorkspaceRoots":{"kind":"request","documentationToken":"#### setIDEWorkspaceRoots","params":{"roots":{"type":"stringList","required":true},"secret":{"type":"string","required":true}},"resultType":"Success"},"FileSystem.writeFileAsString":{"kind":"request","documentationToken":"### writeFileAsString","params":{"contents":{"type":"string","required":true},"uri":{"type":"string","required":true}},"resultType":"Success"},"postEvent":{"kind":"request","documentationToken":"#### `postEvent`","params":{"eventData":{"type":"object","required":true},"eventKind":{"type":"string","required":true},"streamId":{"type":"string","required":true}},"resultType":"Success"},"registerService":{"kind":"request","documentationToken":"#### `registerService`","params":{"capabilities":{"type":"object","required":false},"method":{"type":"string","required":true},"service":{"type":"serviceName","required":true}},"resultType":"Success"},"streamCancel":{"kind":"request","documentationToken":"#### `streamCancel`","params":{"streamId":{"type":"string","required":true}},"resultType":"Success"},"streamListen":{"kind":"request","documentationToken":"#### `streamListen`","params":{"streamId":{"type":"string","required":true}},"resultType":"Success"},"streamNotify":{"kind":"notification","documentationToken":"##### `streamNotify`","params":{"eventData":{"type":"object","required":true},"eventKind":{"type":"string","required":true},"streamId":{"type":"string","required":true}},"resultType":null}},"types":{"FileContent":{"content":{"type":"string","required":true},"type":{"type":"literal:FileContent","required":true}},"IDEWorkspaceRoots":{"ideWorkspaceRoots":{"type":"stringList","required":true},"type":{"type":"literal:IDEWorkspaceRoots","required":true}},"Success":{"type":{"type":"literal:Success","required":true}},"UriList":{"type":{"type":"literal:UriList","required":true},"uris":{"type":"stringList","required":true}}},"errorCodes":[-32602,-32601,103,104,111,112,132,140,141,142,143],"dynamicService":{"methodPattern":"^[^.]+\\..+$","paramsType":"object","resultType":"json"}}''';

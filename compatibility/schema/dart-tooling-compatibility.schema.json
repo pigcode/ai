@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/compatibility/schema/dart-tooling-compatibility.schema.json",
+  "title": "Pigcode Phase 2b Dart tooling compatibility manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "formatVersion",
+    "phase",
+    "implementationCommit",
+    "dartSdkConstraint",
+    "sources",
+    "peerProfiles",
+    "claims",
+    "evidence",
+    "knownUnsupported"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./schema/dart-tooling-compatibility.schema.json"
+    },
+    "formatVersion": {
+      "const": 1
+    },
+    "phase": {
+      "const": "phase-2b-dart-tooling"
+    },
+    "implementationCommit": {
+      "type": "string",
+      "pattern": "^(pending-main-merge|[a-f0-9]{40})$"
+    },
+    "dartSdkConstraint": {
+      "const": "^3.6.0"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "peerProfiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/peerProfile"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 41,
+      "maxItems": 41,
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 41,
+      "maxItems": 41,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "knownUnsupported": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/knownUnsupported"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "protocols",
+        "release",
+        "revision",
+        "artifactRefs",
+        "profiles"
+      ],
+      "properties": {
+        "sourceId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "protocols": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "release": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "artifactRefs": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "profiles": {
+          "type": "object"
+        }
+      }
+    },
+    "peerProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "family",
+        "role",
+        "release",
+        "revision",
+        "platform",
+        "transport"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "family": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "role": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "release": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "platform": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "transport": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "observedProtocol": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimId",
+        "protocol",
+        "surface",
+        "level",
+        "role",
+        "transport",
+        "sourceRefs",
+        "runtimeVersionPolicy",
+        "peerScope",
+        "platform",
+        "evidenceIds",
+        "implementationCommit",
+        "evidenceCommit",
+        "limitations"
+      ],
+      "properties": {
+        "claimId": {
+          "type": "string",
+          "pattern": "^P2B-(LSP|DAP|AS|DTD|VM|CROSS)-[0-9]{2}$"
+        },
+        "protocol": {
+          "enum": [
+            "lsp",
+            "dap",
+            "analysis-server",
+            "dtd",
+            "vm-service",
+            "cross-package"
+          ]
+        },
+        "surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "level": {
+          "enum": [
+            "implemented",
+            "verified"
+          ]
+        },
+        "role": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "transport": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceRefs": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "runtimeVersionPolicy": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "peerScope": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "platform": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidenceIds": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "implementationCommit": {
+          "type": "string",
+          "pattern": "^(pending-main-merge|[a-f0-9]{40})$"
+        },
+        "evidenceCommit": {
+          "type": "string",
+          "pattern": "^(pending-main-merge|[a-f0-9]{40})$"
+        },
+        "limitations": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claimId",
+        "kind",
+        "peerProfileRefs",
+        "artifactPaths",
+        "scenarios",
+        "result"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "claimId": {
+          "type": "string",
+          "pattern": "^P2B-(LSP|DAP|AS|DTD|VM|CROSS)-[0-9]{2}$"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "peerProfileRefs": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "artifactPaths": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "scenarios": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "result": {
+          "const": "passed"
+        }
+      }
+    },
+    "knownUnsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "summary": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  }
+}

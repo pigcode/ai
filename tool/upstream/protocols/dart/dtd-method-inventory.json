@@ -1,0 +1,220 @@
+{
+  "formatVersion": 1,
+  "inventoryRevision": "dtd-fixed-inventory-v1",
+  "methods": {
+    "FileSystem.getIDEWorkspaceRoots": {
+      "kind": "request",
+      "documentationToken": "#### getIDEWorkspaceRoots",
+      "params": {},
+      "resultType": "IDEWorkspaceRoots"
+    },
+    "FileSystem.getProjectRoots": {
+      "kind": "request",
+      "documentationToken": "#### getProjectRoots",
+      "params": {
+        "depth": {
+          "type": "int",
+          "required": false
+        }
+      },
+      "resultType": "UriList"
+    },
+    "FileSystem.listDirectoryContents": {
+      "kind": "request",
+      "documentationToken": "### listDirectoryContents",
+      "params": {
+        "uri": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "UriList"
+    },
+    "FileSystem.readFileAsString": {
+      "kind": "request",
+      "documentationToken": "### readFileAsString",
+      "params": {
+        "uri": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "FileContent"
+    },
+    "FileSystem.setIDEWorkspaceRoots": {
+      "kind": "request",
+      "documentationToken": "#### setIDEWorkspaceRoots",
+      "params": {
+        "roots": {
+          "type": "stringList",
+          "required": true
+        },
+        "secret": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "FileSystem.writeFileAsString": {
+      "kind": "request",
+      "documentationToken": "### writeFileAsString",
+      "params": {
+        "contents": {
+          "type": "string",
+          "required": true
+        },
+        "uri": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "postEvent": {
+      "kind": "request",
+      "documentationToken": "#### `postEvent`",
+      "params": {
+        "eventData": {
+          "type": "object",
+          "required": true
+        },
+        "eventKind": {
+          "type": "string",
+          "required": true
+        },
+        "streamId": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "registerService": {
+      "kind": "request",
+      "documentationToken": "#### `registerService`",
+      "params": {
+        "capabilities": {
+          "type": "object",
+          "required": false
+        },
+        "method": {
+          "type": "string",
+          "required": true
+        },
+        "service": {
+          "type": "serviceName",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "streamCancel": {
+      "kind": "request",
+      "documentationToken": "#### `streamCancel`",
+      "params": {
+        "streamId": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "streamListen": {
+      "kind": "request",
+      "documentationToken": "#### `streamListen`",
+      "params": {
+        "streamId": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": "Success"
+    },
+    "streamNotify": {
+      "kind": "notification",
+      "documentationToken": "##### `streamNotify`",
+      "params": {
+        "eventData": {
+          "type": "object",
+          "required": true
+        },
+        "eventKind": {
+          "type": "string",
+          "required": true
+        },
+        "streamId": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "resultType": null
+    }
+  },
+  "types": {
+    "FileContent": {
+      "content": {
+        "type": "string",
+        "required": true
+      },
+      "type": {
+        "type": "literal:FileContent",
+        "required": true
+      }
+    },
+    "IDEWorkspaceRoots": {
+      "ideWorkspaceRoots": {
+        "type": "stringList",
+        "required": true
+      },
+      "type": {
+        "type": "literal:IDEWorkspaceRoots",
+        "required": true
+      }
+    },
+    "Success": {
+      "type": {
+        "type": "literal:Success",
+        "required": true
+      }
+    },
+    "UriList": {
+      "type": {
+        "type": "literal:UriList",
+        "required": true
+      },
+      "uris": {
+        "type": "stringList",
+        "required": true
+      }
+    }
+  },
+  "errorCodes": [
+    -32602,
+    -32601,
+    103,
+    104,
+    111,
+    112,
+    132,
+    140,
+    141,
+    142,
+    143
+  ],
+  "dynamicService": {
+    "methodPattern": "^[^.]+\\..+$",
+    "paramsType": "object",
+    "resultType": "json"
+  },
+  "classifiedDynamicDocumentationTokens": [
+    "#### `service`.`method`",
+    "##### `service.method`"
+  ],
+  "classifiedDocumentDifferences": {
+    "3.6.0": [
+      "success-heading-missing-markers"
+    ],
+    "3.12.2": []
+  }
+}

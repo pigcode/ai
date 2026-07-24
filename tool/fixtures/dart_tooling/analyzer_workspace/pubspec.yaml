@@ -1,0 +1,5 @@
+name: pigcode_analysis_server_fixture
+publish_to: none
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'

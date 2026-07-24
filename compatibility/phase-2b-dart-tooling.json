@@ -1,0 +1,1839 @@
+{
+  "$schema": "./schema/dart-tooling-compatibility.schema.json",
+  "formatVersion": 1,
+  "phase": "phase-2b-dart-tooling",
+  "implementationCommit": "pending-main-merge",
+  "dartSdkConstraint": "^3.6.0",
+  "sources": [
+    {
+      "sourceId": "lsp-3.18-b7f5132",
+      "protocols": [
+        "lsp"
+      ],
+      "release": "3.18-audit-snapshot",
+      "revision": "b7f5132c95261c0898ae5124e7a91707abc48fcd",
+      "artifactRefs": [
+        "lsp-meta-model",
+        "lsp-meta-model-schema",
+        "lsp-meta-model-typescript",
+        "lsp-license",
+        "lsp-code-license"
+      ],
+      "profiles": {
+        "stable": "3.17 overlap",
+        "proposed": "3.18 explicit opt-in only"
+      }
+    },
+    {
+      "sourceId": "dap-v1.71.0",
+      "protocols": [
+        "dap"
+      ],
+      "release": "v1.71.0",
+      "revision": "51d95ea4e692b34c5d06601bbd1bebc1ff3fbdd4",
+      "artifactRefs": [
+        "dap-schema",
+        "dap-license",
+        "dap-code-license"
+      ],
+      "profiles": {
+        "schemaVersion": "1.71.0"
+      }
+    },
+    {
+      "sourceId": "dart-3.6.0",
+      "protocols": [
+        "analysis-server",
+        "dtd",
+        "vm-service"
+      ],
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "artifactRefs": [
+        "dart-3.6.0-analysis-spec",
+        "dart-3.6.0-analysis-api",
+        "dart-3.6.0-analysis-generated",
+        "dart-3.6.0-analysis-constants",
+        "dart-3.6.0-dtd-protocol",
+        "dart-3.6.0-vm-service",
+        "dart-3.6.0-vm-generated",
+        "dart-3.6.0-vm-runtime-version",
+        "dart-sdk-license"
+      ],
+      "profiles": {
+        "analysisServerApi": "1.38.0",
+        "dtdInventory": "dtd-fixed-inventory-v1",
+        "vmService": "4.16"
+      }
+    },
+    {
+      "sourceId": "dart-3.12.2",
+      "protocols": [
+        "analysis-server",
+        "dtd",
+        "vm-service"
+      ],
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "artifactRefs": [
+        "dart-3.12.2-analysis-spec",
+        "dart-3.12.2-analysis-api",
+        "dart-3.12.2-analysis-generated",
+        "dart-3.12.2-analysis-constants",
+        "dart-3.12.2-dtd-protocol",
+        "dart-3.12.2-vm-service",
+        "dart-3.12.2-vm-generated",
+        "dart-3.12.2-vm-runtime-version"
+      ],
+      "profiles": {
+        "analysisServerApi": "1.40.1",
+        "dtdInventory": "dtd-fixed-inventory-v1",
+        "vmService": "4.21"
+      }
+    }
+  ],
+  "peerProfiles": [
+    {
+      "id": "dart-test-current",
+      "family": "dart-sdk",
+      "role": "unit-contract",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "in-process"
+    },
+    {
+      "id": "dart-sdk-minimum",
+      "family": "dart-sdk",
+      "role": "portability",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "vm-js-wasm"
+    },
+    {
+      "id": "dart-sdk-current",
+      "family": "dart-sdk",
+      "role": "portability",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "vm-chrome-js-wasm"
+    },
+    {
+      "id": "lsp-dart-minimum",
+      "family": "dart-language-server",
+      "role": "lsp",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "stdio-content-length",
+      "observedProtocol": "LSP stable overlap"
+    },
+    {
+      "id": "lsp-dart-current",
+      "family": "dart-language-server",
+      "role": "lsp",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "stdio-content-length",
+      "observedProtocol": "LSP stable overlap"
+    },
+    {
+      "id": "lsp-typescript-5.3.0",
+      "family": "typescript-language-server",
+      "role": "lsp",
+      "release": "5.3.0+typescript-6.0.3",
+      "revision": "589044479e4bc2bffb796b593242136f5323b582",
+      "platform": "macos-arm64",
+      "transport": "stdio-content-length",
+      "observedProtocol": "LSP stable overlap"
+    },
+    {
+      "id": "dap-dart-minimum",
+      "family": "dart-debug-adapter",
+      "role": "dap",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "stdio-content-length",
+      "observedProtocol": "DAP 1.x"
+    },
+    {
+      "id": "dap-dart-current",
+      "family": "dart-debug-adapter",
+      "role": "dap",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "stdio-content-length",
+      "observedProtocol": "DAP 1.x"
+    },
+    {
+      "id": "dap-js-debug-1.117.0",
+      "family": "vscode-js-debug",
+      "role": "dap",
+      "release": "1.117.0",
+      "revision": "496a6f1a4fc8198bcd563f97b84a07aa39917404",
+      "platform": "macos-arm64",
+      "transport": "tcp-content-length",
+      "observedProtocol": "DAP 1.x"
+    },
+    {
+      "id": "analysis-server-minimum",
+      "family": "dart-analysis-server",
+      "role": "analysis-server",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "stdio-json",
+      "observedProtocol": "1.38.0"
+    },
+    {
+      "id": "analysis-server-current",
+      "family": "dart-analysis-server",
+      "role": "analysis-server",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "stdio-json",
+      "observedProtocol": "1.40.1"
+    },
+    {
+      "id": "dtd-minimum",
+      "family": "dart-dtd",
+      "role": "dtd",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "websocket-json-rpc"
+    },
+    {
+      "id": "dtd-current",
+      "family": "dart-dtd",
+      "role": "dtd",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "websocket-json-rpc"
+    },
+    {
+      "id": "vm-service-minimum",
+      "family": "dart-vm-service",
+      "role": "vm-service",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "transport": "websocket-json-rpc",
+      "observedProtocol": "4.16"
+    },
+    {
+      "id": "vm-service-current",
+      "family": "dart-vm-service",
+      "role": "vm-service",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "transport": "websocket-json-rpc",
+      "observedProtocol": "4.21"
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "P2B-LSP-01",
+      "protocol": "lsp",
+      "surface": "source-and-generated-union",
+      "level": "implemented",
+      "role": "codec",
+      "transport": "json",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-3.18-audit-snapshot",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-LSP-PROPOSED"
+      ]
+    },
+    {
+      "claimId": "P2B-LSP-02",
+      "protocol": "lsp",
+      "surface": "stable-codec-and-open-values",
+      "level": "implemented",
+      "role": "codec",
+      "transport": "json-rpc",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-LSP-03",
+      "protocol": "lsp",
+      "surface": "lifecycle-correlation-cancellation",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-AGENT-RECONNECT"
+      ]
+    },
+    {
+      "claimId": "P2B-LSP-04",
+      "protocol": "lsp",
+      "surface": "capability-and-dynamic-registration",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-LSP-05",
+      "protocol": "lsp",
+      "surface": "document-sync-and-content-version",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-05"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-LSP-06",
+      "protocol": "lsp",
+      "surface": "reverse-request-proposals",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-06"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-HOST-BOUNDARY"
+      ]
+    },
+    {
+      "claimId": "P2B-LSP-07",
+      "protocol": "lsp",
+      "surface": "scripted-chaos-and-replay",
+      "level": "implemented",
+      "role": "client",
+      "transport": "stdio-content-length",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-LSP-07"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-LSP-08",
+      "protocol": "lsp",
+      "surface": "cross-family-overlap-peer-matrix",
+      "level": "verified",
+      "role": "lsp",
+      "transport": "stdio-content-length",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "overlap",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-LSP-08"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-PEER-SPECIFIC"
+      ]
+    },
+    {
+      "claimId": "P2B-LSP-09",
+      "protocol": "lsp",
+      "surface": "typescript-peer-profile",
+      "level": "verified",
+      "role": "lsp",
+      "transport": "stdio-content-length",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132"
+      ],
+      "runtimeVersionPolicy": "lsp-stable-overlap",
+      "peerScope": "peer-specific",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-LSP-09"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-PEER-SPECIFIC"
+      ]
+    },
+    {
+      "claimId": "P2B-DAP-01",
+      "protocol": "dap",
+      "surface": "source-and-generated-union",
+      "level": "implemented",
+      "role": "codec",
+      "transport": "json",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DAP-02",
+      "protocol": "dap",
+      "surface": "codec-and-open-values",
+      "level": "implemented",
+      "role": "codec",
+      "transport": "json",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DAP-03",
+      "protocol": "dap",
+      "surface": "lifecycle-correlation-cancellation",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-AGENT-RECONNECT"
+      ]
+    },
+    {
+      "claimId": "P2B-DAP-04",
+      "protocol": "dap",
+      "surface": "capability-generations",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DAP-05",
+      "protocol": "dap",
+      "surface": "debug-state-and-reference-lifetime",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-05"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DAP-06",
+      "protocol": "dap",
+      "surface": "terminal-and-start-debugging-proposals",
+      "level": "implemented",
+      "role": "client",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-06"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-DAP-AUTHORIZATION",
+        "KU-P2B-HOST-BOUNDARY"
+      ]
+    },
+    {
+      "claimId": "P2B-DAP-07",
+      "protocol": "dap",
+      "surface": "scripted-chaos-and-replay",
+      "level": "implemented",
+      "role": "client",
+      "transport": "content-length",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DAP-07"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DAP-08",
+      "protocol": "dap",
+      "surface": "cross-family-overlap-peer-matrix",
+      "level": "verified",
+      "role": "dap",
+      "transport": "content-length",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "overlap",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-DAP-08"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-PEER-SPECIFIC"
+      ]
+    },
+    {
+      "claimId": "P2B-DAP-09",
+      "protocol": "dap",
+      "surface": "js-debug-peer-profile",
+      "level": "verified",
+      "role": "dap",
+      "transport": "tcp-content-length",
+      "sourceRefs": [
+        "dap-v1.71.0"
+      ],
+      "runtimeVersionPolicy": "dap-1.71.0",
+      "peerScope": "peer-specific",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-DAP-09"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-PEER-SPECIFIC"
+      ]
+    },
+    {
+      "claimId": "P2B-AS-01",
+      "protocol": "analysis-server",
+      "surface": "pinned-source-and-union",
+      "level": "implemented",
+      "role": "analysis-server",
+      "transport": "stdio-json",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-AS-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-AS-VERSION-RANGE"
+      ]
+    },
+    {
+      "claimId": "P2B-AS-02",
+      "protocol": "analysis-server",
+      "surface": "version-and-availability",
+      "level": "implemented",
+      "role": "analysis-server",
+      "transport": "stdio-json",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-AS-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-AS-03",
+      "protocol": "analysis-server",
+      "surface": "codec-and-generated-models",
+      "level": "implemented",
+      "role": "analysis-server",
+      "transport": "stdio-json",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-AS-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-AS-04",
+      "protocol": "analysis-server",
+      "surface": "client-lifecycle-and-correlation",
+      "level": "implemented",
+      "role": "analysis-server",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-AS-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-AS-05",
+      "protocol": "analysis-server",
+      "surface": "edit-proposals",
+      "level": "implemented",
+      "role": "analysis-server",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-AS-05"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-HOST-BOUNDARY"
+      ]
+    },
+    {
+      "claimId": "P2B-AS-06",
+      "protocol": "analysis-server",
+      "surface": "exact-sdk-peer-matrix",
+      "level": "verified",
+      "role": "analysis-server",
+      "transport": "stdio-json",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "api-1.38.0-and-1.40.1",
+      "peerScope": "exact-sdk-matrix",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-AS-06"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DTD-01",
+      "protocol": "dtd",
+      "surface": "pinned-docs-and-fixed-inventory",
+      "level": "implemented",
+      "role": "dtd",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DTD-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-DTD-VERSION-RANGE"
+      ]
+    },
+    {
+      "claimId": "P2B-DTD-02",
+      "protocol": "dtd",
+      "surface": "codec-and-dynamic-method-boundary",
+      "level": "implemented",
+      "role": "dtd",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DTD-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DTD-03",
+      "protocol": "dtd",
+      "surface": "stream-lifecycle",
+      "level": "implemented",
+      "role": "dtd",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DTD-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DTD-04",
+      "protocol": "dtd",
+      "surface": "service-ownership",
+      "level": "implemented",
+      "role": "dtd",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DTD-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-DTD-05",
+      "protocol": "dtd",
+      "surface": "filesystem-and-secret-boundary",
+      "level": "implemented",
+      "role": "dtd",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-DTD-05"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-HOST-BOUNDARY"
+      ]
+    },
+    {
+      "claimId": "P2B-DTD-06",
+      "protocol": "dtd",
+      "surface": "exact-sdk-devtools-peer-matrix",
+      "level": "verified",
+      "role": "dtd",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "no-wire-version-exact-sdk-inventory",
+      "peerScope": "exact-sdk-matrix",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-DTD-06"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-01",
+      "protocol": "vm-service",
+      "surface": "pinned-source-runtime-oracle-and-union",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-VM-VERSION-RANGE"
+      ]
+    },
+    {
+      "claimId": "P2B-VM-02",
+      "protocol": "vm-service",
+      "surface": "version-and-availability",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-03",
+      "protocol": "vm-service",
+      "surface": "codec-model-and-sentinel",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-04",
+      "protocol": "vm-service",
+      "surface": "client-and-protocol-gates",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-05",
+      "protocol": "vm-service",
+      "surface": "stream-lifecycle",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-05"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-06",
+      "protocol": "vm-service",
+      "surface": "object-and-isolate-reference-lifetime",
+      "level": "implemented",
+      "role": "vm-service",
+      "transport": "caller-owned",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-VM-06"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-VM-07",
+      "protocol": "vm-service",
+      "surface": "exact-sdk-vm-peer-matrix",
+      "level": "verified",
+      "role": "vm-service",
+      "transport": "websocket-json-rpc",
+      "sourceRefs": [
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "major-4-minor-16-and-21",
+      "peerScope": "exact-sdk-matrix",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-VM-07"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-CROSS-01",
+      "protocol": "cross-package",
+      "surface": "minimum-current-portability",
+      "level": "verified",
+      "role": "portability",
+      "transport": "vm-js-wasm-chrome",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132",
+        "dap-v1.71.0",
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "dart-sdk-3.6.0-and-3.12.2",
+      "peerScope": "full-gate",
+      "platform": "macos-arm64",
+      "evidenceIds": [
+        "EV-P2B-CROSS-01"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-FLUTTER-PLATFORM-REMOTE"
+      ]
+    },
+    {
+      "claimId": "P2B-CROSS-02",
+      "protocol": "cross-package",
+      "surface": "dependency-and-side-effect-boundary",
+      "level": "implemented",
+      "role": "boundary",
+      "transport": "source",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132",
+        "dap-v1.71.0",
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "portable-default-barrels",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-CROSS-02"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-HOST-BOUNDARY"
+      ]
+    },
+    {
+      "claimId": "P2B-CROSS-03",
+      "protocol": "cross-package",
+      "surface": "claim-evidence-source-closure",
+      "level": "implemented",
+      "role": "compatibility",
+      "transport": "json",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132",
+        "dap-v1.71.0",
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "phase-2b-manifest-v1",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-CROSS-03"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": []
+    },
+    {
+      "claimId": "P2B-CROSS-04",
+      "protocol": "cross-package",
+      "surface": "documentation-and-unsupported-closure",
+      "level": "implemented",
+      "role": "documentation",
+      "transport": "markdown",
+      "sourceRefs": [
+        "lsp-3.18-b7f5132",
+        "dap-v1.71.0",
+        "dart-3.6.0",
+        "dart-3.12.2"
+      ],
+      "runtimeVersionPolicy": "phase-2b-bounded-support",
+      "peerScope": "in-process",
+      "platform": "portable-dart",
+      "evidenceIds": [
+        "EV-P2B-CROSS-04"
+      ],
+      "implementationCommit": "pending-main-merge",
+      "evidenceCommit": "pending-main-merge",
+      "limitations": [
+        "KU-P2B-LSP-PROPOSED",
+        "KU-P2B-PEER-SPECIFIC",
+        "KU-P2B-DAP-AUTHORIZATION",
+        "KU-P2B-AS-VERSION-RANGE",
+        "KU-P2B-DTD-VERSION-RANGE",
+        "KU-P2B-VM-VERSION-RANGE",
+        "KU-P2B-FLUTTER-PLATFORM-REMOTE",
+        "KU-P2B-HOST-BOUNDARY",
+        "KU-P2B-AGENT-RECONNECT"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-P2B-LSP-01",
+      "claimId": "P2B-LSP-01",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/schema/source_test.dart"
+      ],
+      "scenarios": [
+        "source-lock-and-inventory"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-02",
+      "claimId": "P2B-LSP-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/schema/codec_golden_test.dart"
+      ],
+      "scenarios": [
+        "golden-positive-negative"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-03",
+      "claimId": "P2B-LSP-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/lifecycle_test.dart"
+      ],
+      "scenarios": [
+        "initialize-shutdown-cancel-races"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-04",
+      "claimId": "P2B-LSP-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/dynamic_registration_test.dart"
+      ],
+      "scenarios": [
+        "immutable-capability-generations"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-05",
+      "claimId": "P2B-LSP-05",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/document_sync_test.dart"
+      ],
+      "scenarios": [
+        "incremental-sync-and-content-modified"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-06",
+      "claimId": "P2B-LSP-06",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/apply_edit_proposal_test.dart"
+      ],
+      "scenarios": [
+        "proposal-without-side-effect"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-07",
+      "claimId": "P2B-LSP-07",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/lsp/test/scripted_peer_test.dart"
+      ],
+      "scenarios": [
+        "chaos-framing-and-sanitized-replay"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-08",
+      "claimId": "P2B-LSP-08",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "lsp-dart-minimum",
+        "lsp-dart-current",
+        "lsp-typescript-5.3.0"
+      ],
+      "artifactPaths": [
+        "tool/run_lsp_peer_matrix.dart"
+      ],
+      "scenarios": [
+        "initialize",
+        "open",
+        "hover",
+        "completion",
+        "shutdown"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-LSP-09",
+      "claimId": "P2B-LSP-09",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "lsp-typescript-5.3.0"
+      ],
+      "artifactPaths": [
+        "tool/src/lsp_peer_harness.dart"
+      ],
+      "scenarios": [
+        "typescript-language-server-5.3.0-typescript-6.0.3"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-01",
+      "claimId": "P2B-DAP-01",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/schema/source_test.dart"
+      ],
+      "scenarios": [
+        "source-lock-and-schema-inventory"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-02",
+      "claimId": "P2B-DAP-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/schema/codec_golden_test.dart"
+      ],
+      "scenarios": [
+        "golden-positive-negative"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-03",
+      "claimId": "P2B-DAP-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/lifecycle_test.dart"
+      ],
+      "scenarios": [
+        "initialize-configure-terminal-races"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-04",
+      "claimId": "P2B-DAP-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/capabilities_event_test.dart"
+      ],
+      "scenarios": [
+        "initialize-and-capabilities-event"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-05",
+      "claimId": "P2B-DAP-05",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/reference_lifetime_test.dart"
+      ],
+      "scenarios": [
+        "stopped-continued-reference-expiry"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-06",
+      "claimId": "P2B-DAP-06",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/run_in_terminal_proposal_test.dart"
+      ],
+      "scenarios": [
+        "proposal-without-side-effect"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-07",
+      "claimId": "P2B-DAP-07",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dap/test/scripted_peer_test.dart"
+      ],
+      "scenarios": [
+        "chaos-framing-and-sanitized-replay"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-08",
+      "claimId": "P2B-DAP-08",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "dap-dart-minimum",
+        "dap-dart-current",
+        "dap-js-debug-1.117.0"
+      ],
+      "artifactPaths": [
+        "tool/run_dap_peer_matrix.dart"
+      ],
+      "scenarios": [
+        "initialize",
+        "breakpoint",
+        "launch",
+        "stopped",
+        "stack",
+        "continue",
+        "disconnect"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DAP-09",
+      "claimId": "P2B-DAP-09",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "dap-js-debug-1.117.0"
+      ],
+      "artifactPaths": [
+        "tool/src/dap_peer_harness.dart"
+      ],
+      "scenarios": [
+        "js-debug-1.117.0-start-debugging-profile"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-01",
+      "claimId": "P2B-AS-01",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/analysis_server/source_test.dart"
+      ],
+      "scenarios": [
+        "source-and-generated-inventory"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-02",
+      "claimId": "P2B-AS-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/analysis_server/version_availability_test.dart"
+      ],
+      "scenarios": [
+        "minimum-current-diff-and-major-rejection"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-03",
+      "claimId": "P2B-AS-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/analysis_server/codec_golden_test.dart"
+      ],
+      "scenarios": [
+        "request-response-notification-goldens"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-04",
+      "claimId": "P2B-AS-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/analysis_server/lifecycle_test.dart"
+      ],
+      "scenarios": [
+        "version-first-cancel-shutdown-reconnect"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-05",
+      "claimId": "P2B-AS-05",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/analysis_server/edit_proposal_test.dart"
+      ],
+      "scenarios": [
+        "source-change-without-filesystem-write"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-AS-06",
+      "claimId": "P2B-AS-06",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "analysis-server-minimum",
+        "analysis-server-current"
+      ],
+      "artifactPaths": [
+        "tool/run_analysis_server_peer_matrix.dart"
+      ],
+      "scenarios": [
+        "version",
+        "clientCapabilities",
+        "setRoots",
+        "status",
+        "errors",
+        "hover",
+        "shutdown"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-01",
+      "claimId": "P2B-DTD-01",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/dtd/source_test.dart"
+      ],
+      "scenarios": [
+        "two-docs-and-fixed-method-inventory"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-02",
+      "claimId": "P2B-DTD-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/dtd/codec_golden_test.dart"
+      ],
+      "scenarios": [
+        "fixed-and-dynamic-codec"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-03",
+      "claimId": "P2B-DTD-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/dtd/stream_test.dart"
+      ],
+      "scenarios": [
+        "listen-cancel-notify-bounds"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-04",
+      "claimId": "P2B-DTD-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/dtd/service_lifecycle_test.dart"
+      ],
+      "scenarios": [
+        "owner-generation-and-late-response"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-05",
+      "claimId": "P2B-DTD-05",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/dtd/secret_redaction_test.dart"
+      ],
+      "scenarios": [
+        "typed-rpc-and-secret-redaction"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-DTD-06",
+      "claimId": "P2B-DTD-06",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "dtd-minimum",
+        "dtd-current"
+      ],
+      "artifactPaths": [
+        "tool/run_dtd_peer_matrix.dart"
+      ],
+      "scenarios": [
+        "machineEvent",
+        "stream",
+        "service",
+        "fileSystemDenied",
+        "invalidRootSecret",
+        "cleanup"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-01",
+      "claimId": "P2B-VM-01",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/source_test.dart"
+      ],
+      "scenarios": [
+        "service-doc-generated-api-runtime-oracle"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-02",
+      "claimId": "P2B-VM-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/version_availability_test.dart"
+      ],
+      "scenarios": [
+        "runtime-version-and-current-only-diff"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-03",
+      "claimId": "P2B-VM-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/codec_golden_test.dart"
+      ],
+      "scenarios": [
+        "rpc-result-error-event-sentinel"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-04",
+      "claimId": "P2B-VM-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/lifecycle_test.dart"
+      ],
+      "scenarios": [
+        "version-first-supported-protocols-reconnect"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-05",
+      "claimId": "P2B-VM-05",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/stream_test.dart"
+      ],
+      "scenarios": [
+        "listen-cancel-ordering-late-event"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-06",
+      "claimId": "P2B-VM-06",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/vm_service/reference_lifetime_test.dart"
+      ],
+      "scenarios": [
+        "sentinel-pause-isolate-connection-generations"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-VM-07",
+      "claimId": "P2B-VM-07",
+      "kind": "real-process-matrix",
+      "peerProfileRefs": [
+        "vm-service-minimum",
+        "vm-service-current"
+      ],
+      "artifactPaths": [
+        "tool/run_vm_service_peer_matrix.dart"
+      ],
+      "scenarios": [
+        "version",
+        "supportedProtocols",
+        "vm",
+        "stream",
+        "isolate",
+        "object",
+        "temporaryIdExpired",
+        "disconnect",
+        "cleanup"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-CROSS-01",
+      "claimId": "P2B-CROSS-01",
+      "kind": "full-portability-gate",
+      "peerProfileRefs": [
+        "dart-sdk-minimum",
+        "dart-sdk-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/portable_compile_smoke.dart"
+      ],
+      "scenarios": [
+        "minimum-current-vm-js-wasm-current-chrome"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-CROSS-02",
+      "claimId": "P2B-CROSS-02",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "packages/dart/test/entrypoint_boundary_test.dart"
+      ],
+      "scenarios": [
+        "no-dart-io-no-flutter-no-host-authorization"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-CROSS-03",
+      "claimId": "P2B-CROSS-03",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "tool/test/dart_tooling_fixture_coverage_test.dart"
+      ],
+      "scenarios": [
+        "41-claim-one-to-one-evidence-closure"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "EV-P2B-CROSS-04",
+      "claimId": "P2B-CROSS-04",
+      "kind": "unit-and-contract",
+      "peerProfileRefs": [
+        "dart-test-current"
+      ],
+      "artifactPaths": [
+        "docs/dart-tooling-support.md"
+      ],
+      "scenarios": [
+        "readme-example-support-matrix-alignment"
+      ],
+      "result": "passed"
+    }
+  ],
+  "knownUnsupported": [
+    {
+      "id": "KU-P2B-LSP-PROPOSED",
+      "scope": "lsp",
+      "summary": "LSP 3.18 proposed APIs are explicit opt-in and not generally verified."
+    },
+    {
+      "id": "KU-P2B-PEER-SPECIFIC",
+      "scope": "lsp-dap",
+      "summary": "Single-peer methods and capabilities remain peer-specific."
+    },
+    {
+      "id": "KU-P2B-DAP-AUTHORIZATION",
+      "scope": "dap",
+      "summary": "DAP capabilities do not authorize terminals, processes, filesystems, or debuggees."
+    },
+    {
+      "id": "KU-P2B-AS-VERSION-RANGE",
+      "scope": "analysis-server",
+      "summary": "Only API 1.38.0 and 1.40.1 at the exact SDK revisions are verified."
+    },
+    {
+      "id": "KU-P2B-DTD-VERSION-RANGE",
+      "scope": "dtd",
+      "summary": "DTD has no wire range; only the fixed inventory at two SDK revisions is verified."
+    },
+    {
+      "id": "KU-P2B-VM-VERSION-RANGE",
+      "scope": "vm-service",
+      "summary": "Only VM Service 4.16 and 4.21 fixed profiles are verified."
+    },
+    {
+      "id": "KU-P2B-FLUTTER-PLATFORM-REMOTE",
+      "scope": "platform",
+      "summary": "Flutter tooling, all OS and CPU combinations, and remote/container transports are not claimed."
+    },
+    {
+      "id": "KU-P2B-HOST-BOUNDARY",
+      "scope": "host",
+      "summary": "Caller-owned process, socket, authorization, credential, and sandbox policy remain outside the packages."
+    },
+    {
+      "id": "KU-P2B-AGENT-RECONNECT",
+      "scope": "agent",
+      "summary": "Protocol reconnect does not restore a higher-level Agent Run."
+    }
+  ]
+}

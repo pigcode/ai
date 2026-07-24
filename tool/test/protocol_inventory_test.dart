@@ -4,7 +4,9 @@ import 'dart:convert';
 import '../src/protocol_inventory.dart';
 
 void main() {
-  final inventory = buildProtocolInventory(Directory.current);
+  final root = Directory.current;
+  final inventory = buildProtocolInventory(root);
+  final toolingInventory = buildPhase2bToolingInventory(root);
 
   _expect(inventory.acpDefinitionCount == 142, 'ACP definition drift.');
   _expect(inventory.acpMethodCount == 23, 'ACP method drift.');
@@ -59,6 +61,12 @@ void main() {
         .toString()
         .contains(RegExp('draft|unstable|2026-07-28')),
     'Stable inventory contains draft, unstable, or RC material.',
+  );
+  _expect(
+    toolingInventory.keys.toSet().containsAll(
+      const <String>{'formatVersion', 'lsp', 'dap', 'dartTooling'},
+    ),
+    'Phase 2b tooling inventory sections are incomplete.',
   );
 
   stdout.writeln('Protocol inventory validation passed.');

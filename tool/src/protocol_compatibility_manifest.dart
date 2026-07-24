@@ -14,6 +14,12 @@ const protocolCompatibilitySchemaPath =
 const phase2aProtocolEvidenceCommit =
     'b286630a5870830141394a415144c93c500598f1';
 
+const phase2aProtocolSourceIds = <String>{
+  'acp-v1',
+  'mcp-2025-11-25',
+  'mcp-conformance-v0.1.16',
+};
+
 const phase2aProtocolFixtureIds = <String>{
   'P2A-UTIL-01',
   'P2A-UTIL-02',
@@ -251,7 +257,9 @@ List<ProtocolCompatibilityViolation> _validateManifest(
 
   final sourceLock = loadProtocolSourceLock(root);
   final lockedSources = <String, ProtocolSource>{
-    for (final source in sourceLock.sources) source.sourceId: source,
+    for (final source in sourceLock.sources)
+      if (phase2aProtocolSourceIds.contains(source.sourceId))
+        source.sourceId: source,
   };
   final sources = _objectList(manifest['sources'], 'sources');
   final manifestSourceIds = <String>{};

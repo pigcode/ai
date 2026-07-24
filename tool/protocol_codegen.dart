@@ -6,7 +6,7 @@ void main(List<String> arguments) {
   final root = Directory.current;
   if (arguments.isEmpty) {
     writeProtocolGeneratedOutputs(root);
-    stdout.writeln('Generated protocol source inventory.');
+    stdout.writeln('Generated protocol source and tooling inventories.');
     return;
   }
   if (arguments.length == 1 && arguments.single == '--check') {

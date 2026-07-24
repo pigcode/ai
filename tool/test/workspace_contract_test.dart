@@ -16,7 +16,247 @@ const _packageNames = <String, String>{
   'mcp': 'pigcode_ai_mcp',
   'agent_kernel': 'pigcode_ai_agent_kernel',
   'agent_io': 'pigcode_ai_agent_io',
+  'lsp': 'pigcode_ai_lsp',
+  'dap': 'pigcode_ai_dap',
+  'dart': 'pigcode_ai_dart',
 };
+
+const _phase2bProtocolPaths = <String>[
+  'analysis_options.yaml',
+  'compatibility/phase-2b-dart-tooling.json',
+  'compatibility/schema/dart-tooling-compatibility.schema.json',
+  'compatibility/upstream/phase-2b-tooling-inventory.json',
+  'docs/dart-tooling-support.md',
+  'tool/check_dart_tooling_compatibility.dart',
+  'tool/check_format.dart',
+  'tool/src/dart_tooling_compatibility_manifest.dart',
+  'tool/test/dart_tooling_compatibility_manifest_test.dart',
+  'tool/test/dart_tooling_fixture_coverage_test.dart',
+  'tool/src/lsp_inventory.dart',
+  'tool/src/dap_inventory.dart',
+  'tool/src/dart_tooling_inventory.dart',
+  'tool/src/schema/draft_04.dart',
+  'tool/src/schema/draft_07.dart',
+  'tool/test/lsp_inventory_test.dart',
+  'tool/test/dap_inventory_test.dart',
+  'tool/test/dart_tooling_inventory_test.dart',
+  'tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.json',
+  'tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.schema.json',
+  'tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.ts',
+  'tool/upstream/protocols/lsp/3.18-b7f5132/License.txt',
+  'tool/upstream/protocols/lsp/3.18-b7f5132/License-code.txt',
+  'tool/upstream/protocols/dap/v1.71.0/debugAdapterProtocol.json',
+  'tool/upstream/protocols/dap/v1.71.0/License.txt',
+  'tool/upstream/protocols/dap/v1.71.0/License-code.txt',
+  'tool/upstream/protocols/dart/3.6.0/analysis_server/spec_input.html',
+  'tool/upstream/protocols/dart/3.6.0/analysis_server/api.html',
+  'tool/upstream/protocols/dart/3.6.0/analysis_server/protocol_generated.dart',
+  'tool/upstream/protocols/dart/3.6.0/analysis_server/protocol_constants.dart',
+  'tool/upstream/protocols/dart/3.6.0/dtd/dtd_protocol.md',
+  'tool/upstream/protocols/dart/3.6.0/vm_service/service.md',
+  'tool/upstream/protocols/dart/3.6.0/vm_service/vm_service.dart',
+  'tool/upstream/protocols/dart/3.6.0/vm_service/service.h',
+  'tool/upstream/protocols/dart/3.12.2/analysis_server/spec_input.html',
+  'tool/upstream/protocols/dart/3.12.2/analysis_server/api.html',
+  'tool/upstream/protocols/dart/3.12.2/analysis_server/protocol_generated.dart',
+  'tool/upstream/protocols/dart/3.12.2/analysis_server/protocol_constants.dart',
+  'tool/upstream/protocols/dart/3.12.2/dtd/dtd_protocol.md',
+  'tool/upstream/protocols/dart/3.12.2/vm_service/service.md',
+  'tool/upstream/protocols/dart/3.12.2/vm_service/vm_service.dart',
+  'tool/upstream/protocols/dart/3.12.2/vm_service/service.h',
+  'tool/upstream/protocols/dart/LICENSE',
+  'tool/upstream/protocols/peers/phase-2b-peers.json',
+  'packages/lsp/lib/src/codec.dart',
+  'packages/lsp/example/portable_client.dart',
+  'packages/lsp/lib/src/capabilities.dart',
+  'packages/lsp/lib/src/cancellation.dart',
+  'packages/lsp/lib/src/client.dart',
+  'packages/lsp/lib/src/connection.dart',
+  'packages/lsp/lib/src/document.dart',
+  'packages/lsp/lib/src/errors.dart',
+  'packages/lsp/lib/src/generated/lsp_inventory.g.dart',
+  'packages/lsp/lib/src/generated/lsp_proposed_models.g.dart',
+  'packages/lsp/lib/src/generated/lsp_stable_models.g.dart',
+  'packages/lsp/lib/src/method.dart',
+  'packages/lsp/lib/src/models.dart',
+  'packages/lsp/lib/src/handlers.dart',
+  'packages/lsp/lib/src/proposed.dart',
+  'packages/lsp/lib/src/proposals.dart',
+  'packages/lsp/lib/src/progress.dart',
+  'packages/lsp/lib/src/recording.dart',
+  'packages/lsp/lib/src/registration.dart',
+  'packages/lsp/lib/src/source.dart',
+  'packages/lsp/test/fixtures/golden/stable_messages.json',
+  'packages/lsp/test/capability_test.dart',
+  'packages/lsp/test/cancellation_test.dart',
+  'packages/lsp/test/content_modified_test.dart',
+  'packages/lsp/test/document_sync_test.dart',
+  'packages/lsp/test/dynamic_registration_test.dart',
+  'packages/lsp/test/initialize_test.dart',
+  'packages/lsp/test/lifecycle_test.dart',
+  'packages/lsp/test/reconnect_test.dart',
+  'packages/lsp/test/progress_test.dart',
+  'packages/lsp/test/reverse_request_test.dart',
+  'packages/lsp/test/apply_edit_proposal_test.dart',
+  'packages/lsp/test/chaos_framing_test.dart',
+  'packages/lsp/test/record_replay_test.dart',
+  'packages/lsp/test/scripted_peer_test.dart',
+  'packages/lsp/test/support/scripted_peer.dart',
+  'tool/fixtures/lsp_peer.dart',
+  'tool/test/lsp_cross_process_test.dart',
+  'tool/run_lsp_peer_matrix.dart',
+  'tool/run_with_pinned_dart.dart',
+  'tool/fixtures/lsp/dart_workspace/lib/main.dart',
+  'tool/fixtures/lsp/dart_workspace/pubspec.yaml',
+  'tool/fixtures/lsp/typescript/package-lock.json',
+  'tool/fixtures/lsp/typescript/package.json',
+  'tool/fixtures/lsp/typescript_workspace/index.ts',
+  'tool/fixtures/lsp/typescript_workspace/tsconfig.json',
+  'tool/src/lsp_peer_harness.dart',
+  'tool/src/tooling_peer_cache.dart',
+  'tool/src/tooling_process_harness.dart',
+  'tool/test/lsp_peer_matrix_test.dart',
+  'tool/test/pinned_dart_sdk_gate_test.dart',
+  'packages/dap/lib/src/codec.dart',
+  'packages/dap/example/portable_client.dart',
+  'packages/dap/lib/src/capabilities.dart',
+  'packages/dap/lib/src/cancellation.dart',
+  'packages/dap/lib/src/client.dart',
+  'packages/dap/lib/src/connection.dart',
+  'packages/dap/lib/src/debug_state.dart',
+  'packages/dap/lib/src/errors.dart',
+  'packages/dap/lib/src/events.dart',
+  'packages/dap/lib/src/generated/dap_inventory.g.dart',
+  'packages/dap/lib/src/generated/dap_models.g.dart',
+  'packages/dap/lib/src/method.dart',
+  'packages/dap/lib/src/models.dart',
+  'packages/dap/lib/src/open_value.dart',
+  'packages/dap/lib/src/progress.dart',
+  'packages/dap/lib/src/proposals.dart',
+  'packages/dap/lib/src/references.dart',
+  'packages/dap/lib/src/recording.dart',
+  'packages/dap/lib/src/session.dart',
+  'packages/dap/lib/src/source.dart',
+  'packages/dap/test/fixtures/golden/messages.json',
+  'packages/dap/test/capabilities_event_test.dart',
+  'packages/dap/test/cancellation_test.dart',
+  'packages/dap/test/chaos_framing_test.dart',
+  'packages/dap/test/correlation_test.dart',
+  'packages/dap/test/debug_state_test.dart',
+  'packages/dap/test/initialize_test.dart',
+  'packages/dap/test/lifecycle_test.dart',
+  'packages/dap/test/progress_test.dart',
+  'packages/dap/test/reference_lifetime_test.dart',
+  'packages/dap/test/record_replay_test.dart',
+  'packages/dap/test/run_in_terminal_proposal_test.dart',
+  'packages/dap/test/schema/codec_golden_test.dart',
+  'packages/dap/test/schema/invalid_fixture_test.dart',
+  'packages/dap/test/schema/inventory_test.dart',
+  'packages/dap/test/schema/open_enum_test.dart',
+  'packages/dap/test/schema/source_test.dart',
+  'packages/dap/test/terminal_race_test.dart',
+  'packages/dap/test/start_debugging_proposal_test.dart',
+  'packages/dap/test/scripted_peer_test.dart',
+  'packages/dap/test/support/scripted_peer.dart',
+  'tool/fixtures/dap_peer.dart',
+  'tool/test/dap_cross_process_test.dart',
+  'tool/run_dap_peer_matrix.dart',
+  'tool/fixtures/dap/dart_app/bin/main.dart',
+  'tool/fixtures/dap/dart_app/pubspec.yaml',
+  'tool/fixtures/dap/javascript_app/main.js',
+  'tool/src/dap_peer_harness.dart',
+  'tool/test/dap_peer_matrix_test.dart',
+  'packages/lsp/test/schema/codec_golden_test.dart',
+  'packages/lsp/test/schema/invalid_fixture_test.dart',
+  'packages/lsp/test/schema/inventory_test.dart',
+  'packages/lsp/test/schema/proposed_boundary_test.dart',
+  'packages/lsp/test/schema/source_test.dart',
+  'packages/dart/lib/src/common/availability.dart',
+  'packages/dart/lib/src/common/diagnostics.dart',
+  'packages/dart/lib/src/common/errors.dart',
+  'packages/dart/lib/src/common/source_identity.dart',
+  'packages/dart/lib/src/analysis_server/capabilities.dart',
+  'packages/dart/lib/src/analysis_server/client.dart',
+  'packages/dart/lib/src/analysis_server/codec.dart',
+  'packages/dart/lib/src/analysis_server/connection.dart',
+  'packages/dart/lib/src/analysis_server/generated/inventory.g.dart',
+  'packages/dart/lib/src/analysis_server/generated/models.g.dart',
+  'packages/dart/lib/src/analysis_server/models.dart',
+  'packages/dart/lib/src/analysis_server/proposals.dart',
+  'packages/dart/lib/src/analysis_server/version.dart',
+  'packages/dart/test/analysis_server/cancellation_test.dart',
+  'packages/dart/test/analysis_server/codec_golden_test.dart',
+  'packages/dart/test/analysis_server/correlation_test.dart',
+  'packages/dart/test/analysis_server/edit_proposal_test.dart',
+  'packages/dart/test/analysis_server/inventory_test.dart',
+  'packages/dart/test/analysis_server/lifecycle_test.dart',
+  'packages/dart/test/analysis_server/notification_test.dart',
+  'packages/dart/test/analysis_server/source_test.dart',
+  'packages/dart/test/analysis_server/upstream_diff_test.dart',
+  'packages/dart/test/analysis_server/version_availability_test.dart',
+  'packages/dart/test/entrypoint_boundary_test.dart',
+  'packages/dart/test/error_boundary_test.dart',
+  'packages/dart/test/source_identity_test.dart',
+  'tool/src/analysis_server_codegen.dart',
+  'tool/src/dtd_codegen.dart',
+  'tool/upstream/protocols/dart/dtd-method-inventory.json',
+  'packages/dart/lib/src/dtd/client.dart',
+  'packages/dart/lib/src/dtd/codec.dart',
+  'packages/dart/lib/src/dtd/connection.dart',
+  'packages/dart/lib/src/dtd/file_system.dart',
+  'packages/dart/lib/src/dtd/generated/inventory.g.dart',
+  'packages/dart/lib/src/dtd/method.dart',
+  'packages/dart/lib/src/dtd/models.dart',
+  'packages/dart/lib/src/dtd/services.dart',
+  'packages/dart/lib/src/dtd/streams.dart',
+  'packages/dart/example/tooling_clients.dart',
+  'packages/dart/test/dtd/codec_golden_test.dart',
+  'packages/dart/test/dtd/dynamic_service_test.dart',
+  'packages/dart/test/dtd/file_system_test.dart',
+  'packages/dart/test/dtd/inventory_test.dart',
+  'packages/dart/test/dtd/no_wire_version_test.dart',
+  'packages/dart/test/dtd/reconnect_test.dart',
+  'packages/dart/test/dtd/secret_redaction_test.dart',
+  'packages/dart/test/dtd/service_lifecycle_test.dart',
+  'packages/dart/test/dtd/source_test.dart',
+  'packages/dart/test/dtd/stream_test.dart',
+  'tool/src/vm_service_codegen.dart',
+  'packages/dart/lib/src/vm_service/codec.dart',
+  'packages/dart/lib/src/vm_service/capabilities.dart',
+  'packages/dart/lib/src/vm_service/client.dart',
+  'packages/dart/lib/src/vm_service/connection.dart',
+  'packages/dart/lib/src/vm_service/generated/inventory.g.dart',
+  'packages/dart/lib/src/vm_service/generated/models.g.dart',
+  'packages/dart/lib/src/vm_service/models.dart',
+  'packages/dart/lib/src/vm_service/references.dart',
+  'packages/dart/lib/src/vm_service/streams.dart',
+  'packages/dart/lib/src/vm_service/version.dart',
+  'packages/dart/test/vm_service/codec_golden_test.dart',
+  'packages/dart/test/vm_service/inventory_test.dart',
+  'packages/dart/test/vm_service/lifecycle_test.dart',
+  'packages/dart/test/vm_service/reference_lifetime_test.dart',
+  'packages/dart/test/vm_service/source_test.dart',
+  'packages/dart/test/vm_service/stream_test.dart',
+  'packages/dart/test/vm_service/supported_protocols_test.dart',
+  'packages/dart/test/vm_service/upstream_version_mismatch_test.dart',
+  'packages/dart/test/vm_service/version_availability_test.dart',
+  'packages/dart/test/vm_service/version_gate_test.dart',
+  'tool/src/analysis_server_peer_harness.dart',
+  'tool/run_analysis_server_peer_matrix.dart',
+  'tool/fixtures/dart_tooling/analyzer_workspace/analysis_options.yaml',
+  'tool/fixtures/dart_tooling/analyzer_workspace/lib/main.dart',
+  'tool/fixtures/dart_tooling/analyzer_workspace/pubspec.yaml',
+  'tool/test/analysis_server_peer_matrix_test.dart',
+  'tool/src/dtd_peer_harness.dart',
+  'tool/run_dtd_peer_matrix.dart',
+  'tool/fixtures/dart_tooling/dtd_client_fixture.dart',
+  'tool/test/dtd_peer_matrix_test.dart',
+  'tool/src/vm_service_peer_harness.dart',
+  'tool/run_vm_service_peer_matrix.dart',
+  'tool/fixtures/dart_tooling/vm_service_app.dart',
+  'tool/test/vm_service_peer_matrix_test.dart',
+  'tool/run_workspace_tests.dart',
+];
 
 void main() {
   final tests = <String, _TestBody>{
@@ -516,6 +756,30 @@ dependencies:
         );
       });
     },
+    'allows tooling packages to depend only on protocol utilities': () {
+      _withFixture((fixture) {
+        for (final package in const <String>['lsp', 'dap', 'dart']) {
+          fixture.replaceIn(
+            'packages/$package/pubspec.yaml',
+            '  pigcode_ai_protocol_utils: ^0.0.1\n',
+            '  pigcode_ai_protocol_utils: ^0.0.1\n'
+                '  pigcode_ai_provider: ^0.0.1\n',
+          );
+        }
+
+        final violations = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final package in const <String>['lsp', 'dap', 'dart']) {
+          _expectViolation(
+            violations,
+            code: 'forbidden_internal_dependency',
+            messageFragment: 'pigcode_ai_$package -> pigcode_ai_provider',
+          );
+        }
+      });
+    },
     'rejects dart:io in the portable agent kernel barrel': () {
       _withFixture((fixture) {
         fixture.appendTo(
@@ -556,6 +820,20 @@ dependencies:
           validateWorkspace(fixture.root, fixture.trackedPaths),
           code: 'portable_barrel_reexports_io',
           messageFragment: 'packages/mcp/lib/pigcode_ai_mcp.dart',
+        );
+      });
+    },
+    'rejects re-exporting LSP proposed APIs from the stable barrel': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/lsp/lib/pigcode_ai_lsp.dart',
+          "export 'pigcode_ai_lsp_proposed.dart';\n",
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_barrel_export',
+          messageFragment: 'pigcode_ai_lsp_proposed.dart',
         );
       });
     },
@@ -1226,6 +1504,18 @@ final class _WorkspaceFixture {
       ..writeTracked('.github/workflows/ci.yaml', 'name: CI\n')
       ..writeTracked('pubspec.yaml', _rootManifest());
 
+    for (final path in _phase2bProtocolPaths) {
+      fixture.writeTracked(
+        path,
+        path.endsWith('/pubspec.yaml')
+            ? 'name: phase_2b_fixture\n'
+                'publish_to: none\n'
+                'environment:\n'
+                '  sdk: ^3.6.0\n'
+            : 'Phase 2b protocol fixture\n',
+      );
+    }
+
     for (final entry in _packageNames.entries) {
       final packagePath = 'packages/${entry.key}';
       fixture
@@ -1239,14 +1529,35 @@ final class _WorkspaceFixture {
           '$packagePath/pubspec.yaml',
           _packageManifest(
             entry.value,
-            dependencies: entry.key == 'agent_io'
-                ? const <String, String>{
-                    'pigcode_ai_agent_kernel': '^0.0.1',
-                  }
-                : const <String, String>{},
+            dependencies: switch (entry.key) {
+              'agent_io' => const <String, String>{
+                  'pigcode_ai_agent_kernel': '^0.0.1',
+                },
+              'lsp' || 'dap' || 'dart' => const <String, String>{
+                  'pigcode_ai_protocol_utils': '^0.0.1',
+                },
+              _ => const <String, String>{},
+            },
           ),
         );
     }
+    fixture
+      ..writeTracked(
+        'packages/lsp/lib/pigcode_ai_lsp_proposed.dart',
+        'library;\n',
+      )
+      ..writeTracked(
+        'packages/dart/lib/pigcode_ai_dart_analysis_server.dart',
+        'library;\n',
+      )
+      ..writeTracked(
+        'packages/dart/lib/pigcode_ai_dart_dtd.dart',
+        'library;\n',
+      )
+      ..writeTracked(
+        'packages/dart/lib/pigcode_ai_dart_vm_service.dart',
+        'library;\n',
+      );
 
     return fixture;
   }
@@ -1333,6 +1644,9 @@ workspace:
   - packages/mcp
   - packages/agent_kernel
   - packages/agent_io
+  - packages/lsp
+  - packages/dap
+  - packages/dart
 ''';
 
 String _packageManifest(

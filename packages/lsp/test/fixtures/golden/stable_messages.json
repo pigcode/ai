@@ -1,0 +1,4581 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "release": "3.18-audit-snapshot",
+    "revision": "b7f5132c95261c0898ae5124e7a91707abc48fcd",
+    "sha256": "caae8df639a4248520a3f589fd72945365e9d8ebca5baf564161a515430d9d41"
+  },
+  "cases": [
+    {
+      "id": "request:callHierarchy/incomingCalls",
+      "kind": "request",
+      "sender": "client",
+      "method": "callHierarchy/incomingCalls",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "callHierarchy/incomingCalls",
+        "params": {
+          "item": {
+            "name": "",
+            "kind": 1,
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            },
+            "selectionRange": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:callHierarchy/incomingCalls",
+      "kind": "response",
+      "sender": "server",
+      "method": "callHierarchy/incomingCalls",
+      "responseMethod": "callHierarchy/incomingCalls",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": null
+      }
+    },
+    {
+      "id": "request:callHierarchy/outgoingCalls",
+      "kind": "request",
+      "sender": "client",
+      "method": "callHierarchy/outgoingCalls",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "callHierarchy/outgoingCalls",
+        "params": {
+          "item": {
+            "name": "",
+            "kind": 1,
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            },
+            "selectionRange": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:callHierarchy/outgoingCalls",
+      "kind": "response",
+      "sender": "server",
+      "method": "callHierarchy/outgoingCalls",
+      "responseMethod": "callHierarchy/outgoingCalls",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": null
+      }
+    },
+    {
+      "id": "request:client/registerCapability",
+      "kind": "request",
+      "sender": "server",
+      "method": "client/registerCapability",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "client/registerCapability",
+        "params": {
+          "registrations": []
+        }
+      }
+    },
+    {
+      "id": "response:client/registerCapability",
+      "kind": "response",
+      "sender": "client",
+      "method": "client/registerCapability",
+      "responseMethod": "client/registerCapability",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": null
+      }
+    },
+    {
+      "id": "request:client/unregisterCapability",
+      "kind": "request",
+      "sender": "server",
+      "method": "client/unregisterCapability",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "client/unregisterCapability",
+        "params": {
+          "unregisterations": []
+        }
+      }
+    },
+    {
+      "id": "response:client/unregisterCapability",
+      "kind": "response",
+      "sender": "client",
+      "method": "client/unregisterCapability",
+      "responseMethod": "client/unregisterCapability",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 8,
+        "result": null
+      }
+    },
+    {
+      "id": "request:codeAction/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "codeAction/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "method": "codeAction/resolve",
+        "params": {
+          "title": ""
+        }
+      }
+    },
+    {
+      "id": "response:codeAction/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "codeAction/resolve",
+      "responseMethod": "codeAction/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "result": {
+          "title": ""
+        }
+      }
+    },
+    {
+      "id": "request:codeLens/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "codeLens/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "method": "codeLens/resolve",
+        "params": {
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:codeLens/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "codeLens/resolve",
+      "responseMethod": "codeLens/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 12,
+        "result": {
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "request:completionItem/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "completionItem/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 13,
+        "method": "completionItem/resolve",
+        "params": {
+          "label": ""
+        }
+      }
+    },
+    {
+      "id": "response:completionItem/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "completionItem/resolve",
+      "responseMethod": "completionItem/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 14,
+        "result": {
+          "label": ""
+        }
+      }
+    },
+    {
+      "id": "request:documentLink/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "documentLink/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "method": "documentLink/resolve",
+        "params": {
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:documentLink/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "documentLink/resolve",
+      "responseMethod": "documentLink/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 16,
+        "result": {
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "request:initialize",
+      "kind": "request",
+      "sender": "client",
+      "method": "initialize",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "method": "initialize",
+        "params": {
+          "processId": null,
+          "rootUri": null,
+          "capabilities": {}
+        }
+      }
+    },
+    {
+      "id": "response:initialize",
+      "kind": "response",
+      "sender": "server",
+      "method": "initialize",
+      "responseMethod": "initialize",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 18,
+        "result": {
+          "capabilities": {}
+        }
+      }
+    },
+    {
+      "id": "request:inlayHint/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "inlayHint/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 19,
+        "method": "inlayHint/resolve",
+        "params": {
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "label": ""
+        }
+      }
+    },
+    {
+      "id": "response:inlayHint/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "inlayHint/resolve",
+      "responseMethod": "inlayHint/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 20,
+        "result": {
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "label": ""
+        }
+      }
+    },
+    {
+      "id": "request:shutdown",
+      "kind": "request",
+      "sender": "client",
+      "method": "shutdown",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 21,
+        "method": "shutdown"
+      }
+    },
+    {
+      "id": "response:shutdown",
+      "kind": "response",
+      "sender": "server",
+      "method": "shutdown",
+      "responseMethod": "shutdown",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 22,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/codeAction",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/codeAction",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 23,
+        "method": "textDocument/codeAction",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          },
+          "context": {
+            "diagnostics": []
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/codeAction",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/codeAction",
+      "responseMethod": "textDocument/codeAction",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 24,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/codeLens",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/codeLens",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 25,
+        "method": "textDocument/codeLens",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/codeLens",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/codeLens",
+      "responseMethod": "textDocument/codeLens",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 26,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/colorPresentation",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/colorPresentation",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 27,
+        "method": "textDocument/colorPresentation",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "color": {
+            "red": 0.0,
+            "green": 0.0,
+            "blue": 0.0,
+            "alpha": 0.0
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/colorPresentation",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/colorPresentation",
+      "responseMethod": "textDocument/colorPresentation",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 28,
+        "result": []
+      }
+    },
+    {
+      "id": "request:textDocument/completion",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/completion",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 29,
+        "method": "textDocument/completion",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/completion",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/completion",
+      "responseMethod": "textDocument/completion",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 30,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/declaration",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/declaration",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 31,
+        "method": "textDocument/declaration",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/declaration",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/declaration",
+      "responseMethod": "textDocument/declaration",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 32,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/definition",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/definition",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 33,
+        "method": "textDocument/definition",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/definition",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/definition",
+      "responseMethod": "textDocument/definition",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 34,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/diagnostic",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/diagnostic",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 35,
+        "method": "textDocument/diagnostic",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/diagnostic",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/diagnostic",
+      "responseMethod": "textDocument/diagnostic",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 36,
+        "result": {
+          "kind": "full",
+          "items": []
+        }
+      }
+    },
+    {
+      "id": "request:textDocument/documentColor",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/documentColor",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 37,
+        "method": "textDocument/documentColor",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/documentColor",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/documentColor",
+      "responseMethod": "textDocument/documentColor",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 38,
+        "result": []
+      }
+    },
+    {
+      "id": "request:textDocument/documentHighlight",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/documentHighlight",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 39,
+        "method": "textDocument/documentHighlight",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/documentHighlight",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/documentHighlight",
+      "responseMethod": "textDocument/documentHighlight",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 40,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/documentLink",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/documentLink",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 41,
+        "method": "textDocument/documentLink",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/documentLink",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/documentLink",
+      "responseMethod": "textDocument/documentLink",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/documentSymbol",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/documentSymbol",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 43,
+        "method": "textDocument/documentSymbol",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/documentSymbol",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/documentSymbol",
+      "responseMethod": "textDocument/documentSymbol",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 44,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/foldingRange",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/foldingRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 45,
+        "method": "textDocument/foldingRange",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/foldingRange",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/foldingRange",
+      "responseMethod": "textDocument/foldingRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 46,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/formatting",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/formatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 47,
+        "method": "textDocument/formatting",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "options": {
+            "tabSize": 0,
+            "insertSpaces": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/formatting",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/formatting",
+      "responseMethod": "textDocument/formatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 48,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/hover",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/hover",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 49,
+        "method": "textDocument/hover",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/hover",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/hover",
+      "responseMethod": "textDocument/hover",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 50,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/implementation",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/implementation",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 51,
+        "method": "textDocument/implementation",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/implementation",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/implementation",
+      "responseMethod": "textDocument/implementation",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 52,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/inlayHint",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/inlayHint",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 53,
+        "method": "textDocument/inlayHint",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/inlayHint",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/inlayHint",
+      "responseMethod": "textDocument/inlayHint",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 54,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/inlineCompletion",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/inlineCompletion",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 55,
+        "method": "textDocument/inlineCompletion",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "context": {
+            "triggerKind": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/inlineCompletion",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/inlineCompletion",
+      "responseMethod": "textDocument/inlineCompletion",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 56,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/inlineValue",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/inlineValue",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 57,
+        "method": "textDocument/inlineValue",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          },
+          "context": {
+            "frameId": 0,
+            "stoppedLocation": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/inlineValue",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/inlineValue",
+      "responseMethod": "textDocument/inlineValue",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 58,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/linkedEditingRange",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/linkedEditingRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 59,
+        "method": "textDocument/linkedEditingRange",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/linkedEditingRange",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/linkedEditingRange",
+      "responseMethod": "textDocument/linkedEditingRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 60,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/moniker",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/moniker",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 61,
+        "method": "textDocument/moniker",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/moniker",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/moniker",
+      "responseMethod": "textDocument/moniker",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 62,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/onTypeFormatting",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/onTypeFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 63,
+        "method": "textDocument/onTypeFormatting",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "ch": "",
+          "options": {
+            "tabSize": 0,
+            "insertSpaces": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/onTypeFormatting",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/onTypeFormatting",
+      "responseMethod": "textDocument/onTypeFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 64,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/prepareCallHierarchy",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/prepareCallHierarchy",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 65,
+        "method": "textDocument/prepareCallHierarchy",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/prepareCallHierarchy",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/prepareCallHierarchy",
+      "responseMethod": "textDocument/prepareCallHierarchy",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 66,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/prepareRename",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/prepareRename",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 67,
+        "method": "textDocument/prepareRename",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/prepareRename",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/prepareRename",
+      "responseMethod": "textDocument/prepareRename",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 68,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/prepareTypeHierarchy",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/prepareTypeHierarchy",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 69,
+        "method": "textDocument/prepareTypeHierarchy",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/prepareTypeHierarchy",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/prepareTypeHierarchy",
+      "responseMethod": "textDocument/prepareTypeHierarchy",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 70,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/rangeFormatting",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/rangeFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 71,
+        "method": "textDocument/rangeFormatting",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          },
+          "options": {
+            "tabSize": 0,
+            "insertSpaces": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/rangeFormatting",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/rangeFormatting",
+      "responseMethod": "textDocument/rangeFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 72,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/rangesFormatting",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/rangesFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 73,
+        "method": "textDocument/rangesFormatting",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "ranges": [],
+          "options": {
+            "tabSize": 0,
+            "insertSpaces": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/rangesFormatting",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/rangesFormatting",
+      "responseMethod": "textDocument/rangesFormatting",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 74,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/references",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/references",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 75,
+        "method": "textDocument/references",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "context": {
+            "includeDeclaration": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/references",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/references",
+      "responseMethod": "textDocument/references",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 76,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/rename",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/rename",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 77,
+        "method": "textDocument/rename",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          },
+          "newName": ""
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/rename",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/rename",
+      "responseMethod": "textDocument/rename",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 78,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/selectionRange",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/selectionRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 79,
+        "method": "textDocument/selectionRange",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "positions": []
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/selectionRange",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/selectionRange",
+      "responseMethod": "textDocument/selectionRange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 80,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/semanticTokens/full",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/semanticTokens/full",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 81,
+        "method": "textDocument/semanticTokens/full",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/semanticTokens/full",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/semanticTokens/full",
+      "responseMethod": "textDocument/semanticTokens/full",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 82,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/semanticTokens/full/delta",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/semanticTokens/full/delta",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 83,
+        "method": "textDocument/semanticTokens/full/delta",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "previousResultId": ""
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/semanticTokens/full/delta",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/semanticTokens/full/delta",
+      "responseMethod": "textDocument/semanticTokens/full/delta",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 84,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/semanticTokens/range",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/semanticTokens/range",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 85,
+        "method": "textDocument/semanticTokens/range",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 0,
+              "character": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/semanticTokens/range",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/semanticTokens/range",
+      "responseMethod": "textDocument/semanticTokens/range",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 86,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/signatureHelp",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/signatureHelp",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 87,
+        "method": "textDocument/signatureHelp",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/signatureHelp",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/signatureHelp",
+      "responseMethod": "textDocument/signatureHelp",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 88,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/typeDefinition",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/typeDefinition",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 89,
+        "method": "textDocument/typeDefinition",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "position": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/typeDefinition",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/typeDefinition",
+      "responseMethod": "textDocument/typeDefinition",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 90,
+        "result": null
+      }
+    },
+    {
+      "id": "request:textDocument/willSaveWaitUntil",
+      "kind": "request",
+      "sender": "client",
+      "method": "textDocument/willSaveWaitUntil",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 91,
+        "method": "textDocument/willSaveWaitUntil",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "reason": 1
+        }
+      }
+    },
+    {
+      "id": "response:textDocument/willSaveWaitUntil",
+      "kind": "response",
+      "sender": "server",
+      "method": "textDocument/willSaveWaitUntil",
+      "responseMethod": "textDocument/willSaveWaitUntil",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 92,
+        "result": null
+      }
+    },
+    {
+      "id": "request:typeHierarchy/subtypes",
+      "kind": "request",
+      "sender": "client",
+      "method": "typeHierarchy/subtypes",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 93,
+        "method": "typeHierarchy/subtypes",
+        "params": {
+          "item": {
+            "name": "",
+            "kind": 1,
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            },
+            "selectionRange": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:typeHierarchy/subtypes",
+      "kind": "response",
+      "sender": "server",
+      "method": "typeHierarchy/subtypes",
+      "responseMethod": "typeHierarchy/subtypes",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 94,
+        "result": null
+      }
+    },
+    {
+      "id": "request:typeHierarchy/supertypes",
+      "kind": "request",
+      "sender": "client",
+      "method": "typeHierarchy/supertypes",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 95,
+        "method": "typeHierarchy/supertypes",
+        "params": {
+          "item": {
+            "name": "",
+            "kind": 1,
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            },
+            "selectionRange": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:typeHierarchy/supertypes",
+      "kind": "response",
+      "sender": "server",
+      "method": "typeHierarchy/supertypes",
+      "responseMethod": "typeHierarchy/supertypes",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 96,
+        "result": null
+      }
+    },
+    {
+      "id": "request:window/showDocument",
+      "kind": "request",
+      "sender": "server",
+      "method": "window/showDocument",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 97,
+        "method": "window/showDocument",
+        "params": {
+          "uri": "file:///sample.dart"
+        }
+      }
+    },
+    {
+      "id": "response:window/showDocument",
+      "kind": "response",
+      "sender": "client",
+      "method": "window/showDocument",
+      "responseMethod": "window/showDocument",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 98,
+        "result": {
+          "success": false
+        }
+      }
+    },
+    {
+      "id": "request:window/showMessageRequest",
+      "kind": "request",
+      "sender": "server",
+      "method": "window/showMessageRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 99,
+        "method": "window/showMessageRequest",
+        "params": {
+          "type": 1,
+          "message": ""
+        }
+      }
+    },
+    {
+      "id": "response:window/showMessageRequest",
+      "kind": "response",
+      "sender": "client",
+      "method": "window/showMessageRequest",
+      "responseMethod": "window/showMessageRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 100,
+        "result": null
+      }
+    },
+    {
+      "id": "request:window/workDoneProgress/create",
+      "kind": "request",
+      "sender": "server",
+      "method": "window/workDoneProgress/create",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 101,
+        "method": "window/workDoneProgress/create",
+        "params": {
+          "token": 0
+        }
+      }
+    },
+    {
+      "id": "response:window/workDoneProgress/create",
+      "kind": "response",
+      "sender": "client",
+      "method": "window/workDoneProgress/create",
+      "responseMethod": "window/workDoneProgress/create",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 102,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/applyEdit",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/applyEdit",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 103,
+        "method": "workspace/applyEdit",
+        "params": {
+          "edit": {}
+        }
+      }
+    },
+    {
+      "id": "response:workspace/applyEdit",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/applyEdit",
+      "responseMethod": "workspace/applyEdit",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 104,
+        "result": {
+          "applied": false
+        }
+      }
+    },
+    {
+      "id": "request:workspace/codeLens/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/codeLens/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 105,
+        "method": "workspace/codeLens/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/codeLens/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/codeLens/refresh",
+      "responseMethod": "workspace/codeLens/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 106,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/configuration",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/configuration",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 107,
+        "method": "workspace/configuration",
+        "params": {
+          "items": []
+        }
+      }
+    },
+    {
+      "id": "response:workspace/configuration",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/configuration",
+      "responseMethod": "workspace/configuration",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 108,
+        "result": []
+      }
+    },
+    {
+      "id": "request:workspace/diagnostic",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/diagnostic",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 109,
+        "method": "workspace/diagnostic",
+        "params": {
+          "previousResultIds": []
+        }
+      }
+    },
+    {
+      "id": "response:workspace/diagnostic",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/diagnostic",
+      "responseMethod": "workspace/diagnostic",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 110,
+        "result": {
+          "items": []
+        }
+      }
+    },
+    {
+      "id": "request:workspace/diagnostic/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/diagnostic/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 111,
+        "method": "workspace/diagnostic/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/diagnostic/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/diagnostic/refresh",
+      "responseMethod": "workspace/diagnostic/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 112,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/executeCommand",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/executeCommand",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 113,
+        "method": "workspace/executeCommand",
+        "params": {
+          "command": ""
+        }
+      }
+    },
+    {
+      "id": "response:workspace/executeCommand",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/executeCommand",
+      "responseMethod": "workspace/executeCommand",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 114,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/foldingRange/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/foldingRange/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 115,
+        "method": "workspace/foldingRange/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/foldingRange/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/foldingRange/refresh",
+      "responseMethod": "workspace/foldingRange/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 116,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/inlayHint/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/inlayHint/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 117,
+        "method": "workspace/inlayHint/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/inlayHint/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/inlayHint/refresh",
+      "responseMethod": "workspace/inlayHint/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 118,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/inlineValue/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/inlineValue/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 119,
+        "method": "workspace/inlineValue/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/inlineValue/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/inlineValue/refresh",
+      "responseMethod": "workspace/inlineValue/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 120,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/semanticTokens/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/semanticTokens/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 121,
+        "method": "workspace/semanticTokens/refresh"
+      }
+    },
+    {
+      "id": "response:workspace/semanticTokens/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/semanticTokens/refresh",
+      "responseMethod": "workspace/semanticTokens/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 122,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/symbol",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/symbol",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 123,
+        "method": "workspace/symbol",
+        "params": {
+          "query": ""
+        }
+      }
+    },
+    {
+      "id": "response:workspace/symbol",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/symbol",
+      "responseMethod": "workspace/symbol",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 124,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/textDocumentContent",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/textDocumentContent",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 125,
+        "method": "workspace/textDocumentContent",
+        "params": {
+          "uri": "file:///sample.dart"
+        }
+      }
+    },
+    {
+      "id": "response:workspace/textDocumentContent",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/textDocumentContent",
+      "responseMethod": "workspace/textDocumentContent",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 126,
+        "result": {
+          "text": ""
+        }
+      }
+    },
+    {
+      "id": "request:workspace/textDocumentContent/refresh",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/textDocumentContent/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 127,
+        "method": "workspace/textDocumentContent/refresh",
+        "params": {
+          "uri": "file:///sample.dart"
+        }
+      }
+    },
+    {
+      "id": "response:workspace/textDocumentContent/refresh",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/textDocumentContent/refresh",
+      "responseMethod": "workspace/textDocumentContent/refresh",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 128,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/willCreateFiles",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/willCreateFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 129,
+        "method": "workspace/willCreateFiles",
+        "params": {
+          "files": []
+        }
+      }
+    },
+    {
+      "id": "response:workspace/willCreateFiles",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/willCreateFiles",
+      "responseMethod": "workspace/willCreateFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 130,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/willDeleteFiles",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/willDeleteFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 131,
+        "method": "workspace/willDeleteFiles",
+        "params": {
+          "files": []
+        }
+      }
+    },
+    {
+      "id": "response:workspace/willDeleteFiles",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/willDeleteFiles",
+      "responseMethod": "workspace/willDeleteFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 132,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/willRenameFiles",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspace/willRenameFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 133,
+        "method": "workspace/willRenameFiles",
+        "params": {
+          "files": []
+        }
+      }
+    },
+    {
+      "id": "response:workspace/willRenameFiles",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspace/willRenameFiles",
+      "responseMethod": "workspace/willRenameFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 134,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspace/workspaceFolders",
+      "kind": "request",
+      "sender": "server",
+      "method": "workspace/workspaceFolders",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 135,
+        "method": "workspace/workspaceFolders"
+      }
+    },
+    {
+      "id": "response:workspace/workspaceFolders",
+      "kind": "response",
+      "sender": "client",
+      "method": "workspace/workspaceFolders",
+      "responseMethod": "workspace/workspaceFolders",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 136,
+        "result": null
+      }
+    },
+    {
+      "id": "request:workspaceSymbol/resolve",
+      "kind": "request",
+      "sender": "client",
+      "method": "workspaceSymbol/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 137,
+        "method": "workspaceSymbol/resolve",
+        "params": {
+          "name": "",
+          "kind": 1,
+          "location": {
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response:workspaceSymbol/resolve",
+      "kind": "response",
+      "sender": "server",
+      "method": "workspaceSymbol/resolve",
+      "responseMethod": "workspaceSymbol/resolve",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "id": 138,
+        "result": {
+          "name": "",
+          "kind": 1,
+          "location": {
+            "uri": "file:///sample.dart",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:$/cancelRequest",
+      "kind": "notification",
+      "sender": "client",
+      "method": "$/cancelRequest",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "$/cancelRequest",
+        "params": {
+          "id": 0
+        }
+      }
+    },
+    {
+      "id": "notification:$/logTrace",
+      "kind": "notification",
+      "sender": "server",
+      "method": "$/logTrace",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "$/logTrace",
+        "params": {
+          "message": ""
+        }
+      }
+    },
+    {
+      "id": "notification:$/progress",
+      "kind": "notification",
+      "sender": "client",
+      "method": "$/progress",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "$/progress",
+        "params": {
+          "token": 0,
+          "value": null
+        }
+      }
+    },
+    {
+      "id": "notification:$/setTrace",
+      "kind": "notification",
+      "sender": "client",
+      "method": "$/setTrace",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "$/setTrace",
+        "params": {
+          "value": "off"
+        }
+      }
+    },
+    {
+      "id": "notification:exit",
+      "kind": "notification",
+      "sender": "client",
+      "method": "exit",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "exit"
+      }
+    },
+    {
+      "id": "notification:initialized",
+      "kind": "notification",
+      "sender": "client",
+      "method": "initialized",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "initialized",
+        "params": {}
+      }
+    },
+    {
+      "id": "notification:notebookDocument/didChange",
+      "kind": "notification",
+      "sender": "client",
+      "method": "notebookDocument/didChange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notebookDocument/didChange",
+        "params": {
+          "notebookDocument": {
+            "version": 0,
+            "uri": "file:///sample.dart"
+          },
+          "change": {}
+        }
+      }
+    },
+    {
+      "id": "notification:notebookDocument/didClose",
+      "kind": "notification",
+      "sender": "client",
+      "method": "notebookDocument/didClose",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notebookDocument/didClose",
+        "params": {
+          "notebookDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "cellTextDocuments": []
+        }
+      }
+    },
+    {
+      "id": "notification:notebookDocument/didOpen",
+      "kind": "notification",
+      "sender": "client",
+      "method": "notebookDocument/didOpen",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notebookDocument/didOpen",
+        "params": {
+          "notebookDocument": {
+            "uri": "file:///sample.dart",
+            "notebookType": "",
+            "version": 0,
+            "cells": []
+          },
+          "cellTextDocuments": []
+        }
+      }
+    },
+    {
+      "id": "notification:notebookDocument/didSave",
+      "kind": "notification",
+      "sender": "client",
+      "method": "notebookDocument/didSave",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "notebookDocument/didSave",
+        "params": {
+          "notebookDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:telemetry/event",
+      "kind": "notification",
+      "sender": "server",
+      "method": "telemetry/event",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "telemetry/event",
+        "params": {}
+      }
+    },
+    {
+      "id": "notification:textDocument/didChange",
+      "kind": "notification",
+      "sender": "client",
+      "method": "textDocument/didChange",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/didChange",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart",
+            "version": 0
+          },
+          "contentChanges": []
+        }
+      }
+    },
+    {
+      "id": "notification:textDocument/didClose",
+      "kind": "notification",
+      "sender": "client",
+      "method": "textDocument/didClose",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/didClose",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:textDocument/didOpen",
+      "kind": "notification",
+      "sender": "client",
+      "method": "textDocument/didOpen",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/didOpen",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart",
+            "languageId": "abap",
+            "version": 0,
+            "text": ""
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:textDocument/didSave",
+      "kind": "notification",
+      "sender": "client",
+      "method": "textDocument/didSave",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/didSave",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:textDocument/publishDiagnostics",
+      "kind": "notification",
+      "sender": "server",
+      "method": "textDocument/publishDiagnostics",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/publishDiagnostics",
+        "params": {
+          "uri": "file:///sample.dart",
+          "diagnostics": []
+        }
+      }
+    },
+    {
+      "id": "notification:textDocument/willSave",
+      "kind": "notification",
+      "sender": "client",
+      "method": "textDocument/willSave",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "textDocument/willSave",
+        "params": {
+          "textDocument": {
+            "uri": "file:///sample.dart"
+          },
+          "reason": 1
+        }
+      }
+    },
+    {
+      "id": "notification:window/logMessage",
+      "kind": "notification",
+      "sender": "server",
+      "method": "window/logMessage",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "window/logMessage",
+        "params": {
+          "type": 1,
+          "message": ""
+        }
+      }
+    },
+    {
+      "id": "notification:window/showMessage",
+      "kind": "notification",
+      "sender": "server",
+      "method": "window/showMessage",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "window/showMessage",
+        "params": {
+          "type": 1,
+          "message": ""
+        }
+      }
+    },
+    {
+      "id": "notification:window/workDoneProgress/cancel",
+      "kind": "notification",
+      "sender": "client",
+      "method": "window/workDoneProgress/cancel",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "window/workDoneProgress/cancel",
+        "params": {
+          "token": 0
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didChangeConfiguration",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didChangeConfiguration",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didChangeConfiguration",
+        "params": {
+          "settings": null
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didChangeWatchedFiles",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didChangeWatchedFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didChangeWatchedFiles",
+        "params": {
+          "changes": []
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didChangeWorkspaceFolders",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didChangeWorkspaceFolders",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didChangeWorkspaceFolders",
+        "params": {
+          "event": {
+            "added": [],
+            "removed": []
+          }
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didCreateFiles",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didCreateFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didCreateFiles",
+        "params": {
+          "files": []
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didDeleteFiles",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didDeleteFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didDeleteFiles",
+        "params": {
+          "files": []
+        }
+      }
+    },
+    {
+      "id": "notification:workspace/didRenameFiles",
+      "kind": "notification",
+      "sender": "client",
+      "method": "workspace/didRenameFiles",
+      "envelope": {
+        "jsonrpc": "2.0",
+        "method": "workspace/didRenameFiles",
+        "params": {
+          "files": []
+        }
+      }
+    }
+  ],
+  "definitionSamples": {
+    "AnnotatedTextEdit": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "newText": "",
+      "annotationId": ""
+    },
+    "ApplyKind": 1,
+    "ApplyWorkspaceEditParams": {
+      "edit": {}
+    },
+    "ApplyWorkspaceEditResult": {
+      "applied": false
+    },
+    "BaseSymbolInformation": {
+      "name": "",
+      "kind": 1
+    },
+    "CallHierarchyClientCapabilities": {},
+    "CallHierarchyIncomingCall": {
+      "from": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      },
+      "fromRanges": []
+    },
+    "CallHierarchyIncomingCallsParams": {
+      "item": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "CallHierarchyItem": {
+      "name": "",
+      "kind": 1,
+      "uri": "file:///sample.dart",
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "selectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "CallHierarchyOptions": {},
+    "CallHierarchyOutgoingCall": {
+      "to": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      },
+      "fromRanges": []
+    },
+    "CallHierarchyOutgoingCallsParams": {
+      "item": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "CallHierarchyPrepareParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "CallHierarchyRegistrationOptions": {
+      "documentSelector": null
+    },
+    "CancelParams": {
+      "id": 0
+    },
+    "ChangeAnnotation": {
+      "label": ""
+    },
+    "ChangeAnnotationIdentifier": "",
+    "ChangeAnnotationsSupportOptions": {},
+    "ClientCapabilities": {},
+    "ClientCodeActionKindOptions": {
+      "valueSet": []
+    },
+    "ClientCodeActionLiteralOptions": {
+      "codeActionKind": {
+        "valueSet": []
+      }
+    },
+    "ClientCodeActionResolveOptions": {
+      "properties": []
+    },
+    "ClientCodeLensResolveOptions": {
+      "properties": []
+    },
+    "ClientCompletionItemInsertTextModeOptions": {
+      "valueSet": []
+    },
+    "ClientCompletionItemOptions": {},
+    "ClientCompletionItemOptionsKind": {},
+    "ClientCompletionItemResolveOptions": {
+      "properties": []
+    },
+    "ClientDiagnosticsTagOptions": {
+      "valueSet": []
+    },
+    "ClientFoldingRangeKindOptions": {},
+    "ClientFoldingRangeOptions": {},
+    "ClientInfo": {
+      "name": ""
+    },
+    "ClientInlayHintResolveOptions": {
+      "properties": []
+    },
+    "ClientSemanticTokensRequestFullDelta": {},
+    "ClientSemanticTokensRequestOptions": {},
+    "ClientShowMessageActionItemOptions": {},
+    "ClientSignatureInformationOptions": {},
+    "ClientSignatureParameterInformationOptions": {},
+    "ClientSymbolKindOptions": {},
+    "ClientSymbolResolveOptions": {
+      "properties": []
+    },
+    "ClientSymbolTagOptions": {
+      "valueSet": []
+    },
+    "CodeAction": {
+      "title": ""
+    },
+    "CodeActionClientCapabilities": {},
+    "CodeActionContext": {
+      "diagnostics": []
+    },
+    "CodeActionDisabled": {
+      "reason": ""
+    },
+    "CodeActionKind": "",
+    "CodeActionKindDocumentation": {
+      "kind": "",
+      "command": {
+        "title": "",
+        "command": ""
+      }
+    },
+    "CodeActionOptions": {},
+    "CodeActionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "context": {
+        "diagnostics": []
+      }
+    },
+    "CodeActionRegistrationOptions": {
+      "documentSelector": null
+    },
+    "CodeActionTag": 1,
+    "CodeActionTagOptions": {
+      "valueSet": []
+    },
+    "CodeActionTriggerKind": 1,
+    "CodeDescription": {
+      "href": "file:///sample.dart"
+    },
+    "CodeLens": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "CodeLensClientCapabilities": {},
+    "CodeLensOptions": {},
+    "CodeLensParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "CodeLensRegistrationOptions": {
+      "documentSelector": null
+    },
+    "CodeLensWorkspaceClientCapabilities": {},
+    "Color": {
+      "red": 0.0,
+      "green": 0.0,
+      "blue": 0.0,
+      "alpha": 0.0
+    },
+    "ColorInformation": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "color": {
+        "red": 0.0,
+        "green": 0.0,
+        "blue": 0.0,
+        "alpha": 0.0
+      }
+    },
+    "ColorPresentation": {
+      "label": ""
+    },
+    "ColorPresentationParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "color": {
+        "red": 0.0,
+        "green": 0.0,
+        "blue": 0.0,
+        "alpha": 0.0
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "Command": {
+      "title": "",
+      "command": ""
+    },
+    "CompletionClientCapabilities": {},
+    "CompletionContext": {
+      "triggerKind": 1
+    },
+    "CompletionItem": {
+      "label": ""
+    },
+    "CompletionItemApplyKinds": {},
+    "CompletionItemDefaults": {},
+    "CompletionItemKind": 1,
+    "CompletionItemLabelDetails": {},
+    "CompletionItemTag": 1,
+    "CompletionItemTagOptions": {
+      "valueSet": []
+    },
+    "CompletionList": {
+      "isIncomplete": false,
+      "items": []
+    },
+    "CompletionListCapabilities": {},
+    "CompletionOptions": {},
+    "CompletionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "CompletionRegistrationOptions": {
+      "documentSelector": null
+    },
+    "CompletionTriggerKind": 1,
+    "ConfigurationItem": {},
+    "ConfigurationParams": {
+      "items": []
+    },
+    "CreateFile": {
+      "kind": "create",
+      "uri": "file:///sample.dart"
+    },
+    "CreateFileOptions": {},
+    "CreateFilesParams": {
+      "files": []
+    },
+    "Declaration": {
+      "uri": "file:///sample.dart",
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DeclarationClientCapabilities": {},
+    "DeclarationLink": {
+      "targetUri": "file:///sample.dart",
+      "targetRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "targetSelectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DeclarationOptions": {},
+    "DeclarationParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "DeclarationRegistrationOptions": {
+      "documentSelector": null
+    },
+    "Definition": {
+      "uri": "file:///sample.dart",
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DefinitionClientCapabilities": {},
+    "DefinitionLink": {
+      "targetUri": "file:///sample.dart",
+      "targetRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "targetSelectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DefinitionOptions": {},
+    "DefinitionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "DefinitionRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DeleteFile": {
+      "kind": "delete",
+      "uri": "file:///sample.dart"
+    },
+    "DeleteFileOptions": {},
+    "DeleteFilesParams": {
+      "files": []
+    },
+    "Diagnostic": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "message": ""
+    },
+    "DiagnosticClientCapabilities": {},
+    "DiagnosticOptions": {
+      "interFileDependencies": false,
+      "workspaceDiagnostics": false
+    },
+    "DiagnosticRegistrationOptions": {
+      "documentSelector": null,
+      "interFileDependencies": false,
+      "workspaceDiagnostics": false
+    },
+    "DiagnosticRelatedInformation": {
+      "location": {
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      },
+      "message": ""
+    },
+    "DiagnosticServerCancellationData": {
+      "retriggerRequest": false
+    },
+    "DiagnosticSeverity": 1,
+    "DiagnosticTag": 1,
+    "DiagnosticWorkspaceClientCapabilities": {},
+    "DiagnosticsCapabilities": {},
+    "DidChangeConfigurationClientCapabilities": {},
+    "DidChangeConfigurationParams": {
+      "settings": null
+    },
+    "DidChangeConfigurationRegistrationOptions": {},
+    "DidChangeNotebookDocumentParams": {
+      "notebookDocument": {
+        "version": 0,
+        "uri": "file:///sample.dart"
+      },
+      "change": {}
+    },
+    "DidChangeTextDocumentParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart",
+        "version": 0
+      },
+      "contentChanges": []
+    },
+    "DidChangeWatchedFilesClientCapabilities": {},
+    "DidChangeWatchedFilesParams": {
+      "changes": []
+    },
+    "DidChangeWatchedFilesRegistrationOptions": {
+      "watchers": []
+    },
+    "DidChangeWorkspaceFoldersParams": {
+      "event": {
+        "added": [],
+        "removed": []
+      }
+    },
+    "DidCloseNotebookDocumentParams": {
+      "notebookDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "cellTextDocuments": []
+    },
+    "DidCloseTextDocumentParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DidOpenNotebookDocumentParams": {
+      "notebookDocument": {
+        "uri": "file:///sample.dart",
+        "notebookType": "",
+        "version": 0,
+        "cells": []
+      },
+      "cellTextDocuments": []
+    },
+    "DidOpenTextDocumentParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart",
+        "languageId": "abap",
+        "version": 0,
+        "text": ""
+      }
+    },
+    "DidSaveNotebookDocumentParams": {
+      "notebookDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DidSaveTextDocumentParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DocumentColorClientCapabilities": {},
+    "DocumentColorOptions": {},
+    "DocumentColorParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DocumentColorRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DocumentDiagnosticParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DocumentDiagnosticReport": {
+      "kind": "full",
+      "items": []
+    },
+    "DocumentDiagnosticReportKind": "full",
+    "DocumentDiagnosticReportPartialResult": {
+      "relatedDocuments": {}
+    },
+    "DocumentDiagnosticReportProgress": {
+      "kind": "full",
+      "items": []
+    },
+    "DocumentFilter": {
+      "language": ""
+    },
+    "DocumentFormattingClientCapabilities": {},
+    "DocumentFormattingOptions": {},
+    "DocumentFormattingParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "options": {
+        "tabSize": 0,
+        "insertSpaces": false
+      }
+    },
+    "DocumentFormattingRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DocumentHighlight": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DocumentHighlightClientCapabilities": {},
+    "DocumentHighlightKind": 1,
+    "DocumentHighlightOptions": {},
+    "DocumentHighlightParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "DocumentHighlightRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DocumentLink": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DocumentLinkClientCapabilities": {},
+    "DocumentLinkOptions": {},
+    "DocumentLinkParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DocumentLinkRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DocumentOnTypeFormattingClientCapabilities": {},
+    "DocumentOnTypeFormattingOptions": {
+      "firstTriggerCharacter": ""
+    },
+    "DocumentOnTypeFormattingParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      },
+      "ch": "",
+      "options": {
+        "tabSize": 0,
+        "insertSpaces": false
+      }
+    },
+    "DocumentOnTypeFormattingRegistrationOptions": {
+      "documentSelector": null,
+      "firstTriggerCharacter": ""
+    },
+    "DocumentRangeFormattingClientCapabilities": {},
+    "DocumentRangeFormattingOptions": {},
+    "DocumentRangeFormattingParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "options": {
+        "tabSize": 0,
+        "insertSpaces": false
+      }
+    },
+    "DocumentRangeFormattingRegistrationOptions": {
+      "documentSelector": null
+    },
+    "DocumentRangesFormattingParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "ranges": [],
+      "options": {
+        "tabSize": 0,
+        "insertSpaces": false
+      }
+    },
+    "DocumentSelector": [],
+    "DocumentSymbol": {
+      "name": "",
+      "kind": 1,
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "selectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "DocumentSymbolClientCapabilities": {},
+    "DocumentSymbolOptions": {},
+    "DocumentSymbolParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "DocumentSymbolRegistrationOptions": {
+      "documentSelector": null
+    },
+    "EditRangeWithInsertReplace": {
+      "insert": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "replace": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "ErrorCodes": -32700,
+    "ExecuteCommandClientCapabilities": {},
+    "ExecuteCommandOptions": {
+      "commands": []
+    },
+    "ExecuteCommandParams": {
+      "command": ""
+    },
+    "ExecuteCommandRegistrationOptions": {
+      "commands": []
+    },
+    "ExecutionSummary": {
+      "executionOrder": 0
+    },
+    "FailureHandlingKind": "abort",
+    "FileChangeType": 1,
+    "FileCreate": {
+      "uri": "file:///sample.dart"
+    },
+    "FileDelete": {
+      "uri": "file:///sample.dart"
+    },
+    "FileEvent": {
+      "uri": "file:///sample.dart",
+      "type": 1
+    },
+    "FileOperationClientCapabilities": {},
+    "FileOperationFilter": {
+      "pattern": {
+        "glob": ""
+      }
+    },
+    "FileOperationOptions": {},
+    "FileOperationPattern": {
+      "glob": ""
+    },
+    "FileOperationPatternKind": "file",
+    "FileOperationPatternOptions": {},
+    "FileOperationRegistrationOptions": {
+      "filters": []
+    },
+    "FileRename": {
+      "oldUri": "file:///sample.dart",
+      "newUri": "file:///sample.dart"
+    },
+    "FileSystemWatcher": {
+      "globPattern": ""
+    },
+    "FoldingRange": {
+      "startLine": 0,
+      "endLine": 0
+    },
+    "FoldingRangeClientCapabilities": {},
+    "FoldingRangeKind": "comment",
+    "FoldingRangeOptions": {},
+    "FoldingRangeParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "FoldingRangeRegistrationOptions": {
+      "documentSelector": null
+    },
+    "FoldingRangeWorkspaceClientCapabilities": {},
+    "FormattingOptions": {
+      "tabSize": 0,
+      "insertSpaces": false
+    },
+    "FullDocumentDiagnosticReport": {
+      "kind": "full",
+      "items": []
+    },
+    "GeneralClientCapabilities": {},
+    "GlobPattern": "",
+    "Hover": {
+      "contents": {
+        "kind": "plaintext",
+        "value": ""
+      }
+    },
+    "HoverClientCapabilities": {},
+    "HoverOptions": {},
+    "HoverParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "HoverRegistrationOptions": {
+      "documentSelector": null
+    },
+    "ImplementationClientCapabilities": {},
+    "ImplementationOptions": {},
+    "ImplementationParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "ImplementationRegistrationOptions": {
+      "documentSelector": null
+    },
+    "InitializeError": {
+      "retry": false
+    },
+    "InitializeParams": {
+      "processId": null,
+      "rootUri": null,
+      "capabilities": {}
+    },
+    "InitializeResult": {
+      "capabilities": {}
+    },
+    "InitializedParams": {},
+    "InlayHint": {
+      "position": {
+        "line": 0,
+        "character": 0
+      },
+      "label": ""
+    },
+    "InlayHintClientCapabilities": {},
+    "InlayHintKind": 1,
+    "InlayHintLabelPart": {
+      "value": ""
+    },
+    "InlayHintOptions": {},
+    "InlayHintParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "InlayHintRegistrationOptions": {
+      "documentSelector": null
+    },
+    "InlayHintWorkspaceClientCapabilities": {},
+    "InlineCompletionClientCapabilities": {},
+    "InlineCompletionContext": {
+      "triggerKind": 1
+    },
+    "InlineCompletionItem": {
+      "insertText": ""
+    },
+    "InlineCompletionList": {
+      "items": []
+    },
+    "InlineCompletionOptions": {},
+    "InlineCompletionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      },
+      "context": {
+        "triggerKind": 1
+      }
+    },
+    "InlineCompletionRegistrationOptions": {
+      "documentSelector": null
+    },
+    "InlineCompletionTriggerKind": 1,
+    "InlineValue": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "text": ""
+    },
+    "InlineValueClientCapabilities": {},
+    "InlineValueContext": {
+      "frameId": 0,
+      "stoppedLocation": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "InlineValueEvaluatableExpression": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "InlineValueOptions": {},
+    "InlineValueParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "context": {
+        "frameId": 0,
+        "stoppedLocation": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "InlineValueRegistrationOptions": {
+      "documentSelector": null
+    },
+    "InlineValueText": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "text": ""
+    },
+    "InlineValueVariableLookup": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "caseSensitiveLookup": false
+    },
+    "InlineValueWorkspaceClientCapabilities": {},
+    "InsertReplaceEdit": {
+      "newText": "",
+      "insert": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "replace": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "InsertTextFormat": 1,
+    "InsertTextMode": 1,
+    "LSPAny": null,
+    "LSPArray": [],
+    "LSPErrorCodes": -32803,
+    "LSPObject": {},
+    "LanguageKind": "abap",
+    "LinkedEditingRangeClientCapabilities": {},
+    "LinkedEditingRangeOptions": {},
+    "LinkedEditingRangeParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "LinkedEditingRangeRegistrationOptions": {
+      "documentSelector": null
+    },
+    "LinkedEditingRanges": {
+      "ranges": []
+    },
+    "Location": {
+      "uri": "file:///sample.dart",
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "LocationLink": {
+      "targetUri": "file:///sample.dart",
+      "targetRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "targetSelectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "LocationUriOnly": {
+      "uri": "file:///sample.dart"
+    },
+    "LogMessageParams": {
+      "type": 1,
+      "message": ""
+    },
+    "LogTraceParams": {
+      "message": ""
+    },
+    "MarkdownClientCapabilities": {
+      "parser": ""
+    },
+    "MarkedString": "",
+    "MarkedStringWithLanguage": {
+      "language": "",
+      "value": ""
+    },
+    "MarkupContent": {
+      "kind": "plaintext",
+      "value": ""
+    },
+    "MarkupKind": "plaintext",
+    "MessageActionItem": {
+      "title": ""
+    },
+    "MessageType": 1,
+    "Moniker": {
+      "scheme": "",
+      "identifier": "",
+      "unique": "document"
+    },
+    "MonikerClientCapabilities": {},
+    "MonikerKind": "import",
+    "MonikerOptions": {},
+    "MonikerParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "MonikerRegistrationOptions": {
+      "documentSelector": null
+    },
+    "NotebookCell": {
+      "kind": 1,
+      "document": "file:///sample.dart"
+    },
+    "NotebookCellArrayChange": {
+      "start": 0,
+      "deleteCount": 0
+    },
+    "NotebookCellKind": 1,
+    "NotebookCellLanguage": {
+      "language": ""
+    },
+    "NotebookCellTextDocumentFilter": {
+      "notebook": ""
+    },
+    "NotebookDocument": {
+      "uri": "file:///sample.dart",
+      "notebookType": "",
+      "version": 0,
+      "cells": []
+    },
+    "NotebookDocumentCellChangeStructure": {
+      "array": {
+        "start": 0,
+        "deleteCount": 0
+      }
+    },
+    "NotebookDocumentCellChanges": {},
+    "NotebookDocumentCellContentChanges": {
+      "document": {
+        "uri": "file:///sample.dart",
+        "version": 0
+      },
+      "changes": []
+    },
+    "NotebookDocumentChangeEvent": {},
+    "NotebookDocumentClientCapabilities": {
+      "synchronization": {}
+    },
+    "NotebookDocumentFilter": {
+      "notebookType": ""
+    },
+    "NotebookDocumentFilterNotebookType": {
+      "notebookType": ""
+    },
+    "NotebookDocumentFilterPattern": {
+      "pattern": ""
+    },
+    "NotebookDocumentFilterScheme": {
+      "scheme": ""
+    },
+    "NotebookDocumentFilterWithCells": {
+      "cells": []
+    },
+    "NotebookDocumentFilterWithNotebook": {
+      "notebook": ""
+    },
+    "NotebookDocumentIdentifier": {
+      "uri": "file:///sample.dart"
+    },
+    "NotebookDocumentSyncClientCapabilities": {},
+    "NotebookDocumentSyncOptions": {
+      "notebookSelector": []
+    },
+    "NotebookDocumentSyncRegistrationOptions": {
+      "notebookSelector": []
+    },
+    "OptionalVersionedTextDocumentIdentifier": {
+      "uri": "file:///sample.dart",
+      "version": null
+    },
+    "ParameterInformation": {
+      "label": ""
+    },
+    "PartialResultParams": {},
+    "Pattern": "",
+    "Position": {
+      "line": 0,
+      "character": 0
+    },
+    "PositionEncodingKind": "utf-8",
+    "PrepareRenameDefaultBehavior": {
+      "defaultBehavior": false
+    },
+    "PrepareRenameParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "PrepareRenamePlaceholder": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "placeholder": ""
+    },
+    "PrepareRenameResult": {
+      "start": {
+        "line": 0,
+        "character": 0
+      },
+      "end": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "PrepareSupportDefaultBehavior": 1,
+    "PreviousResultId": {
+      "uri": "file:///sample.dart",
+      "value": ""
+    },
+    "ProgressParams": {
+      "token": 0,
+      "value": null
+    },
+    "ProgressToken": 0,
+    "PublishDiagnosticsClientCapabilities": {},
+    "PublishDiagnosticsParams": {
+      "uri": "file:///sample.dart",
+      "diagnostics": []
+    },
+    "Range": {
+      "start": {
+        "line": 0,
+        "character": 0
+      },
+      "end": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "ReferenceClientCapabilities": {},
+    "ReferenceContext": {
+      "includeDeclaration": false
+    },
+    "ReferenceOptions": {},
+    "ReferenceParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      },
+      "context": {
+        "includeDeclaration": false
+      }
+    },
+    "ReferenceRegistrationOptions": {
+      "documentSelector": null
+    },
+    "Registration": {
+      "id": "",
+      "method": ""
+    },
+    "RegistrationParams": {
+      "registrations": []
+    },
+    "RegularExpressionEngineKind": "",
+    "RegularExpressionsClientCapabilities": {
+      "engine": ""
+    },
+    "RelatedFullDocumentDiagnosticReport": {
+      "kind": "full",
+      "items": []
+    },
+    "RelatedUnchangedDocumentDiagnosticReport": {
+      "kind": "unchanged",
+      "resultId": ""
+    },
+    "RelativePattern": {
+      "baseUri": {
+        "uri": "file:///sample.dart",
+        "name": ""
+      },
+      "pattern": ""
+    },
+    "RenameClientCapabilities": {},
+    "RenameFile": {
+      "kind": "rename",
+      "oldUri": "file:///sample.dart",
+      "newUri": "file:///sample.dart"
+    },
+    "RenameFileOptions": {},
+    "RenameFilesParams": {
+      "files": []
+    },
+    "RenameOptions": {},
+    "RenameParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      },
+      "newName": ""
+    },
+    "RenameRegistrationOptions": {
+      "documentSelector": null
+    },
+    "ResourceOperation": {
+      "kind": ""
+    },
+    "ResourceOperationKind": "create",
+    "SaveOptions": {},
+    "SelectedCompletionInfo": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "text": ""
+    },
+    "SelectionRange": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "SelectionRangeClientCapabilities": {},
+    "SelectionRangeOptions": {},
+    "SelectionRangeParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "positions": []
+    },
+    "SelectionRangeRegistrationOptions": {
+      "documentSelector": null
+    },
+    "SemanticTokenModifiers": "declaration",
+    "SemanticTokenTypes": "namespace",
+    "SemanticTokens": {
+      "data": []
+    },
+    "SemanticTokensClientCapabilities": {
+      "requests": {},
+      "tokenTypes": [],
+      "tokenModifiers": [],
+      "formats": []
+    },
+    "SemanticTokensDelta": {
+      "edits": []
+    },
+    "SemanticTokensDeltaParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "previousResultId": ""
+    },
+    "SemanticTokensDeltaPartialResult": {
+      "edits": []
+    },
+    "SemanticTokensEdit": {
+      "start": 0,
+      "deleteCount": 0
+    },
+    "SemanticTokensFullDelta": {},
+    "SemanticTokensLegend": {
+      "tokenTypes": [],
+      "tokenModifiers": []
+    },
+    "SemanticTokensOptions": {
+      "legend": {
+        "tokenTypes": [],
+        "tokenModifiers": []
+      }
+    },
+    "SemanticTokensParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      }
+    },
+    "SemanticTokensPartialResult": {
+      "data": []
+    },
+    "SemanticTokensRangeParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "SemanticTokensRegistrationOptions": {
+      "documentSelector": null,
+      "legend": {
+        "tokenTypes": [],
+        "tokenModifiers": []
+      }
+    },
+    "SemanticTokensWorkspaceClientCapabilities": {},
+    "ServerCapabilities": {},
+    "ServerCompletionItemOptions": {},
+    "ServerInfo": {
+      "name": ""
+    },
+    "SetTraceParams": {
+      "value": "off"
+    },
+    "ShowDocumentClientCapabilities": {
+      "support": false
+    },
+    "ShowDocumentParams": {
+      "uri": "file:///sample.dart"
+    },
+    "ShowDocumentResult": {
+      "success": false
+    },
+    "ShowMessageParams": {
+      "type": 1,
+      "message": ""
+    },
+    "ShowMessageRequestClientCapabilities": {},
+    "ShowMessageRequestParams": {
+      "type": 1,
+      "message": ""
+    },
+    "SignatureHelp": {
+      "signatures": []
+    },
+    "SignatureHelpClientCapabilities": {},
+    "SignatureHelpContext": {
+      "triggerKind": 1,
+      "isRetrigger": false
+    },
+    "SignatureHelpOptions": {},
+    "SignatureHelpParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "SignatureHelpRegistrationOptions": {
+      "documentSelector": null
+    },
+    "SignatureHelpTriggerKind": 1,
+    "SignatureInformation": {
+      "label": ""
+    },
+    "SnippetTextEdit": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "snippet": {
+        "kind": "snippet",
+        "value": ""
+      }
+    },
+    "StaleRequestSupportOptions": {
+      "cancel": false,
+      "retryOnContentModified": []
+    },
+    "StaticRegistrationOptions": {},
+    "StringValue": {
+      "kind": "snippet",
+      "value": ""
+    },
+    "SymbolInformation": {
+      "name": "",
+      "kind": 1,
+      "location": {
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "SymbolKind": 1,
+    "SymbolTag": 1,
+    "TextDocumentChangeRegistrationOptions": {
+      "documentSelector": null,
+      "syncKind": 0
+    },
+    "TextDocumentClientCapabilities": {},
+    "TextDocumentContentChangeEvent": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "text": ""
+    },
+    "TextDocumentContentChangePartial": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "text": ""
+    },
+    "TextDocumentContentChangeWholeDocument": {
+      "text": ""
+    },
+    "TextDocumentContentClientCapabilities": {},
+    "TextDocumentContentOptions": {
+      "schemes": []
+    },
+    "TextDocumentContentParams": {
+      "uri": "file:///sample.dart"
+    },
+    "TextDocumentContentRefreshParams": {
+      "uri": "file:///sample.dart"
+    },
+    "TextDocumentContentRegistrationOptions": {
+      "schemes": []
+    },
+    "TextDocumentContentResult": {
+      "text": ""
+    },
+    "TextDocumentEdit": {
+      "textDocument": {
+        "uri": "file:///sample.dart",
+        "version": null
+      },
+      "edits": []
+    },
+    "TextDocumentFilter": {
+      "language": ""
+    },
+    "TextDocumentFilterClientCapabilities": {},
+    "TextDocumentFilterLanguage": {
+      "language": ""
+    },
+    "TextDocumentFilterPattern": {
+      "pattern": ""
+    },
+    "TextDocumentFilterScheme": {
+      "scheme": ""
+    },
+    "TextDocumentIdentifier": {
+      "uri": "file:///sample.dart"
+    },
+    "TextDocumentItem": {
+      "uri": "file:///sample.dart",
+      "languageId": "abap",
+      "version": 0,
+      "text": ""
+    },
+    "TextDocumentPositionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "TextDocumentRegistrationOptions": {
+      "documentSelector": null
+    },
+    "TextDocumentSaveReason": 1,
+    "TextDocumentSaveRegistrationOptions": {
+      "documentSelector": null
+    },
+    "TextDocumentSyncClientCapabilities": {},
+    "TextDocumentSyncKind": 0,
+    "TextDocumentSyncOptions": {},
+    "TextEdit": {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "newText": ""
+    },
+    "TokenFormat": "relative",
+    "TraceValue": "off",
+    "TypeDefinitionClientCapabilities": {},
+    "TypeDefinitionOptions": {},
+    "TypeDefinitionParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "TypeDefinitionRegistrationOptions": {
+      "documentSelector": null
+    },
+    "TypeHierarchyClientCapabilities": {},
+    "TypeHierarchyItem": {
+      "name": "",
+      "kind": 1,
+      "uri": "file:///sample.dart",
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "selectionRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    "TypeHierarchyOptions": {},
+    "TypeHierarchyPrepareParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "position": {
+        "line": 0,
+        "character": 0
+      }
+    },
+    "TypeHierarchyRegistrationOptions": {
+      "documentSelector": null
+    },
+    "TypeHierarchySubtypesParams": {
+      "item": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "TypeHierarchySupertypesParams": {
+      "item": {
+        "name": "",
+        "kind": 1,
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        },
+        "selectionRange": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "UnchangedDocumentDiagnosticReport": {
+      "kind": "unchanged",
+      "resultId": ""
+    },
+    "UniquenessLevel": "document",
+    "Unregistration": {
+      "id": "",
+      "method": ""
+    },
+    "UnregistrationParams": {
+      "unregisterations": []
+    },
+    "VersionedNotebookDocumentIdentifier": {
+      "version": 0,
+      "uri": "file:///sample.dart"
+    },
+    "VersionedTextDocumentIdentifier": {
+      "uri": "file:///sample.dart",
+      "version": 0
+    },
+    "WatchKind": 1,
+    "WillSaveTextDocumentParams": {
+      "textDocument": {
+        "uri": "file:///sample.dart"
+      },
+      "reason": 1
+    },
+    "WindowClientCapabilities": {},
+    "WorkDoneProgressBegin": {
+      "kind": "begin",
+      "title": ""
+    },
+    "WorkDoneProgressCancelParams": {
+      "token": 0
+    },
+    "WorkDoneProgressCreateParams": {
+      "token": 0
+    },
+    "WorkDoneProgressEnd": {
+      "kind": "end"
+    },
+    "WorkDoneProgressOptions": {},
+    "WorkDoneProgressParams": {},
+    "WorkDoneProgressReport": {
+      "kind": "report"
+    },
+    "WorkspaceClientCapabilities": {},
+    "WorkspaceDiagnosticParams": {
+      "previousResultIds": []
+    },
+    "WorkspaceDiagnosticReport": {
+      "items": []
+    },
+    "WorkspaceDiagnosticReportPartialResult": {
+      "items": []
+    },
+    "WorkspaceDocumentDiagnosticReport": {
+      "kind": "full",
+      "items": [],
+      "uri": "file:///sample.dart",
+      "version": null
+    },
+    "WorkspaceEdit": {},
+    "WorkspaceEditClientCapabilities": {},
+    "WorkspaceEditMetadata": {},
+    "WorkspaceFolder": {
+      "uri": "file:///sample.dart",
+      "name": ""
+    },
+    "WorkspaceFoldersChangeEvent": {
+      "added": [],
+      "removed": []
+    },
+    "WorkspaceFoldersInitializeParams": {},
+    "WorkspaceFoldersServerCapabilities": {},
+    "WorkspaceFullDocumentDiagnosticReport": {
+      "kind": "full",
+      "items": [],
+      "uri": "file:///sample.dart",
+      "version": null
+    },
+    "WorkspaceOptions": {},
+    "WorkspaceSymbol": {
+      "name": "",
+      "kind": 1,
+      "location": {
+        "uri": "file:///sample.dart",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0
+          }
+        }
+      }
+    },
+    "WorkspaceSymbolClientCapabilities": {},
+    "WorkspaceSymbolOptions": {},
+    "WorkspaceSymbolParams": {
+      "query": ""
+    },
+    "WorkspaceSymbolRegistrationOptions": {},
+    "WorkspaceUnchangedDocumentDiagnosticReport": {
+      "kind": "unchanged",
+      "resultId": "",
+      "uri": "file:///sample.dart",
+      "version": null
+    },
+    "_InitializeParams": {
+      "processId": null,
+      "rootUri": null,
+      "capabilities": {}
+    }
+  }
+}

@@ -1,8 +1,15 @@
 {
-  "formatVersion": 1,
+  "formatVersion": 2,
   "generator": {
     "identity": "pigcode-protocol-codegen",
     "formatVersion": 1
+  },
+  "peerManifest": {
+    "artifactId": "phase-2b-peers",
+    "role": "peerManifest",
+    "path": "tool/upstream/protocols/peers/phase-2b-peers.json",
+    "size": 3413,
+    "sha256": "cd6c47611c8dee36884f89a0669e42d718a0eb919ae7ba872f254711a5aae881"
   },
   "sources": [
     {
@@ -101,6 +108,267 @@
           "path": "tool/upstream/protocols/mcp-conformance/LICENSE",
           "size": 12227,
           "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+        }
+      ]
+    },
+    {
+      "sourceId": "lsp-3.18-b7f5132",
+      "protocol": "lsp",
+      "repository": "https://github.com/microsoft/language-server-protocol",
+      "release": "3.18-audit-snapshot",
+      "revision": "b7f5132c95261c0898ae5124e7a91707abc48fcd",
+      "releaseDate": "2026-07-16",
+      "wireVersion": null,
+      "schemaDialect": "http://json-schema.org/draft-07/schema#",
+      "entryRefs": [
+        "#/definitions/MetaModel"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "lsp-meta-model",
+          "role": "primary",
+          "path": "tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.json",
+          "size": 434788,
+          "sha256": "caae8df639a4248520a3f589fd72945365e9d8ebca5baf564161a515430d9d41"
+        },
+        {
+          "artifactId": "lsp-meta-model-schema",
+          "role": "schema",
+          "path": "tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.schema.json",
+          "size": 24466,
+          "sha256": "0c18a4346b0d4af8f4ed7a168cae995bc8ce9b3df8f9fac93eb541d8acdf2f92"
+        },
+        {
+          "artifactId": "lsp-meta-model-typescript",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/lsp/3.18-b7f5132/metaModel.ts",
+          "size": 11901,
+          "sha256": "34adc4972d75a29af15992a95157add17eb6a4c8820fbc2a47850fb84f3170ae"
+        },
+        {
+          "artifactId": "lsp-license",
+          "role": "license",
+          "path": "tool/upstream/protocols/lsp/3.18-b7f5132/License.txt",
+          "size": 18649,
+          "sha256": "95df2e9564862e51d69683a899b6dcc8218d577057bdf67322880769ff85f29e"
+        },
+        {
+          "artifactId": "lsp-code-license",
+          "role": "license",
+          "path": "tool/upstream/protocols/lsp/3.18-b7f5132/License-code.txt",
+          "size": 1072,
+          "sha256": "18d3bb3458bb9dabcdf5e74dacf256a339b8a6486338ab09a97ba865d3214928"
+        }
+      ]
+    },
+    {
+      "sourceId": "dap-v1.71.0",
+      "protocol": "dap",
+      "repository": "https://github.com/microsoft/debug-adapter-protocol",
+      "release": "v1.71.0",
+      "revision": "51d95ea4e692b34c5d06601bbd1bebc1ff3fbdd4",
+      "releaseDate": "2026-02-06",
+      "wireVersion": "1.71.0",
+      "schemaDialect": "http://json-schema.org/draft-04/schema#",
+      "entryRefs": [
+        "#/definitions/Request",
+        "#/definitions/Response",
+        "#/definitions/Event"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "dap-schema",
+          "role": "schema",
+          "path": "tool/upstream/protocols/dap/v1.71.0/debugAdapterProtocol.json",
+          "size": 189493,
+          "sha256": "ff8ae4c6cfd588a050e9346c35fd104748a27ef4518d1c3268529ca6f8ff5818"
+        },
+        {
+          "artifactId": "dap-license",
+          "role": "license",
+          "path": "tool/upstream/protocols/dap/v1.71.0/License.txt",
+          "size": 19078,
+          "sha256": "e55d617bc6a67d3d224ace6bc227f19067597ad7e2da809c340fd5b404565b52"
+        },
+        {
+          "artifactId": "dap-code-license",
+          "role": "license",
+          "path": "tool/upstream/protocols/dap/v1.71.0/License-code.txt",
+          "size": 1073,
+          "sha256": "646f8936b8ddcd14e13e578ff6857e368780b0d1a4f6066bee89211923a373e2"
+        }
+      ]
+    },
+    {
+      "sourceId": "dart-3.6.0",
+      "protocol": "dart-tooling",
+      "repository": "https://github.com/dart-lang/sdk",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "releaseDate": "2024-12-11",
+      "wireVersion": null,
+      "schemaDialect": null,
+      "sdkRole": "minimum",
+      "componentVersions": {
+        "dartSdk": "3.6.0",
+        "analysisServerApi": "1.38.0",
+        "dtdPackage": "2.4.1-wip",
+        "vmService": "4.16"
+      },
+      "componentRevisions": {
+        "devtools": "711c998bb532d60c992bf48a780ab5c6595447d9"
+      },
+      "entryRefs": [
+        "analysis-server:spec-input",
+        "dtd:protocol-document",
+        "vm-service:service"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "dart-3.6.0-analysis-spec",
+          "role": "primary",
+          "path": "tool/upstream/protocols/dart/3.6.0/analysis_server/spec_input.html",
+          "size": 187193,
+          "sha256": "839ffd353fe1804add14106d07c62992e1da0153d08ce9bc2ddfda60dd4fdc28"
+        },
+        {
+          "artifactId": "dart-3.6.0-analysis-api",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.6.0/analysis_server/api.html",
+          "size": 263091,
+          "sha256": "86f11374f8d9b7f6ff673fa16dd9d980b71249c6016b0f67c3c61fe12b041656"
+        },
+        {
+          "artifactId": "dart-3.6.0-analysis-generated",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.6.0/analysis_server/protocol_generated.dart",
+          "size": 540505,
+          "sha256": "4ac436b59b68efe1ed3955205d515d1fdf88973e9317c28309a86e0ef9257579"
+        },
+        {
+          "artifactId": "dart-3.6.0-analysis-constants",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.6.0/analysis_server/protocol_constants.dart",
+          "size": 21439,
+          "sha256": "37463b793c89388a83e0dcbfbb72bd94a1e821d38dc2d6581af0b65a98819cf9"
+        },
+        {
+          "artifactId": "dart-3.6.0-dtd-protocol",
+          "role": "specification",
+          "path": "tool/upstream/protocols/dart/3.6.0/dtd/dtd_protocol.md",
+          "size": 22802,
+          "sha256": "02c73206e28998486a62c3453399ff2bb1aa225be335140241219f66f639529f"
+        },
+        {
+          "artifactId": "dart-3.6.0-vm-service",
+          "role": "primary",
+          "path": "tool/upstream/protocols/dart/3.6.0/vm_service/service.md",
+          "size": 148920,
+          "sha256": "f1582f15a835e52c91b6e906ddc41ceea23d9853435555a9b6e6f9089f1a9d20"
+        },
+        {
+          "artifactId": "dart-3.6.0-vm-generated",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.6.0/vm_service/vm_service.dart",
+          "size": 275158,
+          "sha256": "ef1043c8303c7f85fd70cf79bcc16b7fdc2aced48c1e245b6b56a459c3bf1801"
+        },
+        {
+          "artifactId": "dart-3.6.0-vm-runtime-version",
+          "role": "runtimeOracle",
+          "path": "tool/upstream/protocols/dart/3.6.0/vm_service/service.h",
+          "size": 11110,
+          "sha256": "6df702745081d151ca17633c7316cc925d7478237b9ae421b4628609c650afe3"
+        },
+        {
+          "artifactId": "dart-sdk-license",
+          "role": "license",
+          "path": "tool/upstream/protocols/dart/LICENSE",
+          "size": 1502,
+          "sha256": "2cfa3ee8e7512e6d44c854b986510810fadc815f93f890373b3a81c1b6ccd256"
+        }
+      ]
+    },
+    {
+      "sourceId": "dart-3.12.2",
+      "protocol": "dart-tooling",
+      "repository": "https://github.com/dart-lang/sdk",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "releaseDate": "2026-06-09",
+      "wireVersion": null,
+      "schemaDialect": null,
+      "sdkRole": "current",
+      "componentVersions": {
+        "dartSdk": "3.12.2",
+        "analysisServerApi": "1.40.1",
+        "dtdPackage": "4.0.0",
+        "vmService": "4.21"
+      },
+      "componentRevisions": {
+        "devtools": "fa063f322c03cc7a690d819db124c196a69cff56"
+      },
+      "entryRefs": [
+        "analysis-server:spec-input",
+        "dtd:protocol-document",
+        "vm-service:service"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "dart-3.12.2-analysis-spec",
+          "role": "primary",
+          "path": "tool/upstream/protocols/dart/3.12.2/analysis_server/spec_input.html",
+          "size": 189530,
+          "sha256": "72931aaae9706d5ba6927ee019f95c8de013eec547ff52463f529153c87c3c22"
+        },
+        {
+          "artifactId": "dart-3.12.2-analysis-api",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.12.2/analysis_server/api.html",
+          "size": 270250,
+          "sha256": "ef6fcfb9d19d127f1e1fddfbbb80172d5a38f05316f1568290e5aa071ee54b01"
+        },
+        {
+          "artifactId": "dart-3.12.2-analysis-generated",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.12.2/analysis_server/protocol_generated.dart",
+          "size": 539354,
+          "sha256": "8fbcc7cd8e92714f82f84208ab9c57f8a24f002490715b0b9c73a611e3c62928"
+        },
+        {
+          "artifactId": "dart-3.12.2-analysis-constants",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.12.2/analysis_server/protocol_constants.dart",
+          "size": 20392,
+          "sha256": "2cab2fc23e19f85b0be2a9396cea5a71c8d413acd9eb3149e30e945e9b66c298"
+        },
+        {
+          "artifactId": "dart-3.12.2-dtd-protocol",
+          "role": "specification",
+          "path": "tool/upstream/protocols/dart/3.12.2/dtd/dtd_protocol.md",
+          "size": 22801,
+          "sha256": "eb97d36feb8e0cb9ed0362775d4f606ea6f8ea982491c19055627253087a0fb2"
+        },
+        {
+          "artifactId": "dart-3.12.2-vm-service",
+          "role": "primary",
+          "path": "tool/upstream/protocols/dart/3.12.2/vm_service/service.md",
+          "size": 152166,
+          "sha256": "cc234c21330e47f467bca9bb3a1d95cda6691ea10fcb22be432235926f5a4e0e"
+        },
+        {
+          "artifactId": "dart-3.12.2-vm-generated",
+          "role": "generatedComparison",
+          "path": "tool/upstream/protocols/dart/3.12.2/vm_service/vm_service.dart",
+          "size": 279996,
+          "sha256": "69fae97213097830b74b8fb8f2bf5c64e1a7ed291533e7225ec6a60fdcc2eb1e"
+        },
+        {
+          "artifactId": "dart-3.12.2-vm-runtime-version",
+          "role": "runtimeOracle",
+          "path": "tool/upstream/protocols/dart/3.12.2/vm_service/service.h",
+          "size": 10765,
+          "sha256": "ccb5d3c10aeab9df1c97b59f02f23afe91a59b63ddf0c114e6e5ca142abc057d"
         }
       ]
     }

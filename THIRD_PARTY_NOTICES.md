@@ -52,6 +52,27 @@ They are never refreshed from an upstream default branch during a build.
   Apache-2.0/MIT transition and CC-BY-4.0 terms for non-specification
   documentation. Its complete upstream licensing notice is retained at
   [`tool/upstream/protocols/mcp-conformance/LICENSE`](tool/upstream/protocols/mcp-conformance/LICENSE).
+- Language Server Protocol 3.18 audit-snapshot meta-model, schema, and
+  generated TypeScript comparison source, commit
+  `b7f5132c95261c0898ae5124e7a91707abc48fcd`. The upstream specification and
+  code license texts are retained beside the artifacts under
+  [`tool/upstream/protocols/lsp/3.18-b7f5132/`](tool/upstream/protocols/lsp/3.18-b7f5132/).
+- Debug Adapter Protocol schema, release `v1.71.0`, commit
+  `51d95ea4e692b34c5d06601bbd1bebc1ff3fbdd4`. The upstream specification and
+  code license texts are retained beside the artifacts under
+  [`tool/upstream/protocols/dap/v1.71.0/`](tool/upstream/protocols/dap/v1.71.0/).
+- Dart SDK Analysis Server, Dart Tooling Daemon, and VM Service protocol
+  sources from releases `3.6.0` and `3.12.2`, commits
+  `ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04` and
+  `d684a576a6aa954ae107a03b2b4e1d61c3bebe93`. These artifacts use the Dart
+  SDK's BSD-3-Clause terms; the upstream license is retained at
+  [`tool/upstream/protocols/dart/LICENSE`](tool/upstream/protocols/dart/LICENSE).
+
+Exact external peer package/archive identities and integrity digests are
+recorded in
+[`tool/upstream/protocols/peers/phase-2b-peers.json`](tool/upstream/protocols/peers/phase-2b-peers.json).
+Those peer packages are downloaded only by the compatibility harness and are
+not vendored in this repository.
 
 ## Direct dependency inventory
 

@@ -43,6 +43,11 @@ jobs:
           dart run tool/test/protocol_compatibility_manifest_test.dart
           dart run tool/test/protocol_fixture_coverage_test.dart
           dart run tool/check_protocol_compatibility.dart
+      - name: Test Dart tooling compatibility evidence
+        run: |
+          dart run tool/test/dart_tooling_compatibility_manifest_test.dart
+          dart run tool/test/dart_tooling_fixture_coverage_test.dart
+          dart run tool/check_dart_tooling_compatibility.dart
       - name: Test Agent Kernel and Store compatibility evidence
         run: |
           dart run tool/test/kernel_store_compatibility_manifest_test.dart
@@ -58,6 +63,8 @@ jobs:
         run: |
           dart run tool/test/acp_cross_process_test.dart
           dart run tool/test/mcp_stdio_cross_process_test.dart
+          dart run tool/test/lsp_cross_process_test.dart
+          dart run tool/test/dap_cross_process_test.dart
       - name: Verify Agent Store crash matrix
         run: dart run tool/run_agent_store_crash_matrix.dart --suite all
       - name: Verify ACP fixed peer matrix
@@ -65,6 +72,16 @@ jobs:
           dart run tool/run_acp_peer_matrix.dart --peer dart
           dart run tool/run_acp_peer_matrix.dart --peer typescript
           dart run tool/run_acp_peer_matrix.dart --peer rust
+      - name: Verify LSP fixed peer matrix
+        run: dart run tool/run_lsp_peer_matrix.dart --all
+      - name: Verify DAP fixed peer matrix
+        run: dart run tool/run_dap_peer_matrix.dart --all
+      - name: Verify Analysis Server fixed peer matrix
+        run: dart run tool/run_analysis_server_peer_matrix.dart --all
+      - name: Verify DTD fixed peer matrix
+        run: dart run tool/run_dtd_peer_matrix.dart --all
+      - name: Verify VM Service fixed peer matrix
+        run: dart run tool/run_vm_service_peer_matrix.dart --all
       - name: Install pinned MCP conformance harness
         run: npm ci --prefix tool/conformance/mcp --ignore-scripts
       - name: Verify MCP conformance inventory
@@ -87,7 +104,7 @@ jobs:
         shell: bash
         run: |
           portable_smoke_root=$(mktemp -d)
-          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp agent_kernel; do
+          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp agent_kernel lsp dap dart; do
             (
               cd "packages/$package"
               dart test --platform chrome test/barrel_test.dart
@@ -111,3 +128,37 @@ jobs:
         run: dart test packages/agent_io/test/barrel_test.dart
       - name: Test
         run: dart run melos test
+
+  minimum-sdk:
+    name: Dart 3.6.0 workspace
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.12.2
+      - name: Bootstrap pinned SDK runner
+        run: dart pub get
+      - name: Resolve with verified Dart 3.6.0
+        run: dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 -- pub get
+      - name: Analyze with verified Dart 3.6.0
+        run: dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 -- analyze .
+      - name: Test with verified Dart 3.6.0
+        run: >-
+          dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 --
+          run melos test
+      - name: Check workspace with verified Dart 3.6.0
+        run: >-
+          dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 --
+          run tool/check_workspace.dart
+      - name: Compile tooling barrels with verified Dart 3.6.0
+        run: |
+          for package in lsp dap dart; do
+            dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 -- \
+              compile js "packages/$package/test/portable_compile_smoke.dart" \
+              -o "/tmp/$package.js"
+            dart run tool/run_with_pinned_dart.dart --sdk 3.6.0 -- \
+              compile wasm "packages/$package/test/portable_compile_smoke.dart" \
+              -o "/tmp/$package.wasm"
+          done

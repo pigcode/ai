@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "nodeMajor": 22,
+  "dartSdkArchives": [
+    {
+      "peerId": "dart-3.6.0-linux-x64",
+      "sdkRole": "minimum",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "linux-x64",
+      "archive": "dartsdk-linux-x64-release.zip",
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/3.6.0/sdk/dartsdk-linux-x64-release.zip",
+      "sha256": "8e14ff436e1eec72618dabc94f421a97251f2068c9cc9ad2d3bb9d232d6155a3"
+    },
+    {
+      "peerId": "dart-3.6.0-macos-arm64",
+      "sdkRole": "minimum",
+      "release": "3.6.0",
+      "revision": "ae7ca5199a0559db0ae60533e9cedd3ce0d6ab04",
+      "platform": "macos-arm64",
+      "archive": "dartsdk-macos-arm64-release.zip",
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/3.6.0/sdk/dartsdk-macos-arm64-release.zip",
+      "sha256": "1bdbc6544aaa53673e7cbbf66ad7cde914cb7598936ebbd6a4245e1945a702a0"
+    },
+    {
+      "peerId": "dart-3.12.2-linux-x64",
+      "sdkRole": "current",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "linux-x64",
+      "archive": "dartsdk-linux-x64-release.zip",
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/3.12.2/sdk/dartsdk-linux-x64-release.zip",
+      "sha256": "28e47b44cf075f36771046c068bb0d174201cf9c7608744aed1cc23204299c2d"
+    },
+    {
+      "peerId": "dart-3.12.2-macos-arm64",
+      "sdkRole": "current",
+      "release": "3.12.2",
+      "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+      "platform": "macos-arm64",
+      "archive": "dartsdk-macos-arm64-release.zip",
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/3.12.2/sdk/dartsdk-macos-arm64-release.zip",
+      "sha256": "cd8753928e77b6b665bd70dce0e64b4ec6d2e2fde141d6409bb716c8ac1f1c0a"
+    }
+  ],
+  "npmPackages": [
+    {
+      "peerId": "typescript-language-server-v5.3.0",
+      "package": "typescript-language-server",
+      "release": "v5.3.0",
+      "repository": "https://github.com/typescript-language-server/typescript-language-server",
+      "revision": "589044479e4bc2bffb796b593242136f5323b582",
+      "integrity": "sha512-5puofxZHgFdAYtfNpmwCAvgtaYgg8wrUnH30m7Ze3QuguId5RNRadKASpOpyDxTyUdAF51FjhTdjntLw/EuWcQ==",
+      "shasum": "0f3e8c9d1ea915d4d74c548803346a157ae29856",
+      "tarballSize": 501633,
+      "entrypoint": "typescript-language-server"
+    },
+    {
+      "peerId": "typescript-v6.0.3",
+      "package": "typescript",
+      "release": "v6.0.3",
+      "repository": "https://github.com/microsoft/TypeScript",
+      "revision": "050880ce59e30b356b686bd3144efe24f875ebc8",
+      "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+      "shasum": "90251dc007916e972786cb94d74d15b185577d21",
+      "tarballSize": 4515854,
+      "entrypoint": "tsserver"
+    }
+  ],
+  "releaseArchives": [
+    {
+      "peerId": "js-debug-v1.117.0",
+      "release": "v1.117.0",
+      "repository": "https://github.com/microsoft/vscode-js-debug",
+      "revision": "496a6f1a4fc8198bcd563f97b84a07aa39917404",
+      "asset": "js-debug-dap-v1.117.0.tar.gz",
+      "size": 1216795,
+      "sha256": "ad8d04ede9d4b75cc290fd5438a65047a06f786d04f604b6112485b36f090772",
+      "entrypoint": "js-debug/src/dapDebugServer.js"
+    }
+  ]
+}
