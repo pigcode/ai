@@ -43,6 +43,11 @@ jobs:
           dart run tool/test/protocol_compatibility_manifest_test.dart
           dart run tool/test/protocol_fixture_coverage_test.dart
           dart run tool/check_protocol_compatibility.dart
+      - name: Test Agent Kernel and Store compatibility evidence
+        run: |
+          dart run tool/test/kernel_store_compatibility_manifest_test.dart
+          dart run tool/test/kernel_store_fixture_coverage_test.dart
+          dart run tool/check_kernel_store_compatibility.dart
       - name: Test fixed peer
         run: dart run tool/test/ai_core_peer_test.dart
       - name: Test cross-package scripted peer
@@ -53,6 +58,8 @@ jobs:
         run: |
           dart run tool/test/acp_cross_process_test.dart
           dart run tool/test/mcp_stdio_cross_process_test.dart
+      - name: Verify Agent Store crash matrix
+        run: dart run tool/run_agent_store_crash_matrix.dart --suite all
       - name: Verify ACP fixed peer matrix
         run: |
           dart run tool/run_acp_peer_matrix.dart --peer dart
@@ -80,7 +87,7 @@ jobs:
         shell: bash
         run: |
           portable_smoke_root=$(mktemp -d)
-          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp; do
+          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp agent_kernel; do
             (
               cd "packages/$package"
               dart test --platform chrome test/barrel_test.dart
@@ -100,5 +107,7 @@ jobs:
           )
       - name: Verify MCP IO entrypoint
         run: dart test packages/mcp/test/io_barrel_test.dart
+      - name: Verify Agent Store IO entrypoint
+        run: dart test packages/agent_io/test/barrel_test.dart
       - name: Test
         run: dart run melos test

@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/tool/schema/agent_kernel/store-transaction-v1.schema.json",
+  "title": "Pigcode AgentStore transaction v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/createSessionTransaction"
+    },
+    {
+      "$ref": "#/$defs/sessionTransaction"
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^ses_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "commandId": {
+      "type": "string",
+      "pattern": "^cmd_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^(ses|run|evt|cmd|wrk|att|apr|dop|res|snp)_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stateDigest"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "stateDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "session",
+            "run",
+            "event",
+            "command",
+            "workItem",
+            "attempt",
+            "approval",
+            "deferredOperation",
+            "runtimeResource",
+            "snapshot"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/opaqueId"
+        }
+      }
+    },
+    "acceptedCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandId",
+        "contentDigest",
+        "receipt"
+      ],
+      "properties": {
+        "commandId": {
+          "$ref": "#/$defs/commandId"
+        },
+        "contentDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "receipt": {
+          "type": "object"
+        }
+      }
+    },
+    "createSessionTransaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transactionKind",
+        "schemaVersion",
+        "expectedRootHead",
+        "sessionId",
+        "acceptedCommand",
+        "newIdAllocations",
+        "events"
+      ],
+      "properties": {
+        "transactionKind": {
+          "const": "createSession"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "expectedRootHead": {
+          "$ref": "#/$defs/head"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/sessionId"
+        },
+        "acceptedCommand": {
+          "$ref": "#/$defs/acceptedCommand"
+        },
+        "newIdAllocations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/allocation"
+          }
+        },
+        "events": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "sessionTransaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transactionKind",
+        "schemaVersion",
+        "sessionId",
+        "expectedHead",
+        "newIdAllocations",
+        "events"
+      ],
+      "properties": {
+        "transactionKind": {
+          "const": "append"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "sessionId": {
+          "$ref": "#/$defs/sessionId"
+        },
+        "expectedHead": {
+          "$ref": "#/$defs/head"
+        },
+        "acceptedCommand": {
+          "$ref": "#/$defs/acceptedCommand"
+        },
+        "newIdAllocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/allocation"
+          }
+        },
+        "events": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

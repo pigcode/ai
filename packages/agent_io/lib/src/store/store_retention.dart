@@ -1,0 +1,4 @@
+enum StoreRetentionPolicy {
+  retainAll,
+  pruneThroughSnapshot,
+}

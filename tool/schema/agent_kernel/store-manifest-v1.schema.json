@@ -1,0 +1,429 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/tool/schema/agent_kernel/store-manifest-v1.schema.json",
+  "title": "Pigcode AgentStore immutable manifest v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/rootManifest"
+    },
+    {
+      "$ref": "#/$defs/sessionManifest"
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "publishedGeneration": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^ses_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "commandId": {
+      "type": "string",
+      "pattern": "^cmd_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^evt_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "snapshotId": {
+      "type": "string",
+      "pattern": "^snp_[0123456789abcdefghjkmnpqrstvwxyz]{32}$"
+    },
+    "durability": {
+      "enum": [
+        "memory",
+        "buffered",
+        "processCrashFlush"
+      ]
+    },
+    "registryManifestReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "generation",
+        "rootDigest"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "generation": {
+          "$ref": "#/$defs/publishedGeneration"
+        },
+        "rootDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "sessionHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stateDigest",
+        "journalHeadDigest",
+        "identityRegistryRootDigest",
+        "commandRegistryRootDigest",
+        "generation",
+        "historyFloorSequence"
+      ],
+      "properties": {
+        "sequence": {
+          "$ref": "#/$defs/sequence"
+        },
+        "stateDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "journalHeadDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "identityRegistryRootDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "commandRegistryRootDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "historyFloorSequence": {
+          "$ref": "#/$defs/sequence"
+        }
+      }
+    },
+    "rootHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stateDigest",
+        "sessionCatalogRootDigest",
+        "createSessionCommandRegistryRootDigest",
+        "generation"
+      ],
+      "properties": {
+        "sequence": {
+          "$ref": "#/$defs/sequence"
+        },
+        "stateDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "sessionCatalogRootDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "createSessionCommandRegistryRootDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        }
+      }
+    },
+    "appendReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievedDurability",
+        "afterHead",
+        "beforeHead",
+        "eventIds",
+        "requestedDurability"
+      ],
+      "properties": {
+        "achievedDurability": {
+          "$ref": "#/$defs/durability"
+        },
+        "afterHead": {
+          "$ref": "#/$defs/sessionHead"
+        },
+        "beforeHead": {
+          "$ref": "#/$defs/sessionHead"
+        },
+        "eventIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventId"
+          }
+        },
+        "requestedDurability": {
+          "$ref": "#/$defs/durability"
+        }
+      }
+    },
+    "createSessionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievedDurability",
+        "afterRootHead",
+        "beforeRootHead",
+        "eventIds",
+        "requestedDurability",
+        "sessionHead",
+        "sessionId"
+      ],
+      "properties": {
+        "achievedDurability": {
+          "$ref": "#/$defs/durability"
+        },
+        "afterRootHead": {
+          "$ref": "#/$defs/rootHead"
+        },
+        "beforeRootHead": {
+          "$ref": "#/$defs/rootHead"
+        },
+        "eventIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventId"
+          }
+        },
+        "requestedDurability": {
+          "$ref": "#/$defs/durability"
+        },
+        "sessionHead": {
+          "$ref": "#/$defs/sessionHead"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/sessionId"
+        }
+      }
+    },
+    "segmentReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactDigest",
+        "finalRecordDigest",
+        "recordCount",
+        "startSequence"
+      ],
+      "properties": {
+        "artifactDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "finalRecordDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "recordCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startSequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "prefixCommitment"
+      ],
+      "properties": {
+        "policy": {
+          "enum": [
+            "retainAll",
+            "pruneThroughSnapshot"
+          ]
+        },
+        "prefixCommitment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "finalRecordDigest",
+            "throughSequence"
+          ],
+          "properties": {
+            "finalRecordDigest": {
+              "$ref": "#/$defs/digest"
+            },
+            "throughSequence": {
+              "$ref": "#/$defs/sequence"
+            }
+          }
+        }
+      }
+    },
+    "snapshotReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "snapshotId"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "snapshotId": {
+          "$ref": "#/$defs/snapshotId"
+        }
+      }
+    },
+    "rootManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalogManifest",
+        "commandManifest",
+        "createReceipts",
+        "formatVersion",
+        "generation",
+        "head"
+      ],
+      "properties": {
+        "catalogManifest": {
+          "$ref": "#/$defs/registryManifestReference"
+        },
+        "commandManifest": {
+          "$ref": "#/$defs/registryManifestReference"
+        },
+        "createReceipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "commandId",
+              "receipt"
+            ],
+            "properties": {
+              "commandId": {
+                "$ref": "#/$defs/commandId"
+              },
+              "receipt": {
+                "$ref": "#/$defs/createSessionReceipt"
+              }
+            }
+          }
+        },
+        "formatVersion": {
+          "const": 1
+        },
+        "generation": {
+          "$ref": "#/$defs/publishedGeneration"
+        },
+        "head": {
+          "$ref": "#/$defs/rootHead"
+        }
+      }
+    },
+    "sessionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandManifest",
+        "commandReceipts",
+        "compactionReceipts",
+        "formatVersion",
+        "generation",
+        "head",
+        "identityManifest",
+        "segments",
+        "sessionId",
+        "snapshot",
+        "retention"
+      ],
+      "properties": {
+        "commandManifest": {
+          "$ref": "#/$defs/registryManifestReference"
+        },
+        "commandReceipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "commandId",
+              "receipt"
+            ],
+            "properties": {
+              "commandId": {
+                "$ref": "#/$defs/commandId"
+              },
+              "receipt": {
+                "$ref": "#/$defs/appendReceipt"
+              }
+            }
+          }
+        },
+        "compactionReceipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "receipt",
+              "throughSequence"
+            ],
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/appendReceipt"
+              },
+              "throughSequence": {
+                "$ref": "#/$defs/sequence"
+              }
+            }
+          }
+        },
+        "formatVersion": {
+          "const": 1
+        },
+        "generation": {
+          "$ref": "#/$defs/publishedGeneration"
+        },
+        "head": {
+          "$ref": "#/$defs/sessionHead"
+        },
+        "identityManifest": {
+          "$ref": "#/$defs/registryManifestReference"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/segmentReference"
+          }
+        },
+        "sessionId": {
+          "$ref": "#/$defs/sessionId"
+        },
+        "snapshot": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/snapshotReference"
+            }
+          ]
+        },
+        "retention": {
+          "$ref": "#/$defs/retention"
+        }
+      }
+    }
+  }
+}

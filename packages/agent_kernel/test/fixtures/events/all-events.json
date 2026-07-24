@@ -1,0 +1,171 @@
+{
+  "base": {
+    "eventId": "evt_00000000000000000000000000000000",
+    "schemaVersion": 1,
+    "sessionId": "ses_00000000000000000000000000000000",
+    "recordedAt": "2026-07-24T00:00:00.000Z",
+    "causationId": "cmd_00000000000000000000000000000000",
+    "payload": {},
+    "metadata": {}
+  },
+  "events": {
+    "session.created": {},
+    "session.capabilitiesPinned": {},
+    "session.attachmentChanged": {},
+    "session.runtimeLivenessChanged": {},
+    "session.resumeStateStored": {},
+    "session.tombstoned": {},
+    "run.created": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.inputRecorded": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.attemptStarted": {
+      "runId": "run_00000000000000000000000000000000",
+      "attemptId": "att_00000000000000000000000000000000"
+    },
+    "run.started": {
+      "runId": "run_00000000000000000000000000000000",
+      "attemptId": "att_00000000000000000000000000000000"
+    },
+    "run.cancelRequested": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.suspendRequested": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.suspended": {
+      "runId": "run_00000000000000000000000000000000",
+      "attemptId": "att_00000000000000000000000000000000"
+    },
+    "run.resumeRequested": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.reconciling": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.completed": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.failed": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.cancelled": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "run.interrupted": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "work.proposed": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.policyEvaluated": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.approvalRequested": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000",
+      "payload": {
+        "approvalId": "apr_00000000000000000000000000000000"
+      }
+    },
+    "work.approvalResolved": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.executionStarted": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.cancellationRequested": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.succeeded": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.failed": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.cancelled": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "work.outcomeUnknown": {
+      "runId": "run_00000000000000000000000000000000",
+      "workItemId": "wrk_00000000000000000000000000000000"
+    },
+    "deferred.created": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "deferred.ownershipTransferred": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "deferred.completed": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "deferred.failed": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "deferred.cancelled": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "deferred.outcomeUnknown": {
+      "runId": "run_00000000000000000000000000000000",
+      "payload": {
+        "deferredOperationId": "dop_00000000000000000000000000000000"
+      }
+    },
+    "resource.registered": {
+      "payload": {
+        "runtimeResourceId": "res_00000000000000000000000000000000"
+      }
+    },
+    "resource.ownershipTransferred": {
+      "payload": {
+        "runtimeResourceId": "res_00000000000000000000000000000000"
+      }
+    },
+    "resource.updated": {
+      "payload": {
+        "runtimeResourceId": "res_00000000000000000000000000000000"
+      }
+    },
+    "resource.released": {
+      "payload": {
+        "runtimeResourceId": "res_00000000000000000000000000000000"
+      }
+    },
+    "resource.outcomeUnknown": {
+      "payload": {
+        "runtimeResourceId": "res_00000000000000000000000000000000"
+      }
+    },
+    "driver.proposalRejected": {},
+    "driver.sourceDrained": {
+      "runId": "run_00000000000000000000000000000000"
+    },
+    "effect.observed": {},
+    "history.imported": {}
+  }
+}

@@ -13,6 +13,8 @@ const _expectedPackages = <String, String>{
   'protocol_utils': 'pigcode_ai_protocol_utils',
   'acp': 'pigcode_ai_acp',
   'mcp': 'pigcode_ai_mcp',
+  'agent_kernel': 'pigcode_ai_agent_kernel',
+  'agent_io': 'pigcode_ai_agent_io',
 };
 
 const _requiredRootPaths = <String>{
@@ -22,21 +24,27 @@ const _requiredRootPaths = <String>{
   'README.md',
   'THIRD_PARTY_NOTICES.md',
   'compatibility/phase-2a-protocol-foundation.json',
+  'compatibility/phase-3-kernel-store.json',
   'compatibility/schema/ai-core-compatibility.schema.json',
+  'compatibility/schema/kernel-store-compatibility.schema.json',
   'compatibility/schema/protocol-foundation-compatibility.schema.json',
   'compatibility/upstream/phase-2a-protocol-inventory.json',
   'compatibility/upstream/vercel-ai-7.0.35-paths.json',
   'compatibility/vercel-ai-7.0.35.json',
   'docs/protocol-support.md',
+  'docs/kernel-store-support.md',
   'pubspec.yaml',
   'third_party/licenses/Apache-2.0.txt',
   'tool/check_compatibility.dart',
+  'tool/check_agent_kernel_schema.dart',
+  'tool/check_kernel_store_compatibility.dart',
   'tool/check_protocol_compatibility.dart',
   'tool/check_workspace.dart',
   'tool/conformance/mcp/package-lock.json',
   'tool/conformance/mcp/package.json',
   'tool/protocol_codegen.dart',
   'tool/run_acp_peer_matrix.dart',
+  'tool/run_agent_store_crash_matrix.dart',
   'tool/run_mcp_conformance.dart',
   'tool/fixtures/acp_peer.dart',
   'tool/fixtures/acp/rust/README.md',
@@ -45,6 +53,8 @@ const _requiredRootPaths = <String>{
   'tool/fixtures/acp/typescript/package-lock.json',
   'tool/fixtures/acp/typescript/package.json',
   'tool/fixtures/ai_core_peer.dart',
+  'tool/fixtures/agent_store_crash_writer.dart',
+  'tool/fixtures/agent_store_writer.dart',
   'tool/fixtures/anthropic_peer.dart',
   'tool/fixtures/mcp_conformance_client.dart',
   'tool/fixtures/mcp_conformance_server.dart',
@@ -53,7 +63,11 @@ const _requiredRootPaths = <String>{
   'tool/fixtures/openai_peer.dart',
   'tool/generate_upstream_path_inventory.dart',
   'tool/src/acp_peer_harness.dart',
+  'tool/src/agent_kernel_schema.dart',
+  'tool/src/agent_store_crash_harness.dart',
+  'tool/src/agent_store_writer_fixture.dart',
   'tool/src/compatibility_manifest.dart',
+  'tool/src/kernel_store_compatibility_manifest.dart',
   'tool/src/protocol_compatibility_manifest.dart',
   'tool/src/protocol_codegen.dart',
   'tool/src/protocol_inventory.dart',
@@ -62,8 +76,14 @@ const _requiredRootPaths = <String>{
   'tool/test/ai_core_cross_process_test.dart',
   'tool/test/ai_core_cross_scripted_peer_test.dart',
   'tool/test/ai_core_peer_test.dart',
+  'tool/test/agent_kernel_schema_test.dart',
+  'tool/test/agent_kernel_secret_scan_test.dart',
+  'tool/test/agent_store_crash_matrix_test.dart',
+  'tool/test/agent_store_multi_process_test.dart',
   'tool/test/acp_cross_process_test.dart',
   'tool/test/compatibility_manifest_test.dart',
+  'tool/test/kernel_store_compatibility_manifest_test.dart',
+  'tool/test/kernel_store_fixture_coverage_test.dart',
   'tool/test/mcp_conformance_inventory_test.dart',
   'tool/test/mcp_stdio_cross_process_test.dart',
   'tool/test/protocol_codegen_test.dart',
@@ -81,6 +101,16 @@ const _requiredRootPaths = <String>{
   'tool/upstream/protocols/mcp/2025-11-25/schema.json',
   'tool/upstream/protocols/mcp/LICENSE',
   'tool/upstream/protocols/sources.json',
+  'tool/schema/agent_kernel/agent-event-v1.schema.json',
+  'tool/schema/agent_kernel/store-transaction-v1.schema.json',
+  'tool/schema/agent_kernel/snapshot-v1.schema.json',
+  'tool/schema/agent_kernel/store-manifest-v1.schema.json',
+  'tool/schema/agent_kernel/event-inventory-v1.json',
+  'tool/fixtures/agent_kernel/schema/valid-event.json',
+  'tool/fixtures/agent_kernel/schema/valid-root-manifest.json',
+  'tool/fixtures/agent_kernel/schema/valid-session-manifest.json',
+  'tool/fixtures/agent_kernel/schema/invalid-event-missing-id.json',
+  'tool/fixtures/agent_kernel/schema/invalid-event-version.json',
   'packages/acp/lib/src/generated/acp_inventory.g.dart',
   'packages/acp/example/client_agent.dart',
   'packages/acp/test/example_compile_test.dart',
@@ -92,6 +122,17 @@ const _requiredRootPaths = <String>{
   'packages/mcp/test/io_example_compile_test.dart',
   'packages/protocol_utils/example/json_rpc_peer.dart',
   'packages/protocol_utils/test/example_compile_test.dart',
+  'packages/agent_kernel/example/session_run.dart',
+  'packages/agent_kernel/test/example_compile_test.dart',
+  'packages/agent_kernel/test/security/approval_principal_test.dart',
+  'packages/agent_kernel/test/security/capability_no_escalation_test.dart',
+  'packages/agent_kernel/test/security/secret_rejection_test.dart',
+  'packages/agent_io/test/security/private_root_test.dart',
+  'packages/agent_io/test/security/resource_limit_test.dart',
+  'packages/agent_io/test/security/store_path_test.dart',
+  'packages/agent_io/test/security/symlink_test.dart',
+  'packages/agent_io/example/durable_store.dart',
+  'packages/agent_io/test/example_compile_test.dart',
 };
 
 const _expectedWorkspaceMembers = <String>{
@@ -104,6 +145,8 @@ const _expectedWorkspaceMembers = <String>{
   'packages/protocol_utils',
   'packages/acp',
   'packages/mcp',
+  'packages/agent_kernel',
+  'packages/agent_io',
 };
 
 const _allowedInternalDependencies = <String, Set<String>>{
@@ -132,6 +175,8 @@ const _allowedInternalDependencies = <String, Set<String>>{
     'pigcode_ai_provider',
     'pigcode_ai',
   },
+  'pigcode_ai_agent_kernel': <String>{},
+  'pigcode_ai_agent_io': <String>{'pigcode_ai_agent_kernel'},
 };
 
 const _portableBarrels = <String>{
@@ -145,6 +190,7 @@ const _portableBarrels = <String>{
   'packages/acp/lib/pigcode_ai_acp.dart',
   'packages/mcp/lib/pigcode_ai_mcp.dart',
   'packages/mcp/lib/pigcode_ai_mcp_http.dart',
+  'packages/agent_kernel/lib/pigcode_ai_agent_kernel.dart',
 };
 
 const _dependencySections = <String>{
@@ -496,7 +542,7 @@ void _validateRootManifest(
     violations.add(
       const WorkspaceViolation(
         'invalid_workspace_membership',
-        'Expected exactly the nine public package paths in pubspec.yaml workspace',
+        'Expected exactly the eleven public package paths in pubspec.yaml workspace',
       ),
     );
   }

@@ -1,0 +1,1 @@
+{"causationId":"cmd_00000000000000000000000000000000","eventId":"evt_00000000000000000000000000000000","metadata":{},"payload":{"definitionRef":"agent:test"},"recordedAt":"2026-07-24T00:00:00.000Z","schemaVersion":1,"sequence":1,"sessionId":"ses_00000000000000000000000000000000","type":"session.created"}

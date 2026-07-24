@@ -19,10 +19,12 @@ provider integrations.
 | `packages/protocol_utils` | `pigcode_ai_protocol_utils` | Portable JSON-RPC, framing, cancellation, diagnostics, and caller-owned transport primitives. |
 | `packages/acp` | `pigcode_ai_acp` | Stable ACP v1 client/agent protocol pinned to `schema-v1.20.0`, with portable core APIs and caller-owned process adapters. |
 | `packages/mcp` | `pigcode_ai_mcp` | MCP `2025-11-25` client/server APIs, portable Streamable HTTP, VM-only IO adapters, OAuth, tasks, and Pigcode AI mappings. |
+| `packages/agent_kernel` | `pigcode_ai_agent_kernel` | Portable event-sourced Agent domain, command, policy, reducer, stream, and Store contracts. |
+| `packages/agent_io` | `pigcode_ai_agent_io` | VM-only immutable-generation `FileAgentStore` with process-crash recovery, exact registries, snapshots, and explicit retention. |
 
 ## Status
 
-This is a pre-release workspace at version `0.0.1`. All nine packages declare
+This is a pre-release workspace at version `0.0.1`. All eleven packages declare
 `publish_to: none`; publication and stability guarantees will be designed
 separately.
 
@@ -33,6 +35,8 @@ dart pub get
 dart run tool/check_workspace.dart
 dart run tool/protocol_codegen.dart --check
 dart run tool/check_protocol_compatibility.dart
+dart run tool/check_agent_kernel_schema.dart
+dart run tool/check_kernel_store_compatibility.dart
 dart run melos format
 dart run melos analyze
 dart run melos test
@@ -65,6 +69,14 @@ npm ci --prefix tool/conformance/mcp --ignore-scripts
 dart run tool/run_mcp_conformance.dart --role client --suite all
 dart run tool/run_mcp_conformance.dart --role server --suite all
 ```
+
+Phase 3 adds a portable event-sourced Agent Kernel and a VM-only reference
+Store. Its 28 bounded claims, evidence digests, actual platform tuple, and
+known unsupported capabilities are recorded in
+[`compatibility/phase-3-kernel-store.json`](compatibility/phase-3-kernel-store.json)
+and summarized in [Kernel and Store support](docs/kernel-store-support.md).
+`processCrashFlush` means a complete artifact was flushed before its receipt;
+it is process/SIGKILL evidence, not raw-device power-loss durability.
 
 ## License and provenance
 
