@@ -13,9 +13,10 @@ final _appendedEventId = EventId.parse('evt_10000000000000000000000000000000');
 
 Future<void> main() async {
   // The caller owns this private temporary root. No home or workspace path is
-  // used. Directory.systemTemp.createTemp creates an owner-only root on the
-  // supported POSIX reference platforms.
+  // used. Explicitly restrict its permissions because createTemp honors the
+  // process umask, which may permit group or other access.
   final root = Directory.systemTemp.createTempSync('pigcode-store-example-');
+  makeStoreRootPrivate(root);
   final coordinator = await FileStoreCoordinator.start(StoreLayout.open(root));
   try {
     var store = await FileAgentStore.open(
@@ -46,6 +47,16 @@ Future<void> main() async {
   } finally {
     await coordinator.close();
     root.deleteSync(recursive: true);
+  }
+}
+
+void makeStoreRootPrivate(Directory root) {
+  final result = Process.runSync('chmod', <String>['700', root.path]);
+  if (result.exitCode != 0) {
+    throw StateError(
+      'Unable to restrict the Store root to owner-only access: '
+      '${result.stderr}',
+    );
   }
 }
 
