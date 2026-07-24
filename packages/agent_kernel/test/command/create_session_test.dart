@@ -64,6 +64,30 @@ void main() {
     });
   });
 
+  test('concurrent same create command returns the stored receipt', () async {
+    final store = InMemoryAgentStore(
+      synchronizeNextCreateLookups: true,
+    );
+    final fixture = KernelFixture(store: store);
+    final root = await store.loadRoot();
+    final command = CreateSessionCommand(
+      commandId: createCommandId,
+      expectedRootHead: root.head,
+      definitionRef: const AgentDefinitionRef('agent:test'),
+      capabilitySnapshot: CapabilitySnapshot.empty(),
+    );
+
+    final receipts = await Future.wait(<Future<AgentCommandReceipt>>[
+      fixture.kernel.createSession(command),
+      fixture.kernel.createSession(command),
+    ]);
+
+    expect(receipts[1].toJson(), receipts[0].toJson());
+    expect((await store.loadRoot()).sessionIds, <SessionId>{
+      receipts[0].sessionId,
+    });
+  });
+
   test('two create commands with one expected root produce one allocation',
       () async {
     final fixture = KernelFixture();

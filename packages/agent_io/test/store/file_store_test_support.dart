@@ -165,15 +165,26 @@ AgentStoreSnapshot fileSnapshot(
   AgentStoreHead head, {
   int variant = 0,
   bool safeToPrune = true,
+  Map<String, Object?>? canonicalProjection,
 }) {
-  final projection = <String, Object?>{
-    'approvals': <String, Object?>{},
-    'currentRunId': safeToPrune ? null : 'run_00000000000000000000000000000000',
-    'deferredOperations': <String, Object?>{},
-    'journalSequence': head.sequence,
-    'resources': <String, Object?>{},
-    'workItems': <String, Object?>{},
-  };
+  final projection = canonicalProjection ??
+      <String, Object?>{
+        'approvals': <String, Object?>{},
+        'capabilitySnapshot': <String, Object?>{},
+        'conversationAvailability': 'available',
+        'controlAttachment': 'attached',
+        'currentRunId':
+            safeToPrune ? null : 'run_00000000000000000000000000000000',
+        'deferredOperations': <String, Object?>{},
+        'journalSequence': head.sequence,
+        'resources': <String, Object?>{},
+        'resumeStateAvailability': 'none',
+        'runHistory': <Object?>[],
+        'runs': <String, Object?>{},
+        'runtimeLiveness': 'unknown',
+        'sessionId': fileTestSessionId.value,
+        'workItems': <String, Object?>{},
+      };
   return AgentStoreSnapshot(
     sessionId: fileTestSessionId,
     snapshotId: SnapshotId.parse(

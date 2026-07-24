@@ -119,6 +119,40 @@ void main() {
     );
   });
 
+  test('non-reducer snapshot projection cannot be pruned', () async {
+    final before = (await fixture.store.loadSession(fileTestSessionId)).head;
+    final projection = <String, Object?>{
+      'approvals': <String, Object?>{},
+      'currentRunId': null,
+      'deferredOperations': <String, Object?>{},
+      'resources': <String, Object?>{},
+      'workItems': <String, Object?>{},
+    };
+    final snapshotReceipt = await fixture.store.writeSnapshot(
+      fileSnapshot(
+        before,
+        variant: 10,
+        canonicalProjection: projection,
+      ),
+      expectedHead: before,
+    );
+
+    expect(
+      () => fixture.store.compact(
+        fileTestSessionId,
+        expectedHead: snapshotReceipt.afterHead,
+        throughSequence: 1,
+      ),
+      storeError(AgentStoreErrorCode.invalidTransaction),
+    );
+    expect(
+      (await fixture.store.loadSession(fileTestSessionId))
+          .head
+          .historyFloorSequence,
+      0,
+    );
+  });
+
   test('history floor never retreats', () async {
     final before = (await fixture.store.loadSession(fileTestSessionId)).head;
     final snapshotReceipt = await fixture.store.writeSnapshot(

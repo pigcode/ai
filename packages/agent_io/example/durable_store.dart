@@ -122,10 +122,18 @@ AgentEvent _event({
 AgentStoreSnapshot _snapshot(AgentStoreHead head) {
   final projection = <String, Object?>{
     'approvals': <String, Object?>{},
+    'capabilitySnapshot': <String, Object?>{},
+    'conversationAvailability': 'available',
+    'controlAttachment': 'attached',
     'currentRunId': null,
     'deferredOperations': <String, Object?>{},
     'journalSequence': head.sequence,
     'resources': <String, Object?>{},
+    'resumeStateAvailability': 'none',
+    'runHistory': <Object?>[],
+    'runs': <String, Object?>{},
+    'runtimeLiveness': 'unknown',
+    'sessionId': _sessionId.value,
     'workItems': <String, Object?>{},
   };
   return AgentStoreSnapshot(

@@ -1,13 +1,22 @@
+import 'dart:async';
+
 import 'package:pigcode_ai_agent_kernel/pigcode_ai_agent_kernel.dart';
 
 final class InMemoryAgentStore implements AgentStore {
   InMemoryAgentStore({
     this.loseNextCreateReceipt = false,
     this.failNextAppendBeforeCommit = false,
-  });
+    bool synchronizeNextCreateLookups = false,
+    bool synchronizeNextCommandLookups = false,
+  })  : _createLookupBarrier =
+            synchronizeNextCreateLookups ? _TwoPartyBarrier() : null,
+        _commandLookupBarrier =
+            synchronizeNextCommandLookups ? _TwoPartyBarrier() : null;
 
   bool loseNextCreateReceipt;
   bool failNextAppendBeforeCommit;
+  _TwoPartyBarrier? _createLookupBarrier;
+  _TwoPartyBarrier? _commandLookupBarrier;
 
   AgentStoreRootHead _rootHead = AgentStoreRootHead.empty;
   final Set<SessionId> _sessionIds = <SessionId>{};
@@ -27,8 +36,15 @@ final class InMemoryAgentStore implements AgentStore {
   @override
   Future<AgentStoreAcceptedCommand?> lookupCreateSessionCommand(
     CommandId commandId,
-  ) async =>
-      _createCommands[commandId];
+  ) async {
+    final result = _createCommands[commandId];
+    final barrier = _createLookupBarrier;
+    if (barrier != null) {
+      await barrier.wait();
+      _createLookupBarrier = null;
+    }
+    return result;
+  }
 
   @override
   Future<AgentStoreCreateSessionReceipt> createSession(
@@ -125,8 +141,15 @@ final class InMemoryAgentStore implements AgentStore {
   Future<AgentStoreAcceptedCommand?> lookupAcceptedCommand(
     SessionId sessionId,
     CommandId commandId,
-  ) async =>
-      _requireSession(sessionId).commands[commandId];
+  ) async {
+    final result = _requireSession(sessionId).commands[commandId];
+    final barrier = _commandLookupBarrier;
+    if (barrier != null) {
+      await barrier.wait();
+      _commandLookupBarrier = null;
+    }
+    return result;
+  }
 
   @override
   Future<AgentStoreEventPage> readEvents(
@@ -552,6 +575,19 @@ OpaqueId _parseAgentOpaqueId(String value) {
   if (value.startsWith('res_')) return RuntimeResourceId.parse(value);
   if (value.startsWith('snp_')) return SnapshotId.parse(value);
   throw FormatException('Unknown opaque identifier kind.', value);
+}
+
+final class _TwoPartyBarrier {
+  final Completer<void> _release = Completer<void>();
+  var _arrivals = 0;
+
+  Future<void> wait() async {
+    _arrivals += 1;
+    if (_arrivals == 2) {
+      _release.complete();
+    }
+    await _release.future;
+  }
 }
 
 final class _MemorySession {

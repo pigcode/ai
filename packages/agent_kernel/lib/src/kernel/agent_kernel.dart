@@ -111,8 +111,15 @@ final class AgentKernel {
         transaction,
         requestedDurability: _durability,
       );
-      _publish(<AgentEvent>[event]);
-      return _withHandle(persistedReceipt, storeReceipt.sessionHead);
+      final acceptedReceipt = await _restoreAcceptedCreateReceipt(
+        command.commandId,
+        contentDigest,
+      );
+      await _publishAcceptedCommandEvents(
+        acceptedReceipt,
+        localEvents: <AgentEvent>[event],
+      );
+      return _withHandle(acceptedReceipt, storeReceipt.sessionHead);
     } on AgentStoreException catch (error) {
       throw _mapStoreError(error);
     }
@@ -252,8 +259,16 @@ final class AgentKernel {
         transaction,
         requestedDurability: _durability,
       );
-      _publish(events);
-      return _withHandle(persistedReceipt, storeReceipt.afterHead);
+      final acceptedReceipt = await _restoreAcceptedSessionReceipt(
+        command.handle.sessionId,
+        command.commandId,
+        contentDigest,
+      );
+      await _publishAcceptedCommandEvents(
+        acceptedReceipt,
+        localEvents: events,
+      );
+      return _withHandle(acceptedReceipt, storeReceipt.afterHead);
     } on AgentStoreException catch (error) {
       throw _mapStoreError(error);
     }
@@ -1145,6 +1160,96 @@ final class AgentKernel {
         ),
       );
 
+  Future<AgentCommandReceipt> _restoreAcceptedCreateReceipt(
+    CommandId commandId,
+    String contentDigest,
+  ) async {
+    final accepted = await _store.lookupCreateSessionCommand(commandId);
+    if (accepted == null) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.corruption,
+        'Committed create command is missing from the root registry.',
+      );
+    }
+    return restoreCommandReceipt(accepted, contentDigest);
+  }
+
+  Future<AgentCommandReceipt> _restoreAcceptedSessionReceipt(
+    SessionId sessionId,
+    CommandId commandId,
+    String contentDigest,
+  ) async {
+    final accepted = await _store.lookupAcceptedCommand(sessionId, commandId);
+    if (accepted == null) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.corruption,
+        'Committed command is missing from the Session registry.',
+      );
+    }
+    return restoreCommandReceipt(accepted, contentDigest);
+  }
+
+  Future<void> _publishAcceptedCommandEvents(
+    AgentCommandReceipt receipt, {
+    required List<AgentEvent> localEvents,
+  }) async {
+    if (_sameEventIds(
+      receipt.eventIds,
+      localEvents.map((event) => event.eventId).toList(growable: false),
+    )) {
+      _publish(localEvents);
+      return;
+    }
+    final firstSequence =
+        receipt.acceptedThroughSequence - receipt.eventIds.length + 1;
+    if (firstSequence <= 0) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.corruption,
+        'Accepted command receipt has an invalid event range.',
+      );
+    }
+    final persistedEvents = <AgentEvent>[];
+    var cursor = AgentStoreCursor(firstSequence - 1);
+    try {
+      while (persistedEvents.length < receipt.eventIds.length) {
+        final page = await _store.readEvents(
+          receipt.sessionId,
+          after: cursor,
+          limit: receipt.eventIds.length - persistedEvents.length,
+        );
+        if (page.events.isEmpty) {
+          throw const AgentStoreException(
+            AgentStoreErrorCode.corruption,
+            'Accepted command events are missing from the journal.',
+          );
+        }
+        persistedEvents.addAll(page.events);
+        cursor = page.nextCursor;
+      }
+    } on AgentStoreException catch (error) {
+      if (error.code == AgentStoreErrorCode.cursorCompacted) return;
+      rethrow;
+    }
+    if (!_sameEventIds(
+      receipt.eventIds,
+      persistedEvents.map((event) => event.eventId).toList(growable: false),
+    )) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.corruption,
+        'Accepted command receipt does not match the journal.',
+      );
+    }
+    _publish(persistedEvents);
+  }
+
+  bool _sameEventIds(List<EventId> left, List<EventId> right) {
+    if (left.length != right.length) return false;
+    for (var index = 0; index < left.length; index += 1) {
+      if (left[index] != right[index]) return false;
+    }
+    return true;
+  }
+
   Future<_PreparedRunCommand> _prepareRunCommand(
     RunCommand command,
   ) async {
@@ -1227,8 +1332,16 @@ final class AgentKernel {
         ),
         requestedDurability: _durability,
       );
-      _publish(events);
-      return _withHandle(persistedReceipt, receipt.afterHead);
+      final acceptedReceipt = await _restoreAcceptedSessionReceipt(
+        command.handle.sessionId,
+        command.commandId,
+        contentDigest,
+      );
+      await _publishAcceptedCommandEvents(
+        acceptedReceipt,
+        localEvents: events,
+      );
+      return _withHandle(acceptedReceipt, receipt.afterHead);
     } on AgentStoreException catch (error) {
       throw _mapStoreError(error);
     }

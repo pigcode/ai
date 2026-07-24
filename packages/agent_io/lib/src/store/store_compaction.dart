@@ -43,24 +43,17 @@ final class StorePrefixCommitment {
 }
 
 bool snapshotProjectionIsSafeToPrune(
-  Map<String, Object?> projection,
+  Map<String, Object?> canonicalProjection,
 ) {
-  if (!projection.containsKey('currentRunId') ||
-      !projection.containsKey('workItems') ||
-      !projection.containsKey('approvals') ||
-      !projection.containsKey('deferredOperations') ||
-      !projection.containsKey('resources')) {
+  final AgentSessionProjection projection;
+  try {
+    projection = AgentSessionProjection.fromJson(canonicalProjection);
+  } on FormatException {
     return false;
   }
-  if (projection['currentRunId'] != null) return false;
-  for (final key in <String>[
-    'workItems',
-    'approvals',
-    'deferredOperations',
-    'resources',
-  ]) {
-    final value = projection[key];
-    if (value is! Map<String, Object?> || value.isNotEmpty) return false;
-  }
-  return true;
+  return projection.currentRunId == null &&
+      projection.workItems.isEmpty &&
+      projection.approvals.isEmpty &&
+      projection.deferredOperations.isEmpty &&
+      projection.resources.isEmpty;
 }
