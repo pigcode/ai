@@ -37,4 +37,33 @@ void main() {
     );
     expect(recorder.frames, isEmpty);
   });
+
+  test('redacts credential maps nested through arbitrary list depth', () async {
+    const secret = 'dap-deep-secret';
+    final recorder = DapRecorder();
+    final frame = recorder.record(
+      source: jsonEncode(<String, Object?>{
+        'seq': 1,
+        'type': 'request',
+        'command': 'launch',
+        'arguments': <String, Object?>{
+          'custom': <Object?>[
+            <Object?>[
+              <String, Object?>{'token': secret},
+            ],
+          ],
+        },
+      }),
+    );
+
+    expect(jsonEncode(frame.envelope), isNot(contains(secret)));
+    expect(utf8.decode(frame.contentLengthBytes), isNot(contains(secret)));
+    await recorder.replay((recorded) {
+      expect(jsonEncode(recorded.envelope), isNot(contains(secret)));
+      expect(
+        utf8.decode(recorded.contentLengthBytes),
+        isNot(contains(secret)),
+      );
+    });
+  });
 }

@@ -111,8 +111,7 @@ JsonValue _redactValue(String key, Object? value) {
   }
   if (value is List<Object?>) {
     return <Object?>[
-      for (final item in value)
-        if (item is Map<String, Object?>) _redactObject(item) else item,
+      for (final item in value) _redactValue('', item),
     ];
   }
   return value;

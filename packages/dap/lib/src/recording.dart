@@ -106,8 +106,7 @@ JsonValue _redactValue(String key, Object? value) {
   return switch (value) {
     final Map<String, Object?> object => _redactObject(object),
     final List<Object?> list => <Object?>[
-        for (final item in list)
-          if (item is Map<String, Object?>) _redactObject(item) else item,
+        for (final item in list) _redactValue('', item),
       ],
     _ => value,
   };

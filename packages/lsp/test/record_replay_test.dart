@@ -44,4 +44,35 @@ void main() {
     );
     expect(recorder.frames, isEmpty);
   });
+
+  test('redacts credential maps nested through arbitrary list depth', () async {
+    const secret = 'lsp-deep-secret';
+    final recorder = LspRecorder();
+    final frame = recorder.record(
+      sender: LspMessageSender.client,
+      source: jsonEncode(<String, Object?>{
+        'jsonrpc': '2.0',
+        'method': 'workspace/didChangeConfiguration',
+        'params': <String, Object?>{
+          'settings': <String, Object?>{
+            'layers': <Object?>[
+              <Object?>[
+                <String, Object?>{'apiKey': secret},
+              ],
+            ],
+          },
+        },
+      }),
+    );
+
+    expect(jsonEncode(frame.envelope), isNot(contains(secret)));
+    expect(utf8.decode(frame.contentLengthBytes), isNot(contains(secret)));
+    await recorder.replay((recorded) {
+      expect(jsonEncode(recorded.envelope), isNot(contains(secret)));
+      expect(
+        utf8.decode(recorded.contentLengthBytes),
+        isNot(contains(secret)),
+      );
+    });
+  });
 }
