@@ -66,4 +66,48 @@ void main() {
       );
     });
   });
+
+  test('redacts compound credential keys in launch and attach', () async {
+    for (final command in <String>['launch', 'attach']) {
+      final secrets = <String>[
+        '$command-client-secret',
+        '$command-access-token',
+        '$command-api-key',
+      ];
+      final recorder = DapRecorder();
+      final frame = recorder.record(
+        source: jsonEncode(<String, Object?>{
+          'seq': 1,
+          'type': 'request',
+          'command': command,
+          'arguments': <String, Object?>{
+            'clientSecret': secrets[0],
+            'nested': <String, Object?>{'accessToken': secrets[1]},
+            'custom': <Object?>[
+              <Object?>[
+                <String, Object?>{'apiKey': secrets[2]},
+              ],
+            ],
+          },
+        }),
+      );
+
+      for (final secret in secrets) {
+        expect(jsonEncode(frame.envelope), isNot(contains(secret)));
+        expect(
+          utf8.decode(frame.contentLengthBytes),
+          isNot(contains(secret)),
+        );
+      }
+      await recorder.replay((recorded) {
+        for (final secret in secrets) {
+          expect(jsonEncode(recorded.envelope), isNot(contains(secret)));
+          expect(
+            utf8.decode(recorded.contentLengthBytes),
+            isNot(contains(secret)),
+          );
+        }
+      });
+    }
+  });
 }

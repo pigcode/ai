@@ -94,14 +94,9 @@ JsonObject _redactObject(JsonObject value) => freezeJsonObject(
 
 JsonValue _redactValue(String key, Object? value) {
   final normalized = key.toLowerCase().replaceAll(RegExp('[^a-z]'), '');
-  if (_sensitiveKeys.contains(normalized)) {
-    return value is Map
-        ? const <String, Object?>{}
-        : value is List
-            ? const <Object?>[]
-            : value == null
-                ? null
-                : '[REDACTED]';
+  if (_environmentKeys.contains(normalized) ||
+      _credentialKeyFragments.any(normalized.contains)) {
+    return _replacement(value);
   }
   return switch (value) {
     final Map<String, Object?> object => _redactObject(object),
@@ -112,10 +107,25 @@ JsonValue _redactValue(String key, Object? value) {
   };
 }
 
-const _sensitiveKeys = <String>{
+JsonValue _replacement(Object? value) => switch (value) {
+      List<Object?>() => const <Object?>[],
+      Map<Object?, Object?>() => const <String, Object?>{},
+      null => null,
+      _ => '[REDACTED]',
+    };
+
+const _environmentKeys = <String>{
   'env',
   'environment',
+};
+
+const _credentialKeyFragments = <String>{
+  'apikey',
+  'authorization',
+  'cookie',
+  'credential',
   'password',
+  'privatekey',
   'secret',
   'token',
 };
