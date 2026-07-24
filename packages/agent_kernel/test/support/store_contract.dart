@@ -273,6 +273,39 @@ void agentStoreContract(
       expect((await store.loadSession(_session)).head, before);
     });
 
+    test('newly referenced IDs require exact allocation', () async {
+      final store = await _createdStore(createStore, mutationDurability);
+      final before = (await store.loadSession(_session)).head;
+      final missingRunAllocation = AgentStoreTransaction(
+        sessionId: _session,
+        expectedHead: before,
+        acceptedCommand: AgentStoreAcceptedCommand(
+          commandId: _startCommand,
+          contentDigest: _digest('missing-run-allocation'),
+          receipt: <String, Object?>{
+            'kind': 'startRun',
+            'runId': _run.value,
+          },
+        ),
+        newIdAllocations: <AgentStoreIdAllocation>[
+          AgentStoreIdAllocation(_startCommand),
+          AgentStoreIdAllocation(_eventId(2)),
+        ],
+        events: <AgentEvent>[
+          _event(2, AgentEventType.runCreated, runId: _run),
+        ],
+      );
+
+      expect(
+        () => store.append(
+          missingRunAllocation,
+          requestedDurability: mutationDurability,
+        ),
+        throwsA(_storeError(AgentStoreErrorCode.invalidTransaction)),
+      );
+      expect((await store.loadSession(_session)).head, before);
+    });
+
     test('paged reads, snapshot, cursor floor, and compact retry work',
         () async {
       final store = await _createdStore(createStore, mutationDurability);

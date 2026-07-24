@@ -412,6 +412,11 @@ final class InMemoryAgentStore implements AgentStore {
         transaction.acceptedCommand.commandId,
         ...transaction.events.map((event) => event.eventId),
       ],
+      referencedIds: _transactionReferences(
+        transaction.events,
+        commandId: transaction.acceptedCommand.commandId,
+        sessionId: transaction.sessionId,
+      ),
     );
   }
 
@@ -437,6 +442,10 @@ final class InMemoryAgentStore implements AgentStore {
     _validateAllocations(
       transaction.newIdAllocations,
       requiredIds: requiredIds,
+      referencedIds: _transactionReferences(
+        transaction.events,
+        commandId: transaction.acceptedCommand?.commandId,
+      ),
       existingIds: session.allocatedIds,
     );
   }
@@ -455,6 +464,7 @@ final class InMemoryAgentStore implements AgentStore {
   void _validateAllocations(
     List<AgentStoreIdAllocation> allocations, {
     required List<OpaqueId> requiredIds,
+    required Set<String> referencedIds,
     Set<String> existingIds = const <String>{},
   }) {
     final values = <String>{};
@@ -466,6 +476,12 @@ final class InMemoryAgentStore implements AgentStore {
           'Logical ID was already allocated.',
         );
       }
+      if (!referencedIds.contains(allocation.id.value)) {
+        throw const AgentStoreException(
+          AgentStoreErrorCode.invalidTransaction,
+          'Transaction allocates an unreferenced logical ID.',
+        );
+      }
     }
     if (requiredIds.any((id) => !values.contains(id.value))) {
       throw const AgentStoreException(
@@ -473,7 +489,69 @@ final class InMemoryAgentStore implements AgentStore {
         'Transaction omits a required logical ID allocation.',
       );
     }
+    if (referencedIds.any(
+      (id) => !existingIds.contains(id) && !values.contains(id),
+    )) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.invalidTransaction,
+        'Transaction omits a newly referenced logical ID allocation.',
+      );
+    }
   }
+
+  Set<String> _transactionReferences(
+    List<AgentEvent> events, {
+    CommandId? commandId,
+    SessionId? sessionId,
+  }) {
+    final result = <String>{
+      if (commandId != null) commandId.value,
+      if (sessionId != null) sessionId.value,
+    };
+    void collect(Object? value) {
+      if (value is String) {
+        try {
+          result.add(_parseAgentOpaqueId(value).value);
+        } on FormatException {
+          // Non-ID strings are ordinary domain values.
+        }
+      } else if (value is List<Object?>) {
+        for (final item in value) {
+          collect(item);
+        }
+      } else if (value is Map<String, Object?>) {
+        for (final item in value.values) {
+          collect(item);
+        }
+      }
+    }
+
+    for (final event in events) {
+      result
+        ..add(event.eventId.value)
+        ..add(event.sessionId.value)
+        ..add(event.causationId.value);
+      if (event.runId != null) result.add(event.runId!.value);
+      if (event.attemptId != null) result.add(event.attemptId!.value);
+      if (event.workItemId != null) result.add(event.workItemId!.value);
+      collect(event.payload);
+    }
+    return result;
+  }
+}
+
+OpaqueId _parseAgentOpaqueId(String value) {
+  if (value.startsWith('ses_')) return SessionId.parse(value);
+  if (value.startsWith('run_')) return RunId.parse(value);
+  if (value.startsWith('evt_')) return EventId.parse(value);
+  if (value.startsWith('cmd_')) return CommandId.parse(value);
+  if (value.startsWith('wrk_')) return WorkItemId.parse(value);
+  if (value.startsWith('att_')) return AttemptId.parse(value);
+  if (value.startsWith('apr_')) return ApprovalId.parse(value);
+  if (value.startsWith('dop_')) return DeferredOperationId.parse(value);
+  if (value.startsWith('res_')) return RuntimeResourceId.parse(value);
+  if (value.startsWith('snp_')) return SnapshotId.parse(value);
+  throw FormatException('Unknown opaque identifier kind.', value);
 }
 
 final class _MemorySession {

@@ -169,6 +169,7 @@ void main() {
         sessionId: created.sessionId,
         expectedHead: started.sessionHandle!.head,
         newIdAllocations: <AgentStoreIdAllocation>[
+          AgentStoreIdAllocation(driverCommand),
           AgentStoreIdAllocation(attemptId),
           AgentStoreIdAllocation(attemptEventId),
           AgentStoreIdAllocation(startedEventId),

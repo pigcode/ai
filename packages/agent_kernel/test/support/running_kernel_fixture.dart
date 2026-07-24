@@ -58,6 +58,7 @@ Future<RunningKernelState> prepareRunningRun(
       sessionId: created.sessionId,
       expectedHead: started.sessionHandle!.head,
       newIdAllocations: <AgentStoreIdAllocation>[
+        AgentStoreIdAllocation(runningDriverCommandId),
         AgentStoreIdAllocation(runningAttemptId),
         AgentStoreIdAllocation(runningAttemptEventId),
         AgentStoreIdAllocation(runningStartedEventId),

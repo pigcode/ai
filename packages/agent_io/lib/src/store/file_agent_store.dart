@@ -2079,6 +2079,14 @@ final class FileAgentStore implements AgentStore {
         'Transaction omits a required logical ID allocation.',
       );
     }
+    if (referencedIds.any(
+      (id) => !existingIds.contains(id) && !values.contains(id),
+    )) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.invalidTransaction,
+        'Transaction omits a newly referenced logical ID allocation.',
+      );
+    }
   }
 
   Set<String> _transactionReferences(
