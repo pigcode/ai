@@ -21,6 +21,9 @@ provider integrations.
 | `packages/mcp` | `pigcode_ai_mcp` | MCP `2025-11-25` client/server APIs, portable Streamable HTTP, VM-only IO adapters, OAuth, tasks, and Pigcode AI mappings. |
 | `packages/agent_kernel` | `pigcode_ai_agent_kernel` | Portable event-sourced Agent domain, command, policy, reducer, stream, and Store contracts. |
 | `packages/agent_io` | `pigcode_ai_agent_io` | VM-only immutable-generation `FileAgentStore` with process-crash recovery, exact registries, snapshots, and explicit retention. |
+| `packages/lsp` | `pigcode_ai_lsp` | Portable LSP stable APIs, explicit proposed opt-in, lifecycle, capabilities, document state, proposals, and codecs. |
+| `packages/dap` | `pigcode_ai_dap` | Portable DAP schema, lifecycle, debug state, proposals, references, and codecs. |
+| `packages/dart` | `pigcode_ai_dart` | Portable Analysis Server, DTD, and VM Service protocol APIs with fixed source and runtime profiles. |
 
 ## Status
 
@@ -32,9 +35,11 @@ separately.
 
 ```bash
 dart pub get
+dart run tool/check_format.dart
 dart run tool/check_workspace.dart
 dart run tool/protocol_codegen.dart --check
 dart run tool/check_protocol_compatibility.dart
+dart run tool/check_dart_tooling_compatibility.dart
 dart run tool/check_agent_kernel_schema.dart
 dart run tool/check_kernel_store_compatibility.dart
 dart run melos format
@@ -77,6 +82,14 @@ known unsupported capabilities are recorded in
 and summarized in [Kernel and Store support](docs/kernel-store-support.md).
 `processCrashFlush` means a complete artifact was flushed before its receipt;
 it is process/SIGKILL evidence, not raw-device power-loss durability.
+
+Phase 2b adds 41 bounded Dart tooling claims across LSP, DAP, Analysis Server,
+DTD, VM Service, and cross-package portability. Exact source revisions, peer
+profiles, evidence, and unsupported scope are recorded in
+[`compatibility/phase-2b-dart-tooling.json`](compatibility/phase-2b-dart-tooling.json)
+and summarized in [Dart tooling protocol support](docs/dart-tooling-support.md).
+The libraries remain transport-independent and do not grant host authorization
+or perform process, terminal, socket, or filesystem side effects.
 
 ## License and provenance
 

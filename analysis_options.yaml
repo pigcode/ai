@@ -1,0 +1,4 @@
+analyzer:
+  exclude:
+    - tool/upstream/**
+    - tool/fixtures/dart_tooling/analyzer_workspace/**

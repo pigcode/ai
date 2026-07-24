@@ -1,0 +1,19 @@
+name: pigcode_ai_dap
+description: Portable Debug Adapter Protocol models, codecs, and client primitives for Pigcode.
+version: 0.0.1
+publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_protocol_utils: ^0.0.1
+  json_schema: ^5.2.2
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0

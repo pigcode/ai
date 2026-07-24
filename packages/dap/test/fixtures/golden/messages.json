@@ -1,0 +1,2671 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "release": "v1.71.0",
+    "revision": "51d95ea4e692b34c5d06601bbd1bebc1ff3fbdd4",
+    "sha256": "ff8ae4c6cfd588a050e9346c35fd104748a27ef4518d1c3268529ca6f8ff5818"
+  },
+  "cases": [
+    {
+      "id": "request:cancel",
+      "kind": "request",
+      "name": "cancel",
+      "definition": "CancelRequest",
+      "envelope": {
+        "seq": 1,
+        "type": "request",
+        "command": "cancel"
+      }
+    },
+    {
+      "id": "response:cancel",
+      "kind": "response",
+      "name": "cancel",
+      "definition": "CancelResponse",
+      "requestCommand": "cancel",
+      "envelope": {
+        "seq": 2,
+        "type": "response",
+        "request_seq": 1,
+        "success": true,
+        "command": "cancel"
+      }
+    },
+    {
+      "id": "request:runInTerminal",
+      "kind": "request",
+      "name": "runInTerminal",
+      "definition": "RunInTerminalRequest",
+      "envelope": {
+        "seq": 3,
+        "type": "request",
+        "command": "runInTerminal",
+        "arguments": {
+          "args": [],
+          "cwd": ""
+        }
+      }
+    },
+    {
+      "id": "response:runInTerminal",
+      "kind": "response",
+      "name": "runInTerminal",
+      "definition": "RunInTerminalResponse",
+      "requestCommand": "runInTerminal",
+      "envelope": {
+        "seq": 4,
+        "type": "response",
+        "request_seq": 2,
+        "success": true,
+        "command": "runInTerminal",
+        "body": {}
+      }
+    },
+    {
+      "id": "request:startDebugging",
+      "kind": "request",
+      "name": "startDebugging",
+      "definition": "StartDebuggingRequest",
+      "envelope": {
+        "seq": 5,
+        "type": "request",
+        "command": "startDebugging",
+        "arguments": {
+          "configuration": {},
+          "request": "launch"
+        }
+      }
+    },
+    {
+      "id": "response:startDebugging",
+      "kind": "response",
+      "name": "startDebugging",
+      "definition": "StartDebuggingResponse",
+      "requestCommand": "startDebugging",
+      "envelope": {
+        "seq": 6,
+        "type": "response",
+        "request_seq": 3,
+        "success": true,
+        "command": "startDebugging"
+      }
+    },
+    {
+      "id": "request:initialize",
+      "kind": "request",
+      "name": "initialize",
+      "definition": "InitializeRequest",
+      "envelope": {
+        "seq": 7,
+        "type": "request",
+        "command": "initialize",
+        "arguments": {
+          "adapterID": ""
+        }
+      }
+    },
+    {
+      "id": "response:initialize",
+      "kind": "response",
+      "name": "initialize",
+      "definition": "InitializeResponse",
+      "requestCommand": "initialize",
+      "envelope": {
+        "seq": 8,
+        "type": "response",
+        "request_seq": 4,
+        "success": true,
+        "command": "initialize"
+      }
+    },
+    {
+      "id": "request:configurationDone",
+      "kind": "request",
+      "name": "configurationDone",
+      "definition": "ConfigurationDoneRequest",
+      "envelope": {
+        "seq": 9,
+        "type": "request",
+        "command": "configurationDone"
+      }
+    },
+    {
+      "id": "response:configurationDone",
+      "kind": "response",
+      "name": "configurationDone",
+      "definition": "ConfigurationDoneResponse",
+      "requestCommand": "configurationDone",
+      "envelope": {
+        "seq": 10,
+        "type": "response",
+        "request_seq": 5,
+        "success": true,
+        "command": "configurationDone"
+      }
+    },
+    {
+      "id": "request:launch",
+      "kind": "request",
+      "name": "launch",
+      "definition": "LaunchRequest",
+      "envelope": {
+        "seq": 11,
+        "type": "request",
+        "command": "launch",
+        "arguments": {}
+      }
+    },
+    {
+      "id": "response:launch",
+      "kind": "response",
+      "name": "launch",
+      "definition": "LaunchResponse",
+      "requestCommand": "launch",
+      "envelope": {
+        "seq": 12,
+        "type": "response",
+        "request_seq": 6,
+        "success": true,
+        "command": "launch"
+      }
+    },
+    {
+      "id": "request:attach",
+      "kind": "request",
+      "name": "attach",
+      "definition": "AttachRequest",
+      "envelope": {
+        "seq": 13,
+        "type": "request",
+        "command": "attach",
+        "arguments": {}
+      }
+    },
+    {
+      "id": "response:attach",
+      "kind": "response",
+      "name": "attach",
+      "definition": "AttachResponse",
+      "requestCommand": "attach",
+      "envelope": {
+        "seq": 14,
+        "type": "response",
+        "request_seq": 7,
+        "success": true,
+        "command": "attach"
+      }
+    },
+    {
+      "id": "request:restart",
+      "kind": "request",
+      "name": "restart",
+      "definition": "RestartRequest",
+      "envelope": {
+        "seq": 15,
+        "type": "request",
+        "command": "restart"
+      }
+    },
+    {
+      "id": "response:restart",
+      "kind": "response",
+      "name": "restart",
+      "definition": "RestartResponse",
+      "requestCommand": "restart",
+      "envelope": {
+        "seq": 16,
+        "type": "response",
+        "request_seq": 8,
+        "success": true,
+        "command": "restart"
+      }
+    },
+    {
+      "id": "request:disconnect",
+      "kind": "request",
+      "name": "disconnect",
+      "definition": "DisconnectRequest",
+      "envelope": {
+        "seq": 17,
+        "type": "request",
+        "command": "disconnect"
+      }
+    },
+    {
+      "id": "response:disconnect",
+      "kind": "response",
+      "name": "disconnect",
+      "definition": "DisconnectResponse",
+      "requestCommand": "disconnect",
+      "envelope": {
+        "seq": 18,
+        "type": "response",
+        "request_seq": 9,
+        "success": true,
+        "command": "disconnect"
+      }
+    },
+    {
+      "id": "request:terminate",
+      "kind": "request",
+      "name": "terminate",
+      "definition": "TerminateRequest",
+      "envelope": {
+        "seq": 19,
+        "type": "request",
+        "command": "terminate"
+      }
+    },
+    {
+      "id": "response:terminate",
+      "kind": "response",
+      "name": "terminate",
+      "definition": "TerminateResponse",
+      "requestCommand": "terminate",
+      "envelope": {
+        "seq": 20,
+        "type": "response",
+        "request_seq": 10,
+        "success": true,
+        "command": "terminate"
+      }
+    },
+    {
+      "id": "request:breakpointLocations",
+      "kind": "request",
+      "name": "breakpointLocations",
+      "definition": "BreakpointLocationsRequest",
+      "envelope": {
+        "seq": 21,
+        "type": "request",
+        "command": "breakpointLocations"
+      }
+    },
+    {
+      "id": "response:breakpointLocations",
+      "kind": "response",
+      "name": "breakpointLocations",
+      "definition": "BreakpointLocationsResponse",
+      "requestCommand": "breakpointLocations",
+      "envelope": {
+        "seq": 22,
+        "type": "response",
+        "request_seq": 11,
+        "success": true,
+        "command": "breakpointLocations",
+        "body": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "request:setBreakpoints",
+      "kind": "request",
+      "name": "setBreakpoints",
+      "definition": "SetBreakpointsRequest",
+      "envelope": {
+        "seq": 23,
+        "type": "request",
+        "command": "setBreakpoints",
+        "arguments": {
+          "source": {}
+        }
+      }
+    },
+    {
+      "id": "response:setBreakpoints",
+      "kind": "response",
+      "name": "setBreakpoints",
+      "definition": "SetBreakpointsResponse",
+      "requestCommand": "setBreakpoints",
+      "envelope": {
+        "seq": 24,
+        "type": "response",
+        "request_seq": 12,
+        "success": true,
+        "command": "setBreakpoints",
+        "body": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "request:setFunctionBreakpoints",
+      "kind": "request",
+      "name": "setFunctionBreakpoints",
+      "definition": "SetFunctionBreakpointsRequest",
+      "envelope": {
+        "seq": 25,
+        "type": "request",
+        "command": "setFunctionBreakpoints",
+        "arguments": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "response:setFunctionBreakpoints",
+      "kind": "response",
+      "name": "setFunctionBreakpoints",
+      "definition": "SetFunctionBreakpointsResponse",
+      "requestCommand": "setFunctionBreakpoints",
+      "envelope": {
+        "seq": 26,
+        "type": "response",
+        "request_seq": 13,
+        "success": true,
+        "command": "setFunctionBreakpoints",
+        "body": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "request:setExceptionBreakpoints",
+      "kind": "request",
+      "name": "setExceptionBreakpoints",
+      "definition": "SetExceptionBreakpointsRequest",
+      "envelope": {
+        "seq": 27,
+        "type": "request",
+        "command": "setExceptionBreakpoints",
+        "arguments": {
+          "filters": []
+        }
+      }
+    },
+    {
+      "id": "response:setExceptionBreakpoints",
+      "kind": "response",
+      "name": "setExceptionBreakpoints",
+      "definition": "SetExceptionBreakpointsResponse",
+      "requestCommand": "setExceptionBreakpoints",
+      "envelope": {
+        "seq": 28,
+        "type": "response",
+        "request_seq": 14,
+        "success": true,
+        "command": "setExceptionBreakpoints"
+      }
+    },
+    {
+      "id": "request:dataBreakpointInfo",
+      "kind": "request",
+      "name": "dataBreakpointInfo",
+      "definition": "DataBreakpointInfoRequest",
+      "envelope": {
+        "seq": 29,
+        "type": "request",
+        "command": "dataBreakpointInfo",
+        "arguments": {
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "response:dataBreakpointInfo",
+      "kind": "response",
+      "name": "dataBreakpointInfo",
+      "definition": "DataBreakpointInfoResponse",
+      "requestCommand": "dataBreakpointInfo",
+      "envelope": {
+        "seq": 30,
+        "type": "response",
+        "request_seq": 15,
+        "success": true,
+        "command": "dataBreakpointInfo",
+        "body": {
+          "dataId": "",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "request:setDataBreakpoints",
+      "kind": "request",
+      "name": "setDataBreakpoints",
+      "definition": "SetDataBreakpointsRequest",
+      "envelope": {
+        "seq": 31,
+        "type": "request",
+        "command": "setDataBreakpoints",
+        "arguments": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "response:setDataBreakpoints",
+      "kind": "response",
+      "name": "setDataBreakpoints",
+      "definition": "SetDataBreakpointsResponse",
+      "requestCommand": "setDataBreakpoints",
+      "envelope": {
+        "seq": 32,
+        "type": "response",
+        "request_seq": 16,
+        "success": true,
+        "command": "setDataBreakpoints",
+        "body": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "request:setInstructionBreakpoints",
+      "kind": "request",
+      "name": "setInstructionBreakpoints",
+      "definition": "SetInstructionBreakpointsRequest",
+      "envelope": {
+        "seq": 33,
+        "type": "request",
+        "command": "setInstructionBreakpoints",
+        "arguments": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "response:setInstructionBreakpoints",
+      "kind": "response",
+      "name": "setInstructionBreakpoints",
+      "definition": "SetInstructionBreakpointsResponse",
+      "requestCommand": "setInstructionBreakpoints",
+      "envelope": {
+        "seq": 34,
+        "type": "response",
+        "request_seq": 17,
+        "success": true,
+        "command": "setInstructionBreakpoints",
+        "body": {
+          "breakpoints": []
+        }
+      }
+    },
+    {
+      "id": "request:continue",
+      "kind": "request",
+      "name": "continue",
+      "definition": "ContinueRequest",
+      "envelope": {
+        "seq": 35,
+        "type": "request",
+        "command": "continue",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:continue",
+      "kind": "response",
+      "name": "continue",
+      "definition": "ContinueResponse",
+      "requestCommand": "continue",
+      "envelope": {
+        "seq": 36,
+        "type": "response",
+        "request_seq": 18,
+        "success": true,
+        "command": "continue",
+        "body": {}
+      }
+    },
+    {
+      "id": "request:next",
+      "kind": "request",
+      "name": "next",
+      "definition": "NextRequest",
+      "envelope": {
+        "seq": 37,
+        "type": "request",
+        "command": "next",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:next",
+      "kind": "response",
+      "name": "next",
+      "definition": "NextResponse",
+      "requestCommand": "next",
+      "envelope": {
+        "seq": 38,
+        "type": "response",
+        "request_seq": 19,
+        "success": true,
+        "command": "next"
+      }
+    },
+    {
+      "id": "request:stepIn",
+      "kind": "request",
+      "name": "stepIn",
+      "definition": "StepInRequest",
+      "envelope": {
+        "seq": 39,
+        "type": "request",
+        "command": "stepIn",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:stepIn",
+      "kind": "response",
+      "name": "stepIn",
+      "definition": "StepInResponse",
+      "requestCommand": "stepIn",
+      "envelope": {
+        "seq": 40,
+        "type": "response",
+        "request_seq": 20,
+        "success": true,
+        "command": "stepIn"
+      }
+    },
+    {
+      "id": "request:stepOut",
+      "kind": "request",
+      "name": "stepOut",
+      "definition": "StepOutRequest",
+      "envelope": {
+        "seq": 41,
+        "type": "request",
+        "command": "stepOut",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:stepOut",
+      "kind": "response",
+      "name": "stepOut",
+      "definition": "StepOutResponse",
+      "requestCommand": "stepOut",
+      "envelope": {
+        "seq": 42,
+        "type": "response",
+        "request_seq": 21,
+        "success": true,
+        "command": "stepOut"
+      }
+    },
+    {
+      "id": "request:stepBack",
+      "kind": "request",
+      "name": "stepBack",
+      "definition": "StepBackRequest",
+      "envelope": {
+        "seq": 43,
+        "type": "request",
+        "command": "stepBack",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:stepBack",
+      "kind": "response",
+      "name": "stepBack",
+      "definition": "StepBackResponse",
+      "requestCommand": "stepBack",
+      "envelope": {
+        "seq": 44,
+        "type": "response",
+        "request_seq": 22,
+        "success": true,
+        "command": "stepBack"
+      }
+    },
+    {
+      "id": "request:reverseContinue",
+      "kind": "request",
+      "name": "reverseContinue",
+      "definition": "ReverseContinueRequest",
+      "envelope": {
+        "seq": 45,
+        "type": "request",
+        "command": "reverseContinue",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:reverseContinue",
+      "kind": "response",
+      "name": "reverseContinue",
+      "definition": "ReverseContinueResponse",
+      "requestCommand": "reverseContinue",
+      "envelope": {
+        "seq": 46,
+        "type": "response",
+        "request_seq": 23,
+        "success": true,
+        "command": "reverseContinue"
+      }
+    },
+    {
+      "id": "request:restartFrame",
+      "kind": "request",
+      "name": "restartFrame",
+      "definition": "RestartFrameRequest",
+      "envelope": {
+        "seq": 47,
+        "type": "request",
+        "command": "restartFrame",
+        "arguments": {
+          "frameId": 0
+        }
+      }
+    },
+    {
+      "id": "response:restartFrame",
+      "kind": "response",
+      "name": "restartFrame",
+      "definition": "RestartFrameResponse",
+      "requestCommand": "restartFrame",
+      "envelope": {
+        "seq": 48,
+        "type": "response",
+        "request_seq": 24,
+        "success": true,
+        "command": "restartFrame"
+      }
+    },
+    {
+      "id": "request:goto",
+      "kind": "request",
+      "name": "goto",
+      "definition": "GotoRequest",
+      "envelope": {
+        "seq": 49,
+        "type": "request",
+        "command": "goto",
+        "arguments": {
+          "threadId": 0,
+          "targetId": 0
+        }
+      }
+    },
+    {
+      "id": "response:goto",
+      "kind": "response",
+      "name": "goto",
+      "definition": "GotoResponse",
+      "requestCommand": "goto",
+      "envelope": {
+        "seq": 50,
+        "type": "response",
+        "request_seq": 25,
+        "success": true,
+        "command": "goto"
+      }
+    },
+    {
+      "id": "request:pause",
+      "kind": "request",
+      "name": "pause",
+      "definition": "PauseRequest",
+      "envelope": {
+        "seq": 51,
+        "type": "request",
+        "command": "pause",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:pause",
+      "kind": "response",
+      "name": "pause",
+      "definition": "PauseResponse",
+      "requestCommand": "pause",
+      "envelope": {
+        "seq": 52,
+        "type": "response",
+        "request_seq": 26,
+        "success": true,
+        "command": "pause"
+      }
+    },
+    {
+      "id": "request:stackTrace",
+      "kind": "request",
+      "name": "stackTrace",
+      "definition": "StackTraceRequest",
+      "envelope": {
+        "seq": 53,
+        "type": "request",
+        "command": "stackTrace",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:stackTrace",
+      "kind": "response",
+      "name": "stackTrace",
+      "definition": "StackTraceResponse",
+      "requestCommand": "stackTrace",
+      "envelope": {
+        "seq": 54,
+        "type": "response",
+        "request_seq": 27,
+        "success": true,
+        "command": "stackTrace",
+        "body": {
+          "stackFrames": []
+        }
+      }
+    },
+    {
+      "id": "request:scopes",
+      "kind": "request",
+      "name": "scopes",
+      "definition": "ScopesRequest",
+      "envelope": {
+        "seq": 55,
+        "type": "request",
+        "command": "scopes",
+        "arguments": {
+          "frameId": 0
+        }
+      }
+    },
+    {
+      "id": "response:scopes",
+      "kind": "response",
+      "name": "scopes",
+      "definition": "ScopesResponse",
+      "requestCommand": "scopes",
+      "envelope": {
+        "seq": 56,
+        "type": "response",
+        "request_seq": 28,
+        "success": true,
+        "command": "scopes",
+        "body": {
+          "scopes": []
+        }
+      }
+    },
+    {
+      "id": "request:variables",
+      "kind": "request",
+      "name": "variables",
+      "definition": "VariablesRequest",
+      "envelope": {
+        "seq": 57,
+        "type": "request",
+        "command": "variables",
+        "arguments": {
+          "variablesReference": 0
+        }
+      }
+    },
+    {
+      "id": "response:variables",
+      "kind": "response",
+      "name": "variables",
+      "definition": "VariablesResponse",
+      "requestCommand": "variables",
+      "envelope": {
+        "seq": 58,
+        "type": "response",
+        "request_seq": 29,
+        "success": true,
+        "command": "variables",
+        "body": {
+          "variables": []
+        }
+      }
+    },
+    {
+      "id": "request:setVariable",
+      "kind": "request",
+      "name": "setVariable",
+      "definition": "SetVariableRequest",
+      "envelope": {
+        "seq": 59,
+        "type": "request",
+        "command": "setVariable",
+        "arguments": {
+          "variablesReference": 0,
+          "name": "",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "response:setVariable",
+      "kind": "response",
+      "name": "setVariable",
+      "definition": "SetVariableResponse",
+      "requestCommand": "setVariable",
+      "envelope": {
+        "seq": 60,
+        "type": "response",
+        "request_seq": 30,
+        "success": true,
+        "command": "setVariable",
+        "body": {
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "request:source",
+      "kind": "request",
+      "name": "source",
+      "definition": "SourceRequest",
+      "envelope": {
+        "seq": 61,
+        "type": "request",
+        "command": "source",
+        "arguments": {
+          "sourceReference": 0
+        }
+      }
+    },
+    {
+      "id": "response:source",
+      "kind": "response",
+      "name": "source",
+      "definition": "SourceResponse",
+      "requestCommand": "source",
+      "envelope": {
+        "seq": 62,
+        "type": "response",
+        "request_seq": 31,
+        "success": true,
+        "command": "source",
+        "body": {
+          "content": ""
+        }
+      }
+    },
+    {
+      "id": "request:threads",
+      "kind": "request",
+      "name": "threads",
+      "definition": "ThreadsRequest",
+      "envelope": {
+        "seq": 63,
+        "type": "request",
+        "command": "threads"
+      }
+    },
+    {
+      "id": "response:threads",
+      "kind": "response",
+      "name": "threads",
+      "definition": "ThreadsResponse",
+      "requestCommand": "threads",
+      "envelope": {
+        "seq": 64,
+        "type": "response",
+        "request_seq": 32,
+        "success": true,
+        "command": "threads",
+        "body": {
+          "threads": []
+        }
+      }
+    },
+    {
+      "id": "request:terminateThreads",
+      "kind": "request",
+      "name": "terminateThreads",
+      "definition": "TerminateThreadsRequest",
+      "envelope": {
+        "seq": 65,
+        "type": "request",
+        "command": "terminateThreads",
+        "arguments": {}
+      }
+    },
+    {
+      "id": "response:terminateThreads",
+      "kind": "response",
+      "name": "terminateThreads",
+      "definition": "TerminateThreadsResponse",
+      "requestCommand": "terminateThreads",
+      "envelope": {
+        "seq": 66,
+        "type": "response",
+        "request_seq": 33,
+        "success": true,
+        "command": "terminateThreads"
+      }
+    },
+    {
+      "id": "request:modules",
+      "kind": "request",
+      "name": "modules",
+      "definition": "ModulesRequest",
+      "envelope": {
+        "seq": 67,
+        "type": "request",
+        "command": "modules",
+        "arguments": {}
+      }
+    },
+    {
+      "id": "response:modules",
+      "kind": "response",
+      "name": "modules",
+      "definition": "ModulesResponse",
+      "requestCommand": "modules",
+      "envelope": {
+        "seq": 68,
+        "type": "response",
+        "request_seq": 34,
+        "success": true,
+        "command": "modules",
+        "body": {
+          "modules": []
+        }
+      }
+    },
+    {
+      "id": "request:loadedSources",
+      "kind": "request",
+      "name": "loadedSources",
+      "definition": "LoadedSourcesRequest",
+      "envelope": {
+        "seq": 69,
+        "type": "request",
+        "command": "loadedSources"
+      }
+    },
+    {
+      "id": "response:loadedSources",
+      "kind": "response",
+      "name": "loadedSources",
+      "definition": "LoadedSourcesResponse",
+      "requestCommand": "loadedSources",
+      "envelope": {
+        "seq": 70,
+        "type": "response",
+        "request_seq": 35,
+        "success": true,
+        "command": "loadedSources",
+        "body": {
+          "sources": []
+        }
+      }
+    },
+    {
+      "id": "request:evaluate",
+      "kind": "request",
+      "name": "evaluate",
+      "definition": "EvaluateRequest",
+      "envelope": {
+        "seq": 71,
+        "type": "request",
+        "command": "evaluate",
+        "arguments": {
+          "expression": ""
+        }
+      }
+    },
+    {
+      "id": "response:evaluate",
+      "kind": "response",
+      "name": "evaluate",
+      "definition": "EvaluateResponse",
+      "requestCommand": "evaluate",
+      "envelope": {
+        "seq": 72,
+        "type": "response",
+        "request_seq": 36,
+        "success": true,
+        "command": "evaluate",
+        "body": {
+          "result": "",
+          "variablesReference": 0
+        }
+      }
+    },
+    {
+      "id": "request:setExpression",
+      "kind": "request",
+      "name": "setExpression",
+      "definition": "SetExpressionRequest",
+      "envelope": {
+        "seq": 73,
+        "type": "request",
+        "command": "setExpression",
+        "arguments": {
+          "expression": "",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "response:setExpression",
+      "kind": "response",
+      "name": "setExpression",
+      "definition": "SetExpressionResponse",
+      "requestCommand": "setExpression",
+      "envelope": {
+        "seq": 74,
+        "type": "response",
+        "request_seq": 37,
+        "success": true,
+        "command": "setExpression",
+        "body": {
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "request:stepInTargets",
+      "kind": "request",
+      "name": "stepInTargets",
+      "definition": "StepInTargetsRequest",
+      "envelope": {
+        "seq": 75,
+        "type": "request",
+        "command": "stepInTargets",
+        "arguments": {
+          "frameId": 0
+        }
+      }
+    },
+    {
+      "id": "response:stepInTargets",
+      "kind": "response",
+      "name": "stepInTargets",
+      "definition": "StepInTargetsResponse",
+      "requestCommand": "stepInTargets",
+      "envelope": {
+        "seq": 76,
+        "type": "response",
+        "request_seq": 38,
+        "success": true,
+        "command": "stepInTargets",
+        "body": {
+          "targets": []
+        }
+      }
+    },
+    {
+      "id": "request:gotoTargets",
+      "kind": "request",
+      "name": "gotoTargets",
+      "definition": "GotoTargetsRequest",
+      "envelope": {
+        "seq": 77,
+        "type": "request",
+        "command": "gotoTargets",
+        "arguments": {
+          "source": {},
+          "line": 0
+        }
+      }
+    },
+    {
+      "id": "response:gotoTargets",
+      "kind": "response",
+      "name": "gotoTargets",
+      "definition": "GotoTargetsResponse",
+      "requestCommand": "gotoTargets",
+      "envelope": {
+        "seq": 78,
+        "type": "response",
+        "request_seq": 39,
+        "success": true,
+        "command": "gotoTargets",
+        "body": {
+          "targets": []
+        }
+      }
+    },
+    {
+      "id": "request:completions",
+      "kind": "request",
+      "name": "completions",
+      "definition": "CompletionsRequest",
+      "envelope": {
+        "seq": 79,
+        "type": "request",
+        "command": "completions",
+        "arguments": {
+          "text": "",
+          "column": 0
+        }
+      }
+    },
+    {
+      "id": "response:completions",
+      "kind": "response",
+      "name": "completions",
+      "definition": "CompletionsResponse",
+      "requestCommand": "completions",
+      "envelope": {
+        "seq": 80,
+        "type": "response",
+        "request_seq": 40,
+        "success": true,
+        "command": "completions",
+        "body": {
+          "targets": []
+        }
+      }
+    },
+    {
+      "id": "request:exceptionInfo",
+      "kind": "request",
+      "name": "exceptionInfo",
+      "definition": "ExceptionInfoRequest",
+      "envelope": {
+        "seq": 81,
+        "type": "request",
+        "command": "exceptionInfo",
+        "arguments": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "response:exceptionInfo",
+      "kind": "response",
+      "name": "exceptionInfo",
+      "definition": "ExceptionInfoResponse",
+      "requestCommand": "exceptionInfo",
+      "envelope": {
+        "seq": 82,
+        "type": "response",
+        "request_seq": 41,
+        "success": true,
+        "command": "exceptionInfo",
+        "body": {
+          "exceptionId": "",
+          "breakMode": "never"
+        }
+      }
+    },
+    {
+      "id": "request:readMemory",
+      "kind": "request",
+      "name": "readMemory",
+      "definition": "ReadMemoryRequest",
+      "envelope": {
+        "seq": 83,
+        "type": "request",
+        "command": "readMemory",
+        "arguments": {
+          "memoryReference": "",
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "response:readMemory",
+      "kind": "response",
+      "name": "readMemory",
+      "definition": "ReadMemoryResponse",
+      "requestCommand": "readMemory",
+      "envelope": {
+        "seq": 84,
+        "type": "response",
+        "request_seq": 42,
+        "success": true,
+        "command": "readMemory"
+      }
+    },
+    {
+      "id": "request:writeMemory",
+      "kind": "request",
+      "name": "writeMemory",
+      "definition": "WriteMemoryRequest",
+      "envelope": {
+        "seq": 85,
+        "type": "request",
+        "command": "writeMemory",
+        "arguments": {
+          "memoryReference": "",
+          "data": ""
+        }
+      }
+    },
+    {
+      "id": "response:writeMemory",
+      "kind": "response",
+      "name": "writeMemory",
+      "definition": "WriteMemoryResponse",
+      "requestCommand": "writeMemory",
+      "envelope": {
+        "seq": 86,
+        "type": "response",
+        "request_seq": 43,
+        "success": true,
+        "command": "writeMemory"
+      }
+    },
+    {
+      "id": "request:disassemble",
+      "kind": "request",
+      "name": "disassemble",
+      "definition": "DisassembleRequest",
+      "envelope": {
+        "seq": 87,
+        "type": "request",
+        "command": "disassemble",
+        "arguments": {
+          "memoryReference": "",
+          "instructionCount": 0
+        }
+      }
+    },
+    {
+      "id": "response:disassemble",
+      "kind": "response",
+      "name": "disassemble",
+      "definition": "DisassembleResponse",
+      "requestCommand": "disassemble",
+      "envelope": {
+        "seq": 88,
+        "type": "response",
+        "request_seq": 44,
+        "success": true,
+        "command": "disassemble"
+      }
+    },
+    {
+      "id": "request:locations",
+      "kind": "request",
+      "name": "locations",
+      "definition": "LocationsRequest",
+      "envelope": {
+        "seq": 89,
+        "type": "request",
+        "command": "locations",
+        "arguments": {
+          "locationReference": 0
+        }
+      }
+    },
+    {
+      "id": "response:locations",
+      "kind": "response",
+      "name": "locations",
+      "definition": "LocationsResponse",
+      "requestCommand": "locations",
+      "envelope": {
+        "seq": 90,
+        "type": "response",
+        "request_seq": 45,
+        "success": true,
+        "command": "locations"
+      }
+    },
+    {
+      "id": "event:initialized",
+      "kind": "event",
+      "name": "initialized",
+      "definition": "InitializedEvent",
+      "envelope": {
+        "seq": 91,
+        "type": "event",
+        "event": "initialized"
+      }
+    },
+    {
+      "id": "event:stopped",
+      "kind": "event",
+      "name": "stopped",
+      "definition": "StoppedEvent",
+      "envelope": {
+        "seq": 92,
+        "type": "event",
+        "event": "stopped",
+        "body": {
+          "reason": "step"
+        }
+      }
+    },
+    {
+      "id": "event:continued",
+      "kind": "event",
+      "name": "continued",
+      "definition": "ContinuedEvent",
+      "envelope": {
+        "seq": 93,
+        "type": "event",
+        "event": "continued",
+        "body": {
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "event:exited",
+      "kind": "event",
+      "name": "exited",
+      "definition": "ExitedEvent",
+      "envelope": {
+        "seq": 94,
+        "type": "event",
+        "event": "exited",
+        "body": {
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "id": "event:terminated",
+      "kind": "event",
+      "name": "terminated",
+      "definition": "TerminatedEvent",
+      "envelope": {
+        "seq": 95,
+        "type": "event",
+        "event": "terminated"
+      }
+    },
+    {
+      "id": "event:thread",
+      "kind": "event",
+      "name": "thread",
+      "definition": "ThreadEvent",
+      "envelope": {
+        "seq": 96,
+        "type": "event",
+        "event": "thread",
+        "body": {
+          "reason": "started",
+          "threadId": 0
+        }
+      }
+    },
+    {
+      "id": "event:output",
+      "kind": "event",
+      "name": "output",
+      "definition": "OutputEvent",
+      "envelope": {
+        "seq": 97,
+        "type": "event",
+        "event": "output",
+        "body": {
+          "output": ""
+        }
+      }
+    },
+    {
+      "id": "event:breakpoint",
+      "kind": "event",
+      "name": "breakpoint",
+      "definition": "BreakpointEvent",
+      "envelope": {
+        "seq": 98,
+        "type": "event",
+        "event": "breakpoint",
+        "body": {
+          "reason": "changed",
+          "breakpoint": {
+            "verified": false
+          }
+        }
+      }
+    },
+    {
+      "id": "event:module",
+      "kind": "event",
+      "name": "module",
+      "definition": "ModuleEvent",
+      "envelope": {
+        "seq": 99,
+        "type": "event",
+        "event": "module",
+        "body": {
+          "reason": "new",
+          "module": {
+            "id": 0,
+            "name": ""
+          }
+        }
+      }
+    },
+    {
+      "id": "event:loadedSource",
+      "kind": "event",
+      "name": "loadedSource",
+      "definition": "LoadedSourceEvent",
+      "envelope": {
+        "seq": 100,
+        "type": "event",
+        "event": "loadedSource",
+        "body": {
+          "reason": "new",
+          "source": {}
+        }
+      }
+    },
+    {
+      "id": "event:process",
+      "kind": "event",
+      "name": "process",
+      "definition": "ProcessEvent",
+      "envelope": {
+        "seq": 101,
+        "type": "event",
+        "event": "process",
+        "body": {
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "event:capabilities",
+      "kind": "event",
+      "name": "capabilities",
+      "definition": "CapabilitiesEvent",
+      "envelope": {
+        "seq": 102,
+        "type": "event",
+        "event": "capabilities",
+        "body": {
+          "capabilities": {}
+        }
+      }
+    },
+    {
+      "id": "event:progressStart",
+      "kind": "event",
+      "name": "progressStart",
+      "definition": "ProgressStartEvent",
+      "envelope": {
+        "seq": 103,
+        "type": "event",
+        "event": "progressStart",
+        "body": {
+          "progressId": "",
+          "title": ""
+        }
+      }
+    },
+    {
+      "id": "event:progressUpdate",
+      "kind": "event",
+      "name": "progressUpdate",
+      "definition": "ProgressUpdateEvent",
+      "envelope": {
+        "seq": 104,
+        "type": "event",
+        "event": "progressUpdate",
+        "body": {
+          "progressId": ""
+        }
+      }
+    },
+    {
+      "id": "event:progressEnd",
+      "kind": "event",
+      "name": "progressEnd",
+      "definition": "ProgressEndEvent",
+      "envelope": {
+        "seq": 105,
+        "type": "event",
+        "event": "progressEnd",
+        "body": {
+          "progressId": ""
+        }
+      }
+    },
+    {
+      "id": "event:invalidated",
+      "kind": "event",
+      "name": "invalidated",
+      "definition": "InvalidatedEvent",
+      "envelope": {
+        "seq": 106,
+        "type": "event",
+        "event": "invalidated",
+        "body": {}
+      }
+    },
+    {
+      "id": "event:memory",
+      "kind": "event",
+      "name": "memory",
+      "definition": "MemoryEvent",
+      "envelope": {
+        "seq": 107,
+        "type": "event",
+        "event": "memory",
+        "body": {
+          "memoryReference": "",
+          "offset": -9007199254740991,
+          "count": 0
+        }
+      }
+    }
+  ],
+  "definitionSamples": {
+    "AttachRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "attach",
+      "arguments": {}
+    },
+    "AttachRequestArguments": {},
+    "AttachResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "Breakpoint": {
+      "verified": false
+    },
+    "BreakpointEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "breakpoint",
+      "body": {
+        "reason": "changed",
+        "breakpoint": {
+          "verified": false
+        }
+      }
+    },
+    "BreakpointLocation": {
+      "line": 0
+    },
+    "BreakpointLocationsArguments": {
+      "source": {},
+      "line": 0
+    },
+    "BreakpointLocationsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "breakpointLocations"
+    },
+    "BreakpointLocationsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "breakpoints": []
+      }
+    },
+    "BreakpointMode": {
+      "mode": "",
+      "label": "",
+      "appliesTo": []
+    },
+    "BreakpointModeApplicability": "source",
+    "CancelArguments": {},
+    "CancelRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "cancel"
+    },
+    "CancelResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "Capabilities": {},
+    "CapabilitiesEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "capabilities",
+      "body": {
+        "capabilities": {}
+      }
+    },
+    "Checksum": {
+      "algorithm": "MD5",
+      "checksum": ""
+    },
+    "ChecksumAlgorithm": "MD5",
+    "ColumnDescriptor": {
+      "attributeName": "",
+      "label": ""
+    },
+    "CompletionItem": {
+      "label": ""
+    },
+    "CompletionItemType": "method",
+    "CompletionsArguments": {
+      "text": "",
+      "column": 0
+    },
+    "CompletionsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "completions",
+      "arguments": {
+        "text": "",
+        "column": 0
+      }
+    },
+    "CompletionsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "targets": []
+      }
+    },
+    "ConfigurationDoneArguments": {},
+    "ConfigurationDoneRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "configurationDone"
+    },
+    "ConfigurationDoneResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "ContinueArguments": {
+      "threadId": 0
+    },
+    "ContinueRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "continue",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "ContinueResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {}
+    },
+    "ContinuedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "continued",
+      "body": {
+        "threadId": 0
+      }
+    },
+    "DataBreakpoint": {
+      "dataId": ""
+    },
+    "DataBreakpointAccessType": "read",
+    "DataBreakpointInfoArguments": {
+      "name": ""
+    },
+    "DataBreakpointInfoRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "dataBreakpointInfo",
+      "arguments": {
+        "name": ""
+      }
+    },
+    "DataBreakpointInfoResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "dataId": "",
+        "description": ""
+      }
+    },
+    "DisassembleArguments": {
+      "memoryReference": "",
+      "instructionCount": 0
+    },
+    "DisassembleRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "disassemble",
+      "arguments": {
+        "memoryReference": "",
+        "instructionCount": 0
+      }
+    },
+    "DisassembleResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "DisassembledInstruction": {
+      "address": "",
+      "instruction": ""
+    },
+    "DisconnectArguments": {},
+    "DisconnectRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "disconnect"
+    },
+    "DisconnectResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "ErrorResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {}
+    },
+    "EvaluateArguments": {
+      "expression": ""
+    },
+    "EvaluateRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "evaluate",
+      "arguments": {
+        "expression": ""
+      }
+    },
+    "EvaluateResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "result": "",
+        "variablesReference": 0
+      }
+    },
+    "Event": {
+      "seq": 1,
+      "type": "event",
+      "event": ""
+    },
+    "ExceptionBreakMode": "never",
+    "ExceptionBreakpointsFilter": {
+      "filter": "",
+      "label": ""
+    },
+    "ExceptionDetails": {},
+    "ExceptionFilterOptions": {
+      "filterId": ""
+    },
+    "ExceptionInfoArguments": {
+      "threadId": 0
+    },
+    "ExceptionInfoRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "exceptionInfo",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "ExceptionInfoResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "exceptionId": "",
+        "breakMode": "never"
+      }
+    },
+    "ExceptionOptions": {
+      "breakMode": "never"
+    },
+    "ExceptionPathSegment": {
+      "names": []
+    },
+    "ExitedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "exited",
+      "body": {
+        "exitCode": 0
+      }
+    },
+    "FunctionBreakpoint": {
+      "name": ""
+    },
+    "GotoArguments": {
+      "threadId": 0,
+      "targetId": 0
+    },
+    "GotoRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "goto",
+      "arguments": {
+        "threadId": 0,
+        "targetId": 0
+      }
+    },
+    "GotoResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "GotoTarget": {
+      "id": 0,
+      "label": "",
+      "line": 0
+    },
+    "GotoTargetsArguments": {
+      "source": {},
+      "line": 0
+    },
+    "GotoTargetsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "gotoTargets",
+      "arguments": {
+        "source": {},
+        "line": 0
+      }
+    },
+    "GotoTargetsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "targets": []
+      }
+    },
+    "InitializeRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "initialize",
+      "arguments": {
+        "adapterID": ""
+      }
+    },
+    "InitializeRequestArguments": {
+      "adapterID": ""
+    },
+    "InitializeResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "InitializedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "initialized"
+    },
+    "InstructionBreakpoint": {
+      "instructionReference": ""
+    },
+    "InvalidatedAreas": "all",
+    "InvalidatedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "invalidated",
+      "body": {}
+    },
+    "LaunchRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "launch",
+      "arguments": {}
+    },
+    "LaunchRequestArguments": {},
+    "LaunchResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "LoadedSourceEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "loadedSource",
+      "body": {
+        "reason": "new",
+        "source": {}
+      }
+    },
+    "LoadedSourcesArguments": {},
+    "LoadedSourcesRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "loadedSources"
+    },
+    "LoadedSourcesResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "sources": []
+      }
+    },
+    "LocationsArguments": {
+      "locationReference": 0
+    },
+    "LocationsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "locations",
+      "arguments": {
+        "locationReference": 0
+      }
+    },
+    "LocationsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "MemoryEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "memory",
+      "body": {
+        "memoryReference": "",
+        "offset": -9007199254740991,
+        "count": 0
+      }
+    },
+    "Message": {
+      "id": 0,
+      "format": ""
+    },
+    "Module": {
+      "id": 0,
+      "name": ""
+    },
+    "ModuleEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "module",
+      "body": {
+        "reason": "new",
+        "module": {
+          "id": 0,
+          "name": ""
+        }
+      }
+    },
+    "ModulesArguments": {},
+    "ModulesRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "modules",
+      "arguments": {}
+    },
+    "ModulesResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "modules": []
+      }
+    },
+    "NextArguments": {
+      "threadId": 0
+    },
+    "NextRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "next",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "NextResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "OutputEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "output",
+      "body": {
+        "output": ""
+      }
+    },
+    "PauseArguments": {
+      "threadId": 0
+    },
+    "PauseRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "pause",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "PauseResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "ProcessEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "process",
+      "body": {
+        "name": ""
+      }
+    },
+    "ProgressEndEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "progressEnd",
+      "body": {
+        "progressId": ""
+      }
+    },
+    "ProgressStartEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "progressStart",
+      "body": {
+        "progressId": "",
+        "title": ""
+      }
+    },
+    "ProgressUpdateEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "progressUpdate",
+      "body": {
+        "progressId": ""
+      }
+    },
+    "ProtocolMessage": {
+      "seq": 1,
+      "type": "request"
+    },
+    "ReadMemoryArguments": {
+      "memoryReference": "",
+      "count": 0
+    },
+    "ReadMemoryRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "readMemory",
+      "arguments": {
+        "memoryReference": "",
+        "count": 0
+      }
+    },
+    "ReadMemoryResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "Request": {
+      "seq": 1,
+      "type": "request",
+      "command": ""
+    },
+    "Response": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "RestartArguments": {},
+    "RestartFrameArguments": {
+      "frameId": 0
+    },
+    "RestartFrameRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "restartFrame",
+      "arguments": {
+        "frameId": 0
+      }
+    },
+    "RestartFrameResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "RestartRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "restart"
+    },
+    "RestartResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "ReverseContinueArguments": {
+      "threadId": 0
+    },
+    "ReverseContinueRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "reverseContinue",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "ReverseContinueResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "RunInTerminalRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "runInTerminal",
+      "arguments": {
+        "args": [],
+        "cwd": ""
+      }
+    },
+    "RunInTerminalRequestArguments": {
+      "args": [],
+      "cwd": ""
+    },
+    "RunInTerminalResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {}
+    },
+    "Scope": {
+      "name": "",
+      "variablesReference": 0,
+      "expensive": false
+    },
+    "ScopesArguments": {
+      "frameId": 0
+    },
+    "ScopesRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "scopes",
+      "arguments": {
+        "frameId": 0
+      }
+    },
+    "ScopesResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "scopes": []
+      }
+    },
+    "SetBreakpointsArguments": {
+      "source": {}
+    },
+    "SetBreakpointsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setBreakpoints",
+      "arguments": {
+        "source": {}
+      }
+    },
+    "SetBreakpointsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "breakpoints": []
+      }
+    },
+    "SetDataBreakpointsArguments": {
+      "breakpoints": []
+    },
+    "SetDataBreakpointsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setDataBreakpoints",
+      "arguments": {
+        "breakpoints": []
+      }
+    },
+    "SetDataBreakpointsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "breakpoints": []
+      }
+    },
+    "SetExceptionBreakpointsArguments": {
+      "filters": []
+    },
+    "SetExceptionBreakpointsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setExceptionBreakpoints",
+      "arguments": {
+        "filters": []
+      }
+    },
+    "SetExceptionBreakpointsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "SetExpressionArguments": {
+      "expression": "",
+      "value": ""
+    },
+    "SetExpressionRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setExpression",
+      "arguments": {
+        "expression": "",
+        "value": ""
+      }
+    },
+    "SetExpressionResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "value": ""
+      }
+    },
+    "SetFunctionBreakpointsArguments": {
+      "breakpoints": []
+    },
+    "SetFunctionBreakpointsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setFunctionBreakpoints",
+      "arguments": {
+        "breakpoints": []
+      }
+    },
+    "SetFunctionBreakpointsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "breakpoints": []
+      }
+    },
+    "SetInstructionBreakpointsArguments": {
+      "breakpoints": []
+    },
+    "SetInstructionBreakpointsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setInstructionBreakpoints",
+      "arguments": {
+        "breakpoints": []
+      }
+    },
+    "SetInstructionBreakpointsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "breakpoints": []
+      }
+    },
+    "SetVariableArguments": {
+      "variablesReference": 0,
+      "name": "",
+      "value": ""
+    },
+    "SetVariableRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "setVariable",
+      "arguments": {
+        "variablesReference": 0,
+        "name": "",
+        "value": ""
+      }
+    },
+    "SetVariableResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "value": ""
+      }
+    },
+    "Source": {},
+    "SourceArguments": {
+      "sourceReference": 0
+    },
+    "SourceBreakpoint": {
+      "line": 0
+    },
+    "SourceRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "source",
+      "arguments": {
+        "sourceReference": 0
+      }
+    },
+    "SourceResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "content": ""
+      }
+    },
+    "StackFrame": {
+      "id": 0,
+      "name": "",
+      "line": 0,
+      "column": 0
+    },
+    "StackFrameFormat": {},
+    "StackTraceArguments": {
+      "threadId": 0
+    },
+    "StackTraceRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "StackTraceResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "stackFrames": []
+      }
+    },
+    "StartDebuggingRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "startDebugging",
+      "arguments": {
+        "configuration": {},
+        "request": "launch"
+      }
+    },
+    "StartDebuggingRequestArguments": {
+      "configuration": {},
+      "request": "launch"
+    },
+    "StartDebuggingResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "StepBackArguments": {
+      "threadId": 0
+    },
+    "StepBackRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "stepBack",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "StepBackResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "StepInArguments": {
+      "threadId": 0
+    },
+    "StepInRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "stepIn",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "StepInResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "StepInTarget": {
+      "id": 0,
+      "label": ""
+    },
+    "StepInTargetsArguments": {
+      "frameId": 0
+    },
+    "StepInTargetsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "stepInTargets",
+      "arguments": {
+        "frameId": 0
+      }
+    },
+    "StepInTargetsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "targets": []
+      }
+    },
+    "StepOutArguments": {
+      "threadId": 0
+    },
+    "StepOutRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "stepOut",
+      "arguments": {
+        "threadId": 0
+      }
+    },
+    "StepOutResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "SteppingGranularity": "statement",
+    "StoppedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "stopped",
+      "body": {
+        "reason": "step"
+      }
+    },
+    "TerminateArguments": {},
+    "TerminateRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "terminate"
+    },
+    "TerminateResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "TerminateThreadsArguments": {},
+    "TerminateThreadsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "terminateThreads",
+      "arguments": {}
+    },
+    "TerminateThreadsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    },
+    "TerminatedEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "terminated"
+    },
+    "Thread": {
+      "id": 0,
+      "name": ""
+    },
+    "ThreadEvent": {
+      "seq": 1,
+      "type": "event",
+      "event": "thread",
+      "body": {
+        "reason": "started",
+        "threadId": 0
+      }
+    },
+    "ThreadsRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "threads"
+    },
+    "ThreadsResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "threads": []
+      }
+    },
+    "ValueFormat": {},
+    "Variable": {
+      "name": "",
+      "value": "",
+      "variablesReference": 0
+    },
+    "VariablePresentationHint": {},
+    "VariablesArguments": {
+      "variablesReference": 0
+    },
+    "VariablesRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "variables",
+      "arguments": {
+        "variablesReference": 0
+      }
+    },
+    "VariablesResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": "",
+      "body": {
+        "variables": []
+      }
+    },
+    "WriteMemoryArguments": {
+      "memoryReference": "",
+      "data": ""
+    },
+    "WriteMemoryRequest": {
+      "seq": 1,
+      "type": "request",
+      "command": "writeMemory",
+      "arguments": {
+        "memoryReference": "",
+        "data": ""
+      }
+    },
+    "WriteMemoryResponse": {
+      "seq": 1,
+      "type": "response",
+      "request_seq": 1,
+      "success": false,
+      "command": ""
+    }
+  }
+}

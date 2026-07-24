@@ -1,6 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'dap_inventory.dart';
+import 'dart_tooling_inventory.dart';
+import 'lsp_inventory.dart';
+
+Map<String, Object?> buildPhase2bToolingInventory(Directory root) =>
+    <String, Object?>{
+      'formatVersion': 1,
+      'lsp': buildLspInventory(root).toJson(),
+      'dap': buildDapInventory(root).toJson(),
+      'dartTooling': buildDartToolingInventory(root).toJson(),
+    };
+
 final class ProtocolInventory {
   const ProtocolInventory({
     required this.acpDefinitionNames,
