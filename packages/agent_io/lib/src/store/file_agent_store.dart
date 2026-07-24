@@ -146,11 +146,11 @@ final class FileAgentStore implements AgentStore {
   @override
   Future<AgentStoreCreateSessionReceipt> createSession(
     AgentStoreCreateSessionTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) {
+    final requested = requestedDurability ?? options.defaultDurability;
     final achieved = requireFileStoreDurability(
-      requestedDurability,
+      requested,
       options,
     );
     return _coordinated<AgentStoreCreateSessionReceipt>(() async {
@@ -250,7 +250,7 @@ final class FileAgentStore implements AgentStore {
         sessionId: transaction.sessionId,
         sessionHead: sessionHead,
         eventIds: transaction.events.map((event) => event.eventId).toList(),
-        requestedDurability: requestedDurability,
+        requestedDurability: requested,
         achievedDurability: achieved,
       );
       final nextRoot = _FileRootState(
@@ -340,11 +340,11 @@ final class FileAgentStore implements AgentStore {
   @override
   Future<AgentStoreAppendReceipt> append(
     AgentStoreTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) {
+    final requested = requestedDurability ?? options.defaultDurability;
     final achieved = requireFileStoreDurability(
-      requestedDurability,
+      requested,
       options,
     );
     return _coordinated<AgentStoreAppendReceipt>(() async {
@@ -403,7 +403,7 @@ final class FileAgentStore implements AgentStore {
         beforeHead: session.head,
         afterHead: afterHead,
         eventIds: transaction.events.map((event) => event.eventId).toList(),
-        requestedDurability: requestedDurability,
+        requestedDurability: requested,
         achievedDurability: achieved,
       );
       await _writeSessionManifest(
@@ -437,11 +437,11 @@ final class FileAgentStore implements AgentStore {
   Future<AgentStoreAppendReceipt> writeSnapshot(
     AgentStoreSnapshot snapshot, {
     required AgentStoreHead expectedHead,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) {
+    final requested = requestedDurability ?? options.defaultDurability;
     final achieved = requireFileStoreDurability(
-      requestedDurability,
+      requested,
       options,
     );
     return _coordinated<AgentStoreAppendReceipt>(() async {
@@ -496,7 +496,7 @@ final class FileAgentStore implements AgentStore {
         beforeHead: session.head,
         afterHead: afterHead,
         eventIds: const <EventId>[],
-        requestedDurability: requestedDurability,
+        requestedDurability: requested,
         achievedDurability: achieved,
       );
       await _writeSessionManifest(
@@ -528,11 +528,11 @@ final class FileAgentStore implements AgentStore {
     SessionId sessionId, {
     required AgentStoreHead expectedHead,
     required int throughSequence,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) {
+    final requested = requestedDurability ?? options.defaultDurability;
     final achieved = requireFileStoreDurability(
-      requestedDurability,
+      requested,
       options,
     );
     return _coordinated<AgentStoreAppendReceipt>(() async {
@@ -615,7 +615,7 @@ final class FileAgentStore implements AgentStore {
         beforeHead: session.head,
         afterHead: afterHead,
         eventIds: const <EventId>[],
-        requestedDurability: requestedDurability,
+        requestedDurability: requested,
         achievedDurability: achieved,
       );
       await _writeSessionManifest(

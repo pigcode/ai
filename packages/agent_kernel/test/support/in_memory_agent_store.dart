@@ -33,10 +33,10 @@ final class InMemoryAgentStore implements AgentStore {
   @override
   Future<AgentStoreCreateSessionReceipt> createSession(
     AgentStoreCreateSessionTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) async {
-    _requireMemoryDurability(requestedDurability);
+    final requested = requestedDurability ?? AgentStoreDurability.memory;
+    _requireMemoryDurability(requested);
     final accepted = transaction.acceptedCommand;
     final previousCommand = _createCommands[accepted.commandId];
     if (previousCommand != null) {
@@ -88,7 +88,7 @@ final class InMemoryAgentStore implements AgentStore {
       sessionId: transaction.sessionId,
       sessionHead: sessionHead,
       eventIds: transaction.events.map((event) => event.eventId).toList(),
-      requestedDurability: requestedDurability,
+      requestedDurability: requested,
       achievedDurability: AgentStoreDurability.memory,
     );
 
@@ -162,10 +162,10 @@ final class InMemoryAgentStore implements AgentStore {
   @override
   Future<AgentStoreAppendReceipt> append(
     AgentStoreTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) async {
-    _requireMemoryDurability(requestedDurability);
+    final requested = requestedDurability ?? AgentStoreDurability.memory;
+    _requireMemoryDurability(requested);
     final session = _requireSession(transaction.sessionId);
     final accepted = transaction.acceptedCommand;
     if (accepted != null) {
@@ -208,7 +208,7 @@ final class InMemoryAgentStore implements AgentStore {
       beforeHead: beforeHead,
       afterHead: afterHead,
       eventIds: transaction.events.map((event) => event.eventId).toList(),
-      requestedDurability: requestedDurability,
+      requestedDurability: requested,
       achievedDurability: AgentStoreDurability.memory,
     );
 
@@ -227,10 +227,10 @@ final class InMemoryAgentStore implements AgentStore {
   Future<AgentStoreAppendReceipt> writeSnapshot(
     AgentStoreSnapshot snapshot, {
     required AgentStoreHead expectedHead,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) async {
-    _requireMemoryDurability(requestedDurability);
+    final requested = requestedDurability ?? AgentStoreDurability.memory;
+    _requireMemoryDurability(requested);
     final session = _requireSession(snapshot.sessionId);
     _requireHead(session.head, expectedHead);
     if (session.snapshotIds.contains(snapshot.snapshotId)) {
@@ -268,7 +268,7 @@ final class InMemoryAgentStore implements AgentStore {
       beforeHead: beforeHead,
       afterHead: afterHead,
       eventIds: const <EventId>[],
-      requestedDurability: requestedDurability,
+      requestedDurability: requested,
       achievedDurability: AgentStoreDurability.memory,
     );
     session
@@ -283,10 +283,10 @@ final class InMemoryAgentStore implements AgentStore {
     SessionId sessionId, {
     required AgentStoreHead expectedHead,
     required int throughSequence,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   }) async {
-    _requireMemoryDurability(requestedDurability);
+    final requested = requestedDurability ?? AgentStoreDurability.memory;
+    _requireMemoryDurability(requested);
     final session = _requireSession(sessionId);
     final previousReceipt = session.compactionReceipts[throughSequence];
     if (previousReceipt != null) {
@@ -316,7 +316,7 @@ final class InMemoryAgentStore implements AgentStore {
       beforeHead: beforeHead,
       afterHead: afterHead,
       eventIds: const <EventId>[],
-      requestedDurability: requestedDurability,
+      requestedDurability: requested,
       achievedDurability: AgentStoreDurability.memory,
     );
     session

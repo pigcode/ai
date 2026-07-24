@@ -127,6 +127,54 @@ void main() {
     expect((await fixture.store.loadRoot()).sessionIds, isEmpty);
   });
 
+  test('configured default durability applies when request is omitted',
+      () async {
+    fixture = await FileStoreFixture.create(
+      options: const FileStoreOptions(
+        defaultDurability: AgentStoreDurability.buffered,
+        allowBufferedDurability: true,
+        rootAccessPolicy: FileStoreRootAccessPolicy.explicitTestOnly,
+      ),
+    );
+    final AgentStore store = fixture.store;
+    final root = await store.loadRoot();
+    final created = await store.createSession(
+      fileCreateTransaction(root.head),
+    );
+    final appended = await store.append(
+      fileAppendTransaction(created.sessionHead),
+    );
+    final snapshotted = await store.writeSnapshot(
+      fileSnapshot(appended.afterHead),
+      expectedHead: appended.afterHead,
+    );
+    final compacted = await store.compact(
+      fileTestSessionId,
+      expectedHead: snapshotted.afterHead,
+      throughSequence: 1,
+    );
+
+    for (final receipt in <Object>[
+      created,
+      appended,
+      snapshotted,
+      compacted,
+    ]) {
+      final requested = switch (receipt) {
+        AgentStoreCreateSessionReceipt value => value.requestedDurability,
+        AgentStoreAppendReceipt value => value.requestedDurability,
+        _ => throw StateError('Unexpected receipt type.'),
+      };
+      final achieved = switch (receipt) {
+        AgentStoreCreateSessionReceipt value => value.achievedDurability,
+        AgentStoreAppendReceipt value => value.achievedDurability,
+        _ => throw StateError('Unexpected receipt type.'),
+      };
+      expect(requested, AgentStoreDurability.buffered);
+      expect(achieved, AgentStoreDurability.buffered);
+    }
+  });
+
   test('post-commit create receipt loss retries from durable registry',
       () async {
     fixture = await FileStoreFixture.create();

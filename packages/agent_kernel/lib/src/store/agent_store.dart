@@ -56,8 +56,7 @@ abstract interface class AgentStore {
 
   Future<AgentStoreCreateSessionReceipt> createSession(
     AgentStoreCreateSessionTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   });
 
   Future<AgentStoreSession> loadSession(SessionId sessionId);
@@ -75,22 +74,19 @@ abstract interface class AgentStore {
 
   Future<AgentStoreAppendReceipt> append(
     AgentStoreTransaction transaction, {
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   });
 
   Future<AgentStoreAppendReceipt> writeSnapshot(
     AgentStoreSnapshot snapshot, {
     required AgentStoreHead expectedHead,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   });
 
   Future<AgentStoreAppendReceipt> compact(
     SessionId sessionId, {
     required AgentStoreHead expectedHead,
     required int throughSequence,
-    AgentStoreDurability requestedDurability =
-        AgentStoreDurability.processCrashFlush,
+    AgentStoreDurability? requestedDurability,
   });
 }
