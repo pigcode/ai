@@ -147,9 +147,7 @@ final class DapConnection {
     }
     _completeExpected(requestSeq, command);
     _startCompleted = true;
-    if (_initializedEventReceived) {
-      _lifecycle = DapConnectionLifecycle.configuring;
-    }
+    _advanceAfterStartHandshake();
   }
 
   DapPendingRequest beginConfigurationDone() {
@@ -177,10 +175,14 @@ final class DapConnection {
     String command, {
     JsonValue arguments = const <String, Object?>{},
   }) {
-    if (_lifecycle != DapConnectionLifecycle.active) {
+    final allowedDuringConfiguration =
+        _lifecycle == DapConnectionLifecycle.configuring &&
+            _configurationCommands.contains(command);
+    if (_lifecycle != DapConnectionLifecycle.active &&
+        !allowedDuringConfiguration) {
       throw const DapStateException(
         'dap_request_out_of_state',
-        'Ordinary DAP requests require an active debug session.',
+        'DAP request is unavailable in the current debug session state.',
       );
     }
     return _allocateChecked(command, arguments);
@@ -233,9 +235,7 @@ final class DapConnection {
           );
         }
         _initializedEventReceived = true;
-        if (_startCompleted) {
-          _lifecycle = DapConnectionLifecycle.configuring;
-        }
+        _advanceAfterStartHandshake();
       case 'capabilities':
         final changes = body['capabilities'];
         if (changes is! Map<String, Object?>) {
@@ -333,7 +333,24 @@ final class DapConnection {
     pending._complete(failure);
     _tombstones[requestSeq] = command;
   }
+
+  void _advanceAfterStartHandshake() {
+    if (!_startCompleted || !_initializedEventReceived) {
+      return;
+    }
+    _lifecycle = capabilities.supportsCommand('configurationDone')
+        ? DapConnectionLifecycle.configuring
+        : DapConnectionLifecycle.active;
+  }
 }
+
+const _configurationCommands = <String>{
+  'setBreakpoints',
+  'setFunctionBreakpoints',
+  'setExceptionBreakpoints',
+  'setDataBreakpoints',
+  'setInstructionBreakpoints',
+};
 
 const _reverseCommands = <String>{
   'runInTerminal',

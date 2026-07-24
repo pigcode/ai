@@ -36,9 +36,16 @@ final class DapScriptedPeer {
       );
     scenarios.add('launch');
 
-    DapCodec.instance.decode(
-      '{"seq":10,"type":"request","command":"setBreakpoints",'
-      '"arguments":{"source":{"path":"/redacted.dart"},"breakpoints":[]}}',
+    final breakpoints = connection.beginRequest(
+      'setBreakpoints',
+      arguments: const <String, Object?>{
+        'source': <String, Object?>{'path': '/redacted.dart'},
+        'breakpoints': <Object?>[],
+      },
+    );
+    connection.completeResponse(
+      requestSeq: breakpoints.seq,
+      command: 'setBreakpoints',
     );
     scenarios.add('breakpoints');
 

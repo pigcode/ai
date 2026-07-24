@@ -358,7 +358,14 @@ Future<DapPeerReport> runDapPeer(
     }
     final debugInbox = childSession?.inbox ?? inbox;
     stage(childSession == null ? 'stopped' : 'child stopped');
-    var stopped = await debugInbox.event('stopped', deadline: deadline);
+    var stopped = await debugInbox.event(
+      'stopped',
+      deadline: deadline,
+      where: command.supportsStartDebugging
+          ? null
+          : (event) =>
+              (event['body'] as JsonObject?)?['reason'] == 'breakpoint',
+    );
     var stoppedBody = stopped['body']! as JsonObject;
     var nextSequence = 5;
     if (command.supportsStartDebugging && stoppedBody['reason'] == 'entry') {
@@ -387,7 +394,12 @@ Future<DapPeerReport> runDapPeer(
         arguments: <String, Object?>{'threadId': entryThreadId},
         deadline: deadline,
       );
-      stopped = await debugInbox.event('stopped', deadline: deadline);
+      stopped = await debugInbox.event(
+        'stopped',
+        deadline: deadline,
+        where: (event) =>
+            (event['body'] as JsonObject?)?['reason'] == 'breakpoint',
+      );
       stoppedBody = stopped['body']! as JsonObject;
     }
     if (command.supportsStartDebugging &&
@@ -651,9 +663,12 @@ final class _DapInbox {
   Future<JsonObject> event(
     String event, {
     required Duration deadline,
+    bool Function(JsonObject envelope)? where,
   }) async {
-    final queuedIndex =
-        _events.indexWhere((envelope) => envelope['event'] == event);
+    final queuedIndex = _events.indexWhere(
+      (envelope) =>
+          envelope['event'] == event && (where == null || where(envelope)),
+    );
     if (queuedIndex >= 0) {
       return _validateEvent(_events.removeAt(queuedIndex));
     }
@@ -662,7 +677,8 @@ final class _DapInbox {
       _trace(envelope);
       switch (envelope['type']) {
         case 'event':
-          if (envelope['event'] == event) {
+          if (envelope['event'] == event &&
+              (where == null || where(envelope))) {
             return _validateEvent(envelope);
           }
           _events.add(envelope);
