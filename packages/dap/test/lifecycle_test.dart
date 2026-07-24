@@ -101,6 +101,88 @@ void main() {
     }
   });
 
+  test('configures after initialized before the start response', () {
+    final connection = DapConnection();
+    final initialize = connection.beginInitialize();
+    connection.completeInitialize(
+      initialize.seq,
+      const <String, Object?>{'supportsConfigurationDoneRequest': true},
+    );
+    final launch = connection.beginLaunch(const <String, Object?>{});
+
+    connection.receiveEvent(
+      seq: 1,
+      event: 'initialized',
+      body: const <String, Object?>{},
+    );
+    expect(connection.lifecycle, DapConnectionLifecycle.configuring);
+
+    final breakpoints = connection.beginRequest(
+      'setBreakpoints',
+      arguments: const <String, Object?>{
+        'source': <String, Object?>{'path': '/workspace/main.dart'},
+        'breakpoints': <Object?>[],
+      },
+    );
+    connection.completeResponse(
+      requestSeq: breakpoints.seq,
+      command: 'setBreakpoints',
+    );
+    final configuration = connection.beginConfigurationDone();
+    connection.completeConfiguration(configuration.seq);
+
+    expect(connection.lifecycle, DapConnectionLifecycle.startPending);
+    expect(
+      () => connection.beginRequest('threads'),
+      throwsA(isA<DapStateException>()),
+    );
+
+    connection.completeStart(launch.seq);
+    expect(connection.lifecycle, DapConnectionLifecycle.active);
+    expect(connection.beginRequest('threads'), isA<DapPendingRequest>());
+  });
+
+  test('failed start response enters an explicit failed lifecycle', () {
+    for (final completeThroughGenericResponse in <bool>[false, true]) {
+      final connection = DapConnection();
+      final initialize = connection.beginInitialize();
+      connection.completeInitialize(
+        initialize.seq,
+        const <String, Object?>{'supportsConfigurationDoneRequest': true},
+      );
+      final launch = connection.beginLaunch(const <String, Object?>{});
+      connection.receiveEvent(
+        seq: 1,
+        event: 'initialized',
+        body: const <String, Object?>{},
+      );
+      final failure = StateError('launch rejected');
+
+      if (completeThroughGenericResponse) {
+        connection.completeResponse(
+          requestSeq: launch.seq,
+          command: 'launch',
+          failure: failure,
+        );
+      } else {
+        connection.completeStart(launch.seq, failure: failure);
+      }
+
+      expect(launch.done, isTrue);
+      expect(launch.failure, same(failure));
+      expect(connection.lifecycle, DapConnectionLifecycle.startFailed);
+      expect(
+        connection.beginConfigurationDone,
+        throwsA(isA<DapStateException>()),
+      );
+      expect(
+        () => connection.beginRequest('setBreakpoints'),
+        throwsA(isA<DapStateException>()),
+      );
+      expect(connection.beginDisconnect(), isA<DapPendingRequest>());
+    }
+  });
+
   test('becomes active when configurationDone is not supported', () {
     for (final initializedEventFirst in <bool>[false, true]) {
       final connection = _initializedConnection();
@@ -110,6 +192,21 @@ void main() {
           seq: 1,
           event: 'initialized',
           body: const <String, Object?>{},
+        );
+        final breakpoints = connection.beginRequest(
+          'setBreakpoints',
+          arguments: const <String, Object?>{
+            'source': <String, Object?>{'path': '/workspace/main.dart'},
+            'breakpoints': <Object?>[],
+          },
+        );
+        connection.completeResponse(
+          requestSeq: breakpoints.seq,
+          command: 'setBreakpoints',
+        );
+        expect(
+          () => connection.beginRequest('threads'),
+          throwsA(isA<DapStateException>()),
         );
         connection.completeStart(launch.seq);
       } else {

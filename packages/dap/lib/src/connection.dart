@@ -13,6 +13,7 @@ enum DapConnectionLifecycle {
   startPending,
   configuring,
   active,
+  startFailed,
   terminated,
   disconnectPending,
   disconnected,
@@ -66,7 +67,10 @@ final class DapConnection {
   DapCapabilitySnapshot? _capabilities;
   String? _startCommand;
   bool _startCompleted = false;
+  bool _startFailed = false;
   bool _initializedEventReceived = false;
+  bool _configurationDonePending = false;
+  bool _configurationCompleted = false;
 
   DapConnectionLifecycle get lifecycle => _lifecycle;
   int get nextSequence => _nextSequence;
@@ -138,47 +142,62 @@ final class DapConnection {
     return _allocateFrozen(command, frozenArguments);
   }
 
-  void completeStart(int requestSeq) {
+  void completeStart(int requestSeq, {Object? failure}) {
     final command = _startCommand;
-    if (_lifecycle != DapConnectionLifecycle.startPending || command == null) {
+    if (command == null || _startCompleted || _startFailed) {
       throw const DapStateException(
         'dap_start_response_unexpected',
         'DAP launch or attach response is not expected.',
       );
     }
-    _completeExpected(requestSeq, command);
+    _completeExpected(requestSeq, command, failure: failure);
+    if (failure != null) {
+      _startFailed = true;
+      _lifecycle = DapConnectionLifecycle.startFailed;
+      return;
+    }
     _startCompleted = true;
     _advanceAfterStartHandshake();
   }
 
   DapPendingRequest beginConfigurationDone() {
-    if (_lifecycle != DapConnectionLifecycle.configuring) {
+    if (!_initializedEventReceived ||
+        _configurationDonePending ||
+        _configurationCompleted ||
+        _startFailed ||
+        !capabilities.supportsCommand('configurationDone')) {
       throw const DapStateException(
         'dap_configuration_out_of_order',
         'DAP configurationDone requires the initialized event.',
       );
     }
-    return _allocateChecked('configurationDone', const <String, Object?>{});
+    final pending =
+        _allocateChecked('configurationDone', const <String, Object?>{});
+    _configurationDonePending = true;
+    return pending;
   }
 
   void completeConfiguration(int requestSeq) {
-    if (_lifecycle != DapConnectionLifecycle.configuring) {
+    if (!_configurationDonePending || _configurationCompleted) {
       throw const DapStateException(
         'dap_configuration_response_unexpected',
         'DAP configurationDone response is not expected.',
       );
     }
     _completeExpected(requestSeq, 'configurationDone');
-    _lifecycle = DapConnectionLifecycle.active;
+    _configurationDonePending = false;
+    _configurationCompleted = true;
+    _advanceAfterStartHandshake();
   }
 
   DapPendingRequest beginRequest(
     String command, {
     JsonValue arguments = const <String, Object?>{},
   }) {
-    final allowedDuringConfiguration =
-        _lifecycle == DapConnectionLifecycle.configuring &&
-            _configurationCommands.contains(command);
+    final allowedDuringConfiguration = _initializedEventReceived &&
+        !_configurationCompleted &&
+        !_startFailed &&
+        _configurationCommands.contains(command);
     if (_lifecycle != DapConnectionLifecycle.active &&
         !allowedDuringConfiguration) {
       throw const DapStateException(
@@ -194,11 +213,16 @@ final class DapConnection {
     required String command,
     Object? failure,
   }) {
+    if (command == _startCommand && !_startCompleted && !_startFailed) {
+      completeStart(requestSeq, failure: failure);
+      return;
+    }
     _completeExpected(requestSeq, command, failure: failure);
   }
 
   DapPendingRequest beginDisconnect() {
     if (_lifecycle != DapConnectionLifecycle.active &&
+        _lifecycle != DapConnectionLifecycle.startFailed &&
         _lifecycle != DapConnectionLifecycle.terminated) {
       throw const DapStateException(
         'dap_disconnect_out_of_order',
@@ -340,12 +364,25 @@ final class DapConnection {
   }
 
   void _advanceAfterStartHandshake() {
-    if (!_startCompleted || !_initializedEventReceived) {
+    if (_startFailed ||
+        _lifecycle == DapConnectionLifecycle.terminated ||
+        _lifecycle == DapConnectionLifecycle.disconnectPending ||
+        _lifecycle == DapConnectionLifecycle.disconnected ||
+        _lifecycle == DapConnectionLifecycle.closed) {
       return;
     }
-    _lifecycle = capabilities.supportsCommand('configurationDone')
-        ? DapConnectionLifecycle.configuring
-        : DapConnectionLifecycle.active;
+    if (!_initializedEventReceived) {
+      _lifecycle = DapConnectionLifecycle.startPending;
+      return;
+    }
+    if (capabilities.supportsCommand('configurationDone') &&
+        !_configurationCompleted) {
+      _lifecycle = DapConnectionLifecycle.configuring;
+      return;
+    }
+    _lifecycle = _startCompleted
+        ? DapConnectionLifecycle.active
+        : DapConnectionLifecycle.startPending;
   }
 }
 
