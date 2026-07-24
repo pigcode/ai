@@ -129,8 +129,11 @@ final class DapConnection {
       _beginStart('attach', arguments);
 
   DapPendingRequest _beginStart(String command, JsonValue arguments) {
-    if (_lifecycle != DapConnectionLifecycle.initialized ||
-        _startCommand != null) {
+    final startStateAllowed =
+        _lifecycle == DapConnectionLifecycle.initialized ||
+            _lifecycle == DapConnectionLifecycle.startPending ||
+            _lifecycle == DapConnectionLifecycle.configuring;
+    if (!startStateAllowed || _startCommand != null) {
       throw const DapStateException(
         'dap_start_out_of_order',
         'DAP launch or attach is allowed exactly once after initialize.',
@@ -139,7 +142,9 @@ final class DapConnection {
     final frozenArguments = freezeJsonValue(arguments);
     _startCommand = command;
     _lifecycle = DapConnectionLifecycle.startPending;
-    return _allocateFrozen(command, frozenArguments);
+    final pending = _allocateFrozen(command, frozenArguments);
+    _advanceAfterStartHandshake();
+    return pending;
   }
 
   void completeStart(int requestSeq, {Object? failure}) {
@@ -253,10 +258,11 @@ final class DapConnection {
     events.add(seq: seq, event: event, body: body);
     switch (event) {
       case 'initialized':
-        if (_startCommand == null) {
+        if (_capabilities == null || _initializedEventReceived) {
           throw const DapStateException(
             'dap_initialized_event_out_of_order',
-            'DAP initialized event requires launch or attach.',
+            'DAP initialized event requires completed initialize and occurs '
+                'once per session.',
           );
         }
         _initializedEventReceived = true;
