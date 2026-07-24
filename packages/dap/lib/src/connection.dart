@@ -132,9 +132,10 @@ final class DapConnection {
         'DAP launch or attach is allowed exactly once after initialize.',
       );
     }
+    final frozenArguments = freezeJsonValue(arguments);
     _startCommand = command;
     _lifecycle = DapConnectionLifecycle.startPending;
-    return _allocate(command, arguments);
+    return _allocateFrozen(command, frozenArguments);
   }
 
   void completeStart(int requestSeq) {
@@ -295,10 +296,14 @@ final class DapConnection {
   }
 
   DapPendingRequest _allocate(String command, JsonValue arguments) {
+    return _allocateFrozen(command, freezeJsonValue(arguments));
+  }
+
+  DapPendingRequest _allocateFrozen(String command, JsonValue arguments) {
     final pending = DapPendingRequest._(
       seq: _nextSequence++,
       command: command,
-      arguments: freezeJsonValue(arguments),
+      arguments: arguments,
       connectionId: connectionId,
     );
     _pending[pending.seq] = pending;

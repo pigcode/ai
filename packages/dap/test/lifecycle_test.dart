@@ -1,4 +1,6 @@
 import 'package:pigcode_ai_dap/pigcode_ai_dap.dart';
+import 'package:pigcode_ai_protocol_utils/pigcode_ai_protocol_utils.dart'
+    show JsonValue, JsonValueException;
 import 'package:test/test.dart';
 
 void main() {
@@ -63,6 +65,40 @@ void main() {
       () => connection.beginLaunch(const {}),
       throwsA(isA<DapStateException>()),
     );
+  });
+
+  test('invalid start arguments do not change lifecycle state', () {
+    final startCases = <(
+      String,
+      DapPendingRequest Function(DapConnection, JsonValue),
+    )>[
+      ('launch', (connection, arguments) => connection.beginLaunch(arguments)),
+      ('attach', (connection, arguments) => connection.beginAttach(arguments)),
+    ];
+
+    for (final (name, beginStart) in startCases) {
+      final connection = _initializedConnection();
+      final nextSequence = connection.nextSequence;
+
+      for (final invalidArguments in <Object?>[
+        DateTime.utc(2026),
+        <String, Object?>{
+          'nested': <Object?>[double.infinity],
+        },
+      ]) {
+        expect(
+          () => beginStart(connection, invalidArguments),
+          throwsA(isA<JsonValueException>()),
+          reason: '$name must validate arguments before changing state',
+        );
+        expect(connection.lifecycle, DapConnectionLifecycle.initialized);
+        expect(connection.nextSequence, nextSequence);
+      }
+
+      final pending = beginStart(connection, const <String, Object?>{});
+      expect(pending.seq, nextSequence);
+      expect(connection.lifecycle, DapConnectionLifecycle.startPending);
+    }
   });
 
   test('becomes active when configurationDone is not supported', () {
