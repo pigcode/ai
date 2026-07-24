@@ -81,6 +81,24 @@ void main() {
     expect(codec, isNotNull);
   });
 
+  test('root with only corrupt published manifests fails closed', () async {
+    final directory = StoreLayout.open(fixture.root).rootManifests;
+    final manifests = directory
+        .listSync()
+        .whereType<File>()
+        .where((file) => StoreGenerationFile.tryParse(file) != null)
+        .toList();
+    expect(manifests, isNotEmpty);
+    for (final manifest in manifests) {
+      manifest.writeAsStringSync('partial');
+    }
+
+    expect(
+      fixture.store.loadRoot,
+      storeError(AgentStoreErrorCode.corruption),
+    );
+  });
+
   test('each mutation publishes a new immutable file without a pointer',
       () async {
     final before = (await fixture.store.loadSession(fileTestSessionId)).head;

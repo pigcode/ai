@@ -815,8 +815,18 @@ final class FileAgentStore implements AgentStore {
 
   Future<_FileRootState> _recoverRoot() async {
     if (!layout.rootManifests.existsSync()) return _FileRootState.empty();
-    final selected = _latestDecodableManifest(layout.rootManifests);
-    if (selected == null) return _FileRootState.empty();
+    final rootManifestFiles = _generationFiles(layout.rootManifests);
+    if (rootManifestFiles.isEmpty) return _FileRootState.empty();
+    final selected = _latestDecodableManifest(
+      layout.rootManifests,
+      candidateFiles: rootManifestFiles,
+    );
+    if (selected == null) {
+      throw const AgentStoreException(
+        AgentStoreErrorCode.corruption,
+        'Root has published manifests but none are valid.',
+      );
+    }
     final file = selected.file;
     final object = selected.object;
     _requireExactKeys(object, const <String>{
@@ -1860,8 +1870,11 @@ final class FileAgentStore implements AgentStore {
   ({
     StoreGenerationFile file,
     Map<String, Object?> object,
-  })? _latestDecodableManifest(Directory directory) {
-    final files = _generationFiles(directory);
+  })? _latestDecodableManifest(
+    Directory directory, {
+    List<StoreGenerationFile>? candidateFiles,
+  }) {
+    final files = candidateFiles ?? _generationFiles(directory);
     for (var index = files.length - 1; index >= 0;) {
       final generation = files[index].generation;
       final valid = <({
