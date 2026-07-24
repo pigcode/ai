@@ -258,6 +258,85 @@ void main() {
     expect(connection.lifecycle, DapConnectionLifecycle.disconnectPending);
   });
 
+  test('generic responses advance configuration and disconnect lifecycle', () {
+    final connection = DapConnection();
+    final initialize = connection.beginInitialize();
+    connection.completeInitialize(
+      initialize.seq,
+      const <String, Object?>{'supportsConfigurationDoneRequest': true},
+    );
+    final launch = connection.beginLaunch(const <String, Object?>{});
+    connection
+      ..completeStart(launch.seq)
+      ..receiveEvent(
+        seq: 1,
+        event: 'initialized',
+        body: const <String, Object?>{},
+      );
+
+    final configuration = connection.beginConfigurationDone();
+    connection.completeResponse(
+      requestSeq: configuration.seq,
+      command: 'configurationDone',
+    );
+    expect(configuration.done, isTrue);
+    expect(connection.lifecycle, DapConnectionLifecycle.active);
+
+    final disconnect = connection.beginDisconnect();
+    connection.completeResponse(
+      requestSeq: disconnect.seq,
+      command: 'disconnect',
+    );
+    expect(disconnect.done, isTrue);
+    expect(connection.lifecycle, DapConnectionLifecycle.disconnected);
+    expect(connection.terminal.disconnected, isTrue);
+  });
+
+  test('failed lifecycle responses preserve retryable state', () {
+    final connection = DapConnection();
+    final initialize = connection.beginInitialize();
+    connection.completeInitialize(
+      initialize.seq,
+      const <String, Object?>{'supportsConfigurationDoneRequest': true},
+    );
+    final launch = connection.beginLaunch(const <String, Object?>{});
+    connection
+      ..completeStart(launch.seq)
+      ..receiveEvent(
+        seq: 1,
+        event: 'initialized',
+        body: const <String, Object?>{},
+      );
+
+    final configurationFailure = StateError('configuration rejected');
+    final failedConfiguration = connection.beginConfigurationDone();
+    connection.completeResponse(
+      requestSeq: failedConfiguration.seq,
+      command: 'configurationDone',
+      failure: configurationFailure,
+    );
+    expect(failedConfiguration.failure, same(configurationFailure));
+    expect(connection.lifecycle, DapConnectionLifecycle.configuring);
+
+    final configuration = connection.beginConfigurationDone();
+    connection.completeConfiguration(configuration.seq);
+    expect(connection.lifecycle, DapConnectionLifecycle.active);
+
+    final disconnectFailure = StateError('disconnect rejected');
+    final failedDisconnect = connection.beginDisconnect();
+    connection.completeResponse(
+      requestSeq: failedDisconnect.seq,
+      command: 'disconnect',
+      failure: disconnectFailure,
+    );
+    expect(failedDisconnect.failure, same(disconnectFailure));
+    expect(connection.lifecycle, DapConnectionLifecycle.active);
+
+    final disconnect = connection.beginDisconnect();
+    connection.completeDisconnect(disconnect.seq);
+    expect(connection.lifecycle, DapConnectionLifecycle.disconnected);
+  });
+
   test('becomes active when configurationDone is not supported', () {
     for (final initializedEventFirst in <bool>[false, true]) {
       final connection = _initializedConnection();

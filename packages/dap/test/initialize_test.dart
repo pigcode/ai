@@ -15,6 +15,21 @@ void main() {
       () => connection.beginInitialize(),
       throwsA(isA<DapStateException>()),
     );
+    expect(
+      () => connection.completeResponse(
+        requestSeq: initialize.seq,
+        command: 'initialize',
+      ),
+      throwsA(
+        isA<DapStateException>().having(
+          (error) => error.code,
+          'code',
+          'dap_initialize_response_requires_dedicated_method',
+        ),
+      ),
+    );
+    expect(initialize.done, isFalse);
+    expect(connection.lifecycle, DapConnectionLifecycle.initializePending);
 
     final source = <String, Object?>{'supportsCompletionsRequest': true};
     connection.completeInitialize(initialize.seq, source);

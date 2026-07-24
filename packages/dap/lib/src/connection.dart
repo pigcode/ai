@@ -71,6 +71,7 @@ final class DapConnection {
   bool _initializedEventReceived = false;
   bool _configurationDonePending = false;
   bool _configurationCompleted = false;
+  DapConnectionLifecycle? _disconnectOrigin;
 
   DapConnectionLifecycle get lifecycle => _lifecycle;
   int get nextSequence => _nextSequence;
@@ -182,15 +183,19 @@ final class DapConnection {
     return pending;
   }
 
-  void completeConfiguration(int requestSeq) {
+  void completeConfiguration(int requestSeq, {Object? failure}) {
     if (!_configurationDonePending || _configurationCompleted) {
       throw const DapStateException(
         'dap_configuration_response_unexpected',
         'DAP configurationDone response is not expected.',
       );
     }
-    _completeExpected(requestSeq, 'configurationDone');
+    _completeExpected(requestSeq, 'configurationDone', failure: failure);
     _configurationDonePending = false;
+    if (failure != null) {
+      _advanceAfterStartHandshake();
+      return;
+    }
     _configurationCompleted = true;
     _advanceAfterStartHandshake();
   }
@@ -224,8 +229,24 @@ final class DapConnection {
     required String command,
     Object? failure,
   }) {
+    if (command == 'initialize' &&
+        _lifecycle == DapConnectionLifecycle.initializePending) {
+      throw const DapStateException(
+        'dap_initialize_response_requires_dedicated_method',
+        'DAP initialize response requires completeInitialize.',
+      );
+    }
     if (command == _startCommand && !_startCompleted && !_startFailed) {
       completeStart(requestSeq, failure: failure);
+      return;
+    }
+    if (command == 'configurationDone' && _configurationDonePending) {
+      completeConfiguration(requestSeq, failure: failure);
+      return;
+    }
+    if (command == 'disconnect' &&
+        _lifecycle == DapConnectionLifecycle.disconnectPending) {
+      completeDisconnect(requestSeq, failure: failure);
       return;
     }
     _completeExpected(requestSeq, command, failure: failure);
@@ -240,19 +261,29 @@ final class DapConnection {
         'DAP disconnect requires an active or terminated session.',
       );
     }
+    final pending = _allocate('disconnect', const <String, Object?>{});
+    _disconnectOrigin = _lifecycle;
     _lifecycle = DapConnectionLifecycle.disconnectPending;
-    return _allocate('disconnect', const <String, Object?>{});
+    return pending;
   }
 
-  void completeDisconnect(int requestSeq) {
+  void completeDisconnect(int requestSeq, {Object? failure}) {
     if (_lifecycle != DapConnectionLifecycle.disconnectPending) {
       throw const DapStateException(
         'dap_disconnect_response_unexpected',
         'DAP disconnect response is not expected.',
       );
     }
-    _completeExpected(requestSeq, 'disconnect');
+    _completeExpected(requestSeq, 'disconnect', failure: failure);
+    if (failure != null) {
+      _lifecycle = terminal.terminated
+          ? DapConnectionLifecycle.terminated
+          : _disconnectOrigin ?? DapConnectionLifecycle.active;
+      _disconnectOrigin = null;
+      return;
+    }
     terminal.recordDisconnected();
+    _disconnectOrigin = null;
     _lifecycle = DapConnectionLifecycle.disconnected;
   }
 
@@ -308,6 +339,7 @@ final class DapConnection {
       _tombstones[pending.seq] = pending.command;
     }
     _pending.clear();
+    _disconnectOrigin = null;
     terminal.recordDisconnected();
     _capabilities = null;
     _lifecycle = DapConnectionLifecycle.closed;
