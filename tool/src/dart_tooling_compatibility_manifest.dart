@@ -7,7 +7,8 @@ const dartToolingCompatibilitySchemaPath =
     'compatibility/schema/dart-tooling-compatibility.schema.json';
 
 // Replaced with the implementation merge SHA in the evidence-closure PR.
-const phase2bDartToolingEvidenceCommit = 'pending-main-merge';
+const phase2bDartToolingEvidenceCommit =
+    'a1d08619d6a8a88691c128f657645f8dad4e13cb';
 
 const phase2bDartToolingClaimIds = <String>{
   'P2B-LSP-01',
