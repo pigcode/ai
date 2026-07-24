@@ -199,6 +199,12 @@ final class DapConnection {
     String command, {
     JsonValue arguments = const <String, Object?>{},
   }) {
+    if (_lifecycleCommands.contains(command)) {
+      throw DapStateException(
+        'dap_lifecycle_command_requires_dedicated_method',
+        'DAP lifecycle command requires its dedicated method: $command.',
+      );
+    }
     final allowedDuringConfiguration = _initializedEventReceived &&
         !_configurationCompleted &&
         !_startFailed &&
@@ -398,6 +404,14 @@ const _configurationCommands = <String>{
   'setExceptionBreakpoints',
   'setDataBreakpoints',
   'setInstructionBreakpoints',
+};
+
+const _lifecycleCommands = <String>{
+  'initialize',
+  'launch',
+  'attach',
+  'configurationDone',
+  'disconnect',
 };
 
 const _reverseCommands = <String>{

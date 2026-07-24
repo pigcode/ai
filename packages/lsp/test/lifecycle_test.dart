@@ -24,12 +24,35 @@ void main() {
 
   test('close completes pending requests exactly once', () {
     final connection = _initializedConnection();
-    final request = connection.beginRequest('shutdown');
+    final request = connection.beginRequest('textDocument/hover');
     connection.close();
 
     expect(request.done, isTrue);
     expect(request.failure, isA<LspStateException>());
     expect(() => connection.close(), returnsNormally);
+  });
+
+  test('generic requests cannot bypass lifecycle methods', () {
+    final connection = _initializedConnection();
+
+    for (final method in <String>['initialize', 'shutdown']) {
+      expect(
+        () => connection.beginRequest(method),
+        throwsA(
+          isA<LspStateException>().having(
+            (error) => error.code,
+            'code',
+            'lsp_lifecycle_request_requires_dedicated_method',
+          ),
+        ),
+      );
+      expect(connection.lifecycle, LspConnectionLifecycle.initialized);
+      expect(connection.nextRequestId, 1);
+      expect(connection.pendingRequests, isEmpty);
+    }
+
+    connection.beginShutdown();
+    expect(connection.lifecycle, LspConnectionLifecycle.shutdownPending);
   });
 }
 

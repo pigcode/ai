@@ -219,6 +219,45 @@ void main() {
     }
   });
 
+  test('generic requests cannot bypass lifecycle methods', () {
+    final connection = _initializedConnection();
+    final launch = connection.beginLaunch(const <String, Object?>{});
+    connection
+      ..completeStart(launch.seq)
+      ..receiveEvent(
+        seq: 1,
+        event: 'initialized',
+        body: const <String, Object?>{},
+      );
+    expect(connection.lifecycle, DapConnectionLifecycle.active);
+    final nextSequence = connection.nextSequence;
+
+    for (final command in <String>[
+      'initialize',
+      'launch',
+      'attach',
+      'configurationDone',
+      'disconnect',
+    ]) {
+      expect(
+        () => connection.beginRequest(command),
+        throwsA(
+          isA<DapStateException>().having(
+            (error) => error.code,
+            'code',
+            'dap_lifecycle_command_requires_dedicated_method',
+          ),
+        ),
+      );
+      expect(connection.lifecycle, DapConnectionLifecycle.active);
+      expect(connection.nextSequence, nextSequence);
+    }
+
+    final disconnect = connection.beginDisconnect();
+    expect(disconnect.seq, nextSequence);
+    expect(connection.lifecycle, DapConnectionLifecycle.disconnectPending);
+  });
+
   test('becomes active when configurationDone is not supported', () {
     for (final initializedEventFirst in <bool>[false, true]) {
       final connection = _initializedConnection();

@@ -119,6 +119,12 @@ final class LspConnection {
         'Ordinary LSP requests require initialized state.',
       );
     }
+    if (_lifecycleRequestMethods.contains(method)) {
+      throw LspStateException(
+        'lsp_lifecycle_request_requires_dedicated_method',
+        'LSP lifecycle request requires its dedicated method: $method.',
+      );
+    }
     final descriptor = lspMethodsByName[method];
     if (descriptor == null ||
         descriptor.kind != LspMethodKind.request ||
@@ -237,3 +243,8 @@ final class LspConnection {
     }
   }
 }
+
+const _lifecycleRequestMethods = <String>{
+  'initialize',
+  'shutdown',
+};
