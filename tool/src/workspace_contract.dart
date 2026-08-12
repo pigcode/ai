@@ -13,8 +13,10 @@ const _expectedPackages = <String, String>{
   'protocol_utils': 'pigcode_ai_protocol_utils',
   'acp': 'pigcode_ai_acp',
   'mcp': 'pigcode_ai_mcp',
+  'agent': 'pigcode_ai_agent',
   'agent_kernel': 'pigcode_ai_agent_kernel',
   'agent_io': 'pigcode_ai_agent_io',
+  'agent_dart': 'pigcode_ai_agent_dart',
   'lsp': 'pigcode_ai_lsp',
   'dap': 'pigcode_ai_dap',
   'dart': 'pigcode_ai_dart',
@@ -25,14 +27,17 @@ const _requiredRootPaths = <String>{
   'analysis_options.yaml',
   'CHANGELOG.md',
   'LICENSE',
+  'PHASE4_DEVIATIONS.md',
   'README.md',
   'THIRD_PARTY_NOTICES.md',
   'compatibility/phase-2a-protocol-foundation.json',
   'compatibility/phase-2b-dart-tooling.json',
   'compatibility/phase-3-kernel-store.json',
+  'compatibility/phase-4-native-containment.json',
   'compatibility/schema/dart-tooling-compatibility.schema.json',
   'compatibility/schema/ai-core-compatibility.schema.json',
   'compatibility/schema/kernel-store-compatibility.schema.json',
+  'compatibility/schema/native-containment-compatibility.schema.json',
   'compatibility/schema/protocol-foundation-compatibility.schema.json',
   'compatibility/upstream/phase-2a-protocol-inventory.json',
   'compatibility/upstream/phase-2b-tooling-inventory.json',
@@ -40,6 +45,7 @@ const _requiredRootPaths = <String>{
   'compatibility/vercel-ai-7.0.35.json',
   'docs/protocol-support.md',
   'docs/kernel-store-support.md',
+  'docs/native-containment-support.md',
   'docs/dart-tooling-support.md',
   'pubspec.yaml',
   'third_party/licenses/Apache-2.0.txt',
@@ -48,6 +54,8 @@ const _requiredRootPaths = <String>{
   'tool/check_dart_tooling_compatibility.dart',
   'tool/check_format.dart',
   'tool/check_kernel_store_compatibility.dart',
+  'tool/check_native_containment_compatibility.dart',
+  'tool/check_native_containment_documentation.dart',
   'tool/check_protocol_compatibility.dart',
   'tool/check_workspace.dart',
   'tool/conformance/mcp/package-lock.json',
@@ -62,6 +70,7 @@ const _requiredRootPaths = <String>{
   'tool/run_workspace_tests.dart',
   'tool/run_acp_peer_matrix.dart',
   'tool/run_agent_store_crash_matrix.dart',
+  'tool/run_agent_sandbox_crash_matrix.dart',
   'tool/run_mcp_conformance.dart',
   'tool/fixtures/acp_peer.dart',
   'tool/fixtures/acp/rust/README.md',
@@ -72,6 +81,8 @@ const _requiredRootPaths = <String>{
   'tool/fixtures/ai_core_peer.dart',
   'tool/fixtures/agent_store_crash_writer.dart',
   'tool/fixtures/agent_store_writer.dart',
+  'tool/fixtures/agent_sandbox_crash_child.dart',
+  'tool/fixtures/native_journey_child.dart',
   'tool/fixtures/anthropic_peer.dart',
   'tool/fixtures/mcp_conformance_client.dart',
   'tool/fixtures/mcp_conformance_server.dart',
@@ -101,8 +112,11 @@ const _requiredRootPaths = <String>{
   'tool/src/agent_kernel_schema.dart',
   'tool/src/agent_store_crash_harness.dart',
   'tool/src/agent_store_writer_fixture.dart',
+  'tool/src/agent_sandbox_crash_harness.dart',
   'tool/src/compatibility_manifest.dart',
   'tool/src/kernel_store_compatibility_manifest.dart',
+  'tool/src/native_containment_compatibility_manifest.dart',
+  'tool/src/native_containment_documentation.dart',
   'tool/src/protocol_compatibility_manifest.dart',
   'tool/src/protocol_codegen.dart',
   'tool/src/protocol_inventory.dart',
@@ -129,6 +143,11 @@ const _requiredRootPaths = <String>{
   'tool/test/agent_kernel_secret_scan_test.dart',
   'tool/test/agent_store_crash_matrix_test.dart',
   'tool/test/agent_store_multi_process_test.dart',
+  'tool/test/agent_sandbox_crash_matrix_test.dart',
+  'tool/test/native_containment_compatibility_manifest_test.dart',
+  'tool/test/native_containment_manifest_mutation_test.dart',
+  'tool/test/native_containment_documentation_test.dart',
+  'tool/test/native_journey_crash_restart_test.dart',
   'tool/test/analysis_server_peer_matrix_test.dart',
   'tool/test/acp_cross_process_test.dart',
   'tool/test/compatibility_manifest_test.dart',
@@ -360,6 +379,10 @@ const _requiredRootPaths = <String>{
   'packages/protocol_utils/example/json_rpc_peer.dart',
   'packages/protocol_utils/test/example_compile_test.dart',
   'packages/agent_kernel/example/session_run.dart',
+  'packages/agent/example/native_agent.dart',
+  'packages/agent/test/example_compile_test.dart',
+  'packages/agent_dart/example/dart_tooling_agent.dart',
+  'packages/agent_dart/test/example_compile_test.dart',
   'packages/agent_kernel/test/example_compile_test.dart',
   'packages/agent_kernel/test/security/approval_principal_test.dart',
   'packages/agent_kernel/test/security/capability_no_escalation_test.dart',
@@ -369,6 +392,7 @@ const _requiredRootPaths = <String>{
   'packages/agent_io/test/security/store_path_test.dart',
   'packages/agent_io/test/security/symlink_test.dart',
   'packages/agent_io/example/durable_store.dart',
+  'packages/agent_io/example/sandboxed_process.dart',
   'packages/agent_io/test/example_compile_test.dart',
 };
 
@@ -382,8 +406,10 @@ const _expectedWorkspaceMembers = <String>{
   'packages/protocol_utils',
   'packages/acp',
   'packages/mcp',
+  'packages/agent',
   'packages/agent_kernel',
   'packages/agent_io',
+  'packages/agent_dart',
   'packages/lsp',
   'packages/dap',
   'packages/dart',
@@ -415,8 +441,19 @@ const _allowedInternalDependencies = <String, Set<String>>{
     'pigcode_ai_provider',
     'pigcode_ai',
   },
+  'pigcode_ai_agent': <String>{
+    'pigcode_ai_agent_kernel',
+    'pigcode_ai',
+  },
   'pigcode_ai_agent_kernel': <String>{},
   'pigcode_ai_agent_io': <String>{'pigcode_ai_agent_kernel'},
+  'pigcode_ai_agent_dart': <String>{
+    'pigcode_ai_agent',
+    'pigcode_ai_lsp',
+    'pigcode_ai_dap',
+    'pigcode_ai_dart',
+    'pigcode_ai_agent_io',
+  },
   'pigcode_ai_lsp': <String>{'pigcode_ai_protocol_utils'},
   'pigcode_ai_dap': <String>{'pigcode_ai_protocol_utils'},
   'pigcode_ai_dart': <String>{'pigcode_ai_protocol_utils'},
@@ -433,6 +470,7 @@ const _portableBarrels = <String>{
   'packages/acp/lib/pigcode_ai_acp.dart',
   'packages/mcp/lib/pigcode_ai_mcp.dart',
   'packages/mcp/lib/pigcode_ai_mcp_http.dart',
+  'packages/agent/lib/pigcode_ai_agent.dart',
   'packages/agent_kernel/lib/pigcode_ai_agent_kernel.dart',
   'packages/lsp/lib/pigcode_ai_lsp.dart',
   'packages/lsp/lib/pigcode_ai_lsp_proposed.dart',
@@ -816,7 +854,7 @@ void _validateRootManifest(
     violations.add(
       const WorkspaceViolation(
         'invalid_workspace_membership',
-        'Expected exactly the fourteen public package paths in pubspec.yaml workspace',
+        'Expected exactly the sixteen public package paths in pubspec.yaml workspace',
       ),
     );
   }
@@ -1048,6 +1086,15 @@ void _validateInternalDependencyDirection(
     }
     final allowed = _allowedInternalDependencies[packageName]!;
     for (final dependencyName in dependencies.keys.whereType<String>()) {
+      if (packageName == 'pigcode_ai_agent' && dependencyName == 'flutter') {
+        violations.add(
+          const WorkspaceViolation(
+            'forbidden_dependency',
+            'Forbidden dependency: pigcode_ai_agent -> flutter',
+          ),
+        );
+        continue;
+      }
       if (!_allowedInternalDependencies.containsKey(dependencyName) ||
           allowed.contains(dependencyName)) {
         continue;

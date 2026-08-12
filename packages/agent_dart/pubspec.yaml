@@ -1,0 +1,22 @@
+name: pigcode_ai_agent_dart
+description: VM-only Dart tooling composition for Pigcode agents.
+version: 0.0.1
+publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai_agent: ^0.0.1
+  pigcode_ai_agent_io: ^0.0.1
+  pigcode_ai_dap: ^0.0.1
+  pigcode_ai_dart: ^0.0.1
+  pigcode_ai_lsp: ^0.0.1
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0

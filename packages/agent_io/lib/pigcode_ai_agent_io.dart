@@ -1,6 +1,25 @@
 /// VM-only durable agent Store APIs.
 library;
 
+export 'src/credential/credential_vault.dart';
+export 'src/dlp/dlp_boundary.dart';
+export 'src/exec/process_group.dart';
+export 'src/exec/process_recovery_coordinator.dart';
+export 'src/exec/restart_budget.dart';
+export 'src/exec/sandboxed_process.dart';
+export 'src/fs/host_workspace_fs.dart';
+export 'src/git/host_git_client.dart';
+export 'src/pty/host_pty_session.dart';
+export 'src/sandbox/sandbox_backend.dart';
+export 'src/sandbox/sandbox_capability.dart';
+export 'src/sandbox/sandbox_errors.dart';
+export 'src/sandbox/sandbox_policy.dart';
+export 'src/sandbox/landlock/landlock_backend.dart';
+export 'src/sandbox/landlock/landlock_ffi.dart';
+export 'src/sandbox/landlock/seccomp_ffi.dart';
+export 'src/sandbox/seatbelt/sbpl_profile.dart';
+export 'src/sandbox/seatbelt/seatbelt_backend.dart';
+export 'src/sandbox/unsafe_dev_backend.dart';
 export 'src/store/command_registry.dart';
 export 'src/store/file_agent_store.dart';
 export 'src/store/file_store_coordinator.dart';

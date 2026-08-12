@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:pigcode_ai_agent_kernel/pigcode_ai_agent_kernel.dart';
 
@@ -17,16 +18,25 @@ void main() {
   );
 
   final findings = <String>[];
-  for (final root in <Directory>[
+  for (final root in <FileSystemEntity>[
     Directory('packages/agent_kernel/lib'),
     Directory('packages/agent_kernel/test/fixtures'),
     Directory('tool/schema/agent_kernel'),
     Directory('tool/fixtures/agent_kernel'),
+    Directory('packages/agent_io/lib/src/credential'),
+    Directory('packages/agent_io/lib/src/dlp'),
+    Directory('packages/agent_io/test/security'),
+    Directory('packages/agent_io/test/fixtures'),
+    File('tool/fixtures/agent_sandbox_crash_child.dart'),
+    File('tool/src/agent_sandbox_crash_harness.dart'),
   ]) {
     if (!root.existsSync()) continue;
-    for (final entity in root.listSync(recursive: true, followLinks: false)) {
+    final entities = root is File
+        ? <FileSystemEntity>[root]
+        : (root as Directory).listSync(recursive: true, followLinks: false);
+    for (final entity in entities) {
       if (entity is! File) continue;
-      final text = entity.readAsStringSync();
+      final text = utf8.decode(entity.readAsBytesSync(), allowMalformed: true);
       if (_credentialPatterns.any((pattern) => pattern.hasMatch(text))) {
         findings.add(entity.path);
       }

@@ -91,6 +91,10 @@ void main() {
       validateKernelStoreCompatibilityManifest(root: root, manifest: changed),
       'evidence_commit_mismatch',
     );
+    _expectViolation(
+      validateKernelStoreCompatibilityManifest(root: root, manifest: changed),
+      'evidence_commit_unreachable',
+    );
   });
 
   _test('rejects a platform that was not executed', () {

@@ -1,9 +1,10 @@
 # Pigcode AI Agent IO
 
 `pigcode_ai_agent_io` is the VM-only reference implementation of the Agent
-Store contract. `FileAgentStore` uses immutable generations, framed SHA-256
-Journal records, exact identity and command registries, snapshots, cooperative
-writer fencing, and typed recovery failures.
+Store and Host containment contracts. In addition to `FileAgentStore`, it
+provides fail-closed Seatbelt and Landlock+seccomp backends, sandboxed process
+groups, FFI PTYs, workspace-rooted file access, Git composition, credential
+handles, and DLP framing.
 
 The default durability is `processCrashFlush`: complete artifacts are flushed
 before a receipt is returned and are covered by real-process SIGKILL evidence.
@@ -19,12 +20,28 @@ Production mode requires a private owner-only Store root on the supported POSIX
 reference platforms. `FileStoreRootAccessPolicy.explicitTestOnly` is an
 explicit testing escape hatch, not a production permission claim.
 
+Machine-checked Phase 4 claims:
+
+- `P4-HOST-01`: `implemented`
+- `P4-HOST-02`: `verified`
+- `P4-HOST-03`: `implemented`
+- `P4-HOST-04`: `implemented`
+- `P4-HOST-05`: `implemented`
+- `P4-HOST-06`: `implemented`
+- `P4-HOST-07`: `verified`
+- `P4-HOST-08`: `implemented`
+- `P4-HOST-09`: `verified`
+- `P4-HOST-10`: `implemented`
+
 Run the durable example:
 
 ```bash
 dart run packages/agent_io/example/durable_store.dart
+dart run packages/agent_io/example/sandboxed_process.dart
 ```
 
 It uses a caller-owned temporary root, appends, snapshots, reopens, and removes
 only that temporary root. See [Kernel and Store support](../../docs/kernel-store-support.md)
-for supported and unsupported boundaries.
+and [Native containment support](../../docs/native-containment-support.md) for
+supported and unsupported boundaries. `UnsafeDevSandboxBackend` is explicitly
+`unsafe/dev-only` and never counts as production containment evidence.

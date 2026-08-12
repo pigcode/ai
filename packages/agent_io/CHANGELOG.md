@@ -8,3 +8,6 @@
   limits.
 - Add multi-isolate, dual-process, and fixed 12-scenario SIGKILL evidence plus
   a runnable durable Store example.
+- Add production fail-closed Seatbelt and Landlock+seccomp backends, process
+  tree cleanup, FFI PTY, file/Git/credential/DLP capabilities, and a runnable
+  temporary-root sandbox example.

@@ -561,6 +561,10 @@ List<KernelStoreCompatibilityViolation> _validateManifest(
         '$location.artifacts[$artifactIndex]',
         'evidence_artifact_hash_mismatch',
         violations,
+        evidenceCommit: _string(
+          item['evidenceCommit'],
+          '$location.evidenceCommit',
+        ),
       );
     }
     final result = _object(item['result'], '$location.result');
@@ -675,15 +679,30 @@ void _validatePathDigest(
   Map<String, Object?> digest,
   String location,
   String mismatchCode,
-  List<KernelStoreCompatibilityViolation> violations,
-) {
+  List<KernelStoreCompatibilityViolation> violations, {
+  String? evidenceCommit,
+}) {
   final path = _string(digest['path'], '$location.path');
   final expected = _string(digest['sha256'], '$location.sha256');
   if (!RegExp(r'^[a-f0-9]{64}$').hasMatch(expected)) {
     throw FormatException('$location.sha256 is not lowercase SHA-256.');
   }
   final file = _containedFile(root, path);
-  if (!file.existsSync()) {
+  final committed = evidenceCommit == null
+      ? _CommittedArtifact(
+          file.existsSync() ? file.readAsBytesSync() : null,
+        )
+      : _readCommittedArtifact(root, evidenceCommit, path);
+  if (committed.unreachable) {
+    violations.add(
+      KernelStoreCompatibilityViolation(
+        'evidence_commit_unreachable',
+        '$location cannot read commit $evidenceCommit.',
+      ),
+    );
+    return;
+  }
+  if (committed.bytes == null) {
     violations.add(
       KernelStoreCompatibilityViolation(
         'missing_evidence_artifact',
@@ -692,7 +711,7 @@ void _validatePathDigest(
     );
     return;
   }
-  final actual = sha256.convert(file.readAsBytesSync()).toString();
+  final actual = sha256.convert(committed.bytes!).toString();
   if (actual != expected) {
     violations.add(
       KernelStoreCompatibilityViolation(
@@ -701,6 +720,51 @@ void _validatePathDigest(
       ),
     );
   }
+}
+
+_CommittedArtifact _readCommittedArtifact(
+  Directory root,
+  String commit,
+  String path,
+) =>
+    _committedArtifactCache.putIfAbsent(
+      '${root.path}\u0000$commit\u0000$path',
+      () {
+        final commitKey = '${root.path}\u0000$commit';
+        final reachable = _commitReachabilityCache.putIfAbsent(commitKey, () {
+          final probe = Process.runSync(
+            'git',
+            <String>['cat-file', '-e', '$commit^{commit}'],
+            workingDirectory: root.path,
+            stdoutEncoding: null,
+            stderrEncoding: null,
+          );
+          return probe.exitCode == 0;
+        });
+        if (!reachable) return const _CommittedArtifact.unreachable();
+        final result = Process.runSync(
+          'git',
+          <String>['show', '$commit:$path'],
+          workingDirectory: root.path,
+          stdoutEncoding: null,
+          stderrEncoding: null,
+        );
+        if (result.exitCode != 0) return const _CommittedArtifact(null);
+        return _CommittedArtifact(result.stdout! as List<int>);
+      },
+    );
+
+final _committedArtifactCache = <String, _CommittedArtifact>{};
+final _commitReachabilityCache = <String, bool>{};
+
+final class _CommittedArtifact {
+  const _CommittedArtifact(this.bytes) : unreachable = false;
+  const _CommittedArtifact.unreachable()
+      : bytes = null,
+        unreachable = true;
+
+  final List<int>? bytes;
+  final bool unreachable;
 }
 
 bool _overclaimsPowerLoss(String value) {

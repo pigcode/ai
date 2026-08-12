@@ -616,12 +616,14 @@ List<ProtocolCompatibilityViolation> _validateManifest(
       _object(item['peer'], '$location.peer'),
       '$location.peer',
       violations,
+      evidenceCommit: evidenceCommit,
     );
     _validateDigest(
       root,
       _object(item['artifact'], '$location.artifact'),
       '$location.artifact',
       violations,
+      evidenceCommit: evidenceCommit,
     );
     final result = _object(item['result'], '$location.result');
     final protocol = claim['protocol']! as String;
@@ -781,8 +783,9 @@ void _validateDigest(
   Directory root,
   Map<String, Object?> digest,
   String location,
-  List<ProtocolCompatibilityViolation> violations,
-) {
+  List<ProtocolCompatibilityViolation> violations, {
+  required String evidenceCommit,
+}) {
   _expectExactKeys(
     digest,
     const <String>{'name', 'path', 'sha256'},
@@ -809,9 +812,18 @@ void _validateDigest(
     );
     return;
   }
-  final file = _containedFile(root, path);
-  if (FileSystemEntity.typeSync(file.path, followLinks: false) !=
-      FileSystemEntityType.file) {
+  _containedFile(root, path);
+  final committed = _readCommittedArtifact(root, evidenceCommit, path);
+  if (committed.unreachable) {
+    violations.add(
+      ProtocolCompatibilityViolation(
+        'evidence_commit_unreachable',
+        '$location cannot read commit $evidenceCommit.',
+      ),
+    );
+    return;
+  }
+  if (committed.bytes == null) {
     violations.add(
       ProtocolCompatibilityViolation(
         'missing_evidence_artifact',
@@ -820,7 +832,7 @@ void _validateDigest(
     );
     return;
   }
-  final actualHash = sha256.convert(file.readAsBytesSync()).toString();
+  final actualHash = sha256.convert(committed.bytes!).toString();
   if (actualHash != expectedHash) {
     violations.add(
       ProtocolCompatibilityViolation(
@@ -829,6 +841,54 @@ void _validateDigest(
       ),
     );
   }
+}
+
+_CommittedArtifact _readCommittedArtifact(
+  Directory root,
+  String commit,
+  String path,
+) =>
+    _committedArtifactCache.putIfAbsent(
+      '${root.path}\u0000$commit\u0000$path',
+      () {
+        final commitKey = '${root.path}\u0000$commit';
+        final reachable = _commitReachabilityCache.putIfAbsent(commitKey, () {
+          final probe = Process.runSync(
+            'git',
+            <String>['cat-file', '-e', '$commit^{commit}'],
+            workingDirectory: root.path,
+            stdoutEncoding: null,
+            stderrEncoding: null,
+          );
+          return probe.exitCode == 0;
+        });
+        if (!reachable) return const _CommittedArtifact.unreachable();
+        final result = Process.runSync(
+          'git',
+          <String>['show', '$commit:$path'],
+          workingDirectory: root.path,
+          stdoutEncoding: null,
+          stderrEncoding: null,
+        );
+        if (result.exitCode != 0) return const _CommittedArtifact.missing();
+        return _CommittedArtifact(result.stdout! as List<int>);
+      },
+    );
+
+final _committedArtifactCache = <String, _CommittedArtifact>{};
+final _commitReachabilityCache = <String, bool>{};
+
+final class _CommittedArtifact {
+  const _CommittedArtifact(this.bytes) : unreachable = false;
+  const _CommittedArtifact.missing()
+      : bytes = null,
+        unreachable = false;
+  const _CommittedArtifact.unreachable()
+      : bytes = null,
+        unreachable = true;
+
+  final List<int>? bytes;
+  final bool unreachable;
 }
 
 Map<String, Object?> _object(Object? value, String location) {
