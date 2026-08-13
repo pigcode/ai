@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:pigcode_ai_agent_io/pigcode_ai_agent_io.dart';
 import 'package:test/test.dart';
 
+import '../support/dart_fixture_compiler.dart';
 import '../support/workspace_path.dart';
 
 void main() {
@@ -258,7 +259,17 @@ void main() {
     () async {
       final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
       final root = Directory('${temp.path}/root')..createSync();
+      final fixtureRoot = Directory('${temp.path}/fixture');
       try {
+        final probe = await compileDartFixture(
+          sourcePath: resolveTestWorkspacePath(
+            packageRelative: 'test/fixtures/dart_runtime_dependency_probe.dart',
+            workspaceRelative: 'packages/agent_io/test/fixtures/'
+                'dart_runtime_dependency_probe.dart',
+          ),
+          outputDirectory: fixtureRoot,
+          outputName: 'dart_runtime_dependency_probe',
+        );
         final result = await _run(
           LandlockSeccompSandboxBackend(unsafeStandaloneStart: true),
           SandboxPolicy(
@@ -268,31 +279,25 @@ void main() {
                 access: SandboxPathAccess.readWrite,
               ),
               SandboxPathRule(
-                path: Directory.current.absolute.path,
-                access: SandboxPathAccess.readOnly,
-              ),
-              SandboxPathRule(
-                path: File(Platform.resolvedExecutable).parent.parent.path,
+                path: fixtureRoot.path,
                 access: SandboxPathAccess.readOnly,
               ),
             ],
           ),
-          HostCommand(
-            executable: Platform.resolvedExecutable,
-            arguments: <String>[
-              resolveTestWorkspacePath(
-                packageRelative:
-                    'test/fixtures/dart_runtime_dependency_probe.dart',
-                workspaceRelative: 'packages/agent_io/test/fixtures/'
-                    'dart_runtime_dependency_probe.dart',
-              ),
-            ],
-          ),
+          HostCommand(executable: probe.path),
         );
 
-        expect(result.exitCode, 0);
-        expect(result.stdout, contains('DART_MAIN_REACHED'));
-        expect(result.stdout, contains('NON_REQUIRED_PROCFS_DENIED'));
+        expect(result.exitCode, 0, reason: _diagnostics(result));
+        expect(
+          result.stdout,
+          contains('DART_MAIN_REACHED'),
+          reason: _diagnostics(result),
+        );
+        expect(
+          result.stdout,
+          contains('NON_REQUIRED_PROCFS_DENIED'),
+          reason: _diagnostics(result),
+        );
       } finally {
         temp.deleteSync(recursive: true);
       }
@@ -305,7 +310,17 @@ void main() {
     () async {
       final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
       final root = Directory('${temp.path}/root')..createSync();
+      final fixtureRoot = Directory('${temp.path}/fixture');
       try {
+        final probe = await compileDartFixture(
+          sourcePath: resolveTestWorkspacePath(
+            packageRelative: 'test/fixtures/ptrace_probe.dart',
+            workspaceRelative:
+                'packages/agent_io/test/fixtures/ptrace_probe.dart',
+          ),
+          outputDirectory: fixtureRoot,
+          outputName: 'ptrace_probe',
+        );
         final result = await _run(
           LandlockSeccompSandboxBackend(unsafeStandaloneStart: true),
           SandboxPolicy(
@@ -315,28 +330,19 @@ void main() {
                 access: SandboxPathAccess.readWrite,
               ),
               SandboxPathRule(
-                path: Directory.current.absolute.path,
-                access: SandboxPathAccess.readOnly,
-              ),
-              SandboxPathRule(
-                path: File(Platform.resolvedExecutable).parent.path,
+                path: fixtureRoot.path,
                 access: SandboxPathAccess.readOnly,
               ),
             ],
           ),
-          HostCommand(
-            executable: Platform.resolvedExecutable,
-            arguments: <String>[
-              resolveTestWorkspacePath(
-                packageRelative: 'test/fixtures/ptrace_probe.dart',
-                workspaceRelative:
-                    'packages/agent_io/test/fixtures/ptrace_probe.dart',
-              ),
-            ],
-          ),
+          HostCommand(executable: probe.path),
         );
-        expect(result.exitCode, 77);
-        expect(result.stdout, contains('PTRACE_RESULT=-1 ERRNO=1'));
+        expect(result.exitCode, 77, reason: _diagnostics(result));
+        expect(
+          result.stdout,
+          contains('PTRACE_RESULT=-1 ERRNO=1'),
+          reason: _diagnostics(result),
+        );
       } finally {
         temp.deleteSync(recursive: true);
       }
@@ -345,18 +351,19 @@ void main() {
   );
 }
 
-Future<({int exitCode, String stdout})> _run(
+Future<({int exitCode, String stdout, String stderr})> _run(
   SandboxBackend backend,
   SandboxPolicy policy,
   HostCommand command,
 ) async {
   final process = await backend.start(policy, command);
   final output = utf8.decoder.bind(process.stdout).join();
-  process.stderr.drain<void>();
+  final errors = utf8.decoder.bind(process.stderr).join();
   try {
     return (
       exitCode: await process.exitCode.timeout(const Duration(seconds: 8)),
       stdout: await output,
+      stderr: await errors,
     );
   } on TimeoutException {
     process.kill(ProcessSignal.sigkill);
@@ -364,6 +371,11 @@ Future<({int exitCode, String stdout})> _run(
     rethrow;
   }
 }
+
+String _diagnostics(
+  ({int exitCode, String stdout, String stderr}) result,
+) =>
+    'stdout:\n${result.stdout}\nstderr:\n${result.stderr}';
 
 Future<Socket> _connectUntilListening(int port) async {
   final deadline = DateTime.now().add(const Duration(seconds: 2));

@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 
 import 'package:pigcode_ai_agent_io/src/exec/process_cleanup_ledger.dart';
 import 'package:pigcode_ai_agent_io/src/sandbox/sandbox_startup_handshake.dart';
+import '../support/dart_fixture_compiler.dart';
 import '../support/workspace_path.dart';
 
 void main() {
@@ -323,9 +324,10 @@ void main() {
   test(
     'P4-TM-PTY-04 Landlock ABI5 kernel denies device ioctl',
     () async {
-      final root = Directory.systemTemp.createTempSync('pigcode_ioctl_');
-      final hostData =
-          Directory.systemTemp.createTempSync('pigcode_ioctl_host_');
+      final temp = Directory.systemTemp.createTempSync('pigcode_ioctl_');
+      final root = Directory('${temp.path}/root')..createSync();
+      final hostData = Directory('${temp.path}/host')..createSync();
+      final fixtureRoot = Directory('${temp.path}/fixture');
       final launcher = SandboxedProcessLauncher(
         LandlockSeccompSandboxBackend(),
         hostDataDirectory: hostData.path,
@@ -333,6 +335,15 @@ void main() {
       );
       SandboxedProcess? process;
       try {
+        final probe = await compileDartFixture(
+          sourcePath: resolveTestWorkspacePath(
+            packageRelative: 'test/fixtures/ioctl_probe.dart',
+            workspaceRelative:
+                'packages/agent_io/test/fixtures/ioctl_probe.dart',
+          ),
+          outputDirectory: fixtureRoot,
+          outputName: 'ioctl_probe',
+        );
         process = await launcher.launch(
           SandboxPolicy(
             roots: <SandboxPathRule>[
@@ -341,46 +352,38 @@ void main() {
                 access: SandboxPathAccess.readWrite,
               ),
               SandboxPathRule(
-                path: Directory.current.absolute.path,
-                access: SandboxPathAccess.readOnly,
-              ),
-              SandboxPathRule(
-                path: File(Platform.resolvedExecutable).parent.path,
+                path: fixtureRoot.path,
                 access: SandboxPathAccess.readOnly,
               ),
             ],
             requiresPty: true,
           ),
-          HostCommand(
-            executable: Platform.resolvedExecutable,
-            arguments: <String>[
-              resolveTestWorkspacePath(
-                packageRelative: 'test/fixtures/ioctl_probe.dart',
-                workspaceRelative:
-                    'packages/agent_io/test/fixtures/ioctl_probe.dart',
-              ),
-            ],
-          ),
+          HostCommand(executable: probe.path),
         );
-        process.stdout.drain<void>();
-        process.stderr.drain<void>();
+        final output = utf8.decoder.bind(process.stdout).join();
+        final errors = utf8.decoder.bind(process.stderr).join();
         expect(
           await process.exitCode.timeout(const Duration(seconds: 8)),
           0,
+          reason: 'stdout:\n${await output}\nstderr:\n${await errors}',
         );
         expect((await launcher.cleanup(process)).confirmed, isTrue);
         process = null;
       } finally {
-        final active = process;
-        if (active != null) {
-          try {
-            await launcher.cleanup(active).timeout(const Duration(seconds: 3));
-          } on Object {
-            Process.killPid(-active.processGroupId, ProcessSignal.sigkill);
+        try {
+          final active = process;
+          if (active != null) {
+            try {
+              await launcher
+                  .cleanup(active)
+                  .timeout(const Duration(seconds: 3));
+            } on Object {
+              Process.killPid(-active.processGroupId, ProcessSignal.sigkill);
+            }
           }
+        } finally {
+          temp.deleteSync(recursive: true);
         }
-        root.deleteSync(recursive: true);
-        hostData.deleteSync(recursive: true);
       }
     },
     skip: ioctlSupported
