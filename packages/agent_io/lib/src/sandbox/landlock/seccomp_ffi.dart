@@ -2,31 +2,23 @@ import 'dart:ffi';
 import 'dart:io';
 
 import '../sandbox_errors.dart';
+import 'seccomp_policy.dart';
 
 final class SeccompFfi {
   static const blockedCapabilityNames = <String>{
     'ptrace',
-    'socket',
-    'socketpair',
-    'connect',
-    'bind',
+    'socket(non-inet-or-non-stream)',
     'setsid',
     'setpgid',
     'unshare',
   };
   static const _filterMode = 1;
-  static const _bpfLoadWordAbsolute = 0x20;
-  static const _bpfJumpEqual = 0x15;
-  static const _bpfReturn = 0x06;
-  static const _returnAllow = 0x7fff0000;
-  static const _returnErrno = 0x00050000;
-  static const _returnKillProcess = 0x80000000;
-  static const _eperm = 1;
 
   DynamicLibrary? _library;
 
   bool get isSupported {
     if (!Platform.isLinux) return false;
+    if (_architecture == null || !_hasExpectedFilterLayout) return false;
     final prctl = _lib.lookupFunction<
         Int32 Function(Int32, Uint64, Uint64, Uint64, Uint64),
         int Function(int, int, int, int, int)>('prctl');
@@ -40,29 +32,36 @@ final class SeccompFfi {
         'seccomp-linux-only',
       );
     }
-    final blockedSyscalls = _blockedSyscalls;
-    final filterCount = 5 + blockedSyscalls.length * 2;
+    final architecture = _architecture;
+    if (architecture == null) {
+      throw const HostCapabilityException(
+        HostCapabilityError.sandboxUnavailable,
+        'seccomp-unsupported-architecture',
+      );
+    }
+    if (!_hasExpectedFilterLayout) {
+      throw const HostCapabilityException(
+        HostCapabilityError.sandboxUnavailable,
+        'seccomp-bpf-layout-invalid',
+      );
+    }
+    final policy = SeccompPolicy.forArchitecture(architecture);
+    final instructions = policy.buildProgram().instructions;
+    final filterCount = instructions.length;
     final filters =
         _calloc(filterCount, sizeOf<_SockFilter>()).cast<_SockFilter>();
     final program = _calloc(1, sizeOf<_SockFprog>()).cast<_SockFprog>();
     try {
-      _setFilter(filters + 0, _bpfLoadWordAbsolute, 0, 0, 4);
-      _setFilter(filters + 1, _bpfJumpEqual, 1, 0, _auditArchitecture);
-      _setFilter(filters + 2, _bpfReturn, 0, 0, _returnKillProcess);
-      _setFilter(filters + 3, _bpfLoadWordAbsolute, 0, 0, 0);
-      var index = 4;
-      for (final syscall in blockedSyscalls) {
-        _setFilter(filters + index, _bpfJumpEqual, 0, 1, syscall);
+      for (var index = 0; index < instructions.length; index += 1) {
+        final instruction = instructions[index];
         _setFilter(
-          filters + index + 1,
-          _bpfReturn,
-          0,
-          0,
-          _returnErrno | _eperm,
+          filters + index,
+          instruction.code,
+          instruction.jumpTrue,
+          instruction.jumpFalse,
+          instruction.value,
         );
-        index += 2;
       }
-      _setFilter(filters + index, _bpfReturn, 0, 0, _returnAllow);
       program.ref
         ..length = filterCount
         ..filters = filters;
@@ -72,7 +71,13 @@ final class SeccompFfi {
           'seccomp-no-new-privileges-failed',
         );
       }
-      if (_seccomp(_filterMode, 0, program.cast<Void>()) != 0) {
+      if (_seccomp(
+            policy.seccompSystemCall,
+            _filterMode,
+            0,
+            program.cast<Void>(),
+          ) !=
+          0) {
         throw const HostCapabilityException(
           HostCapabilityError.sandboxUnavailable,
           'seccomp-filter-apply-failed',
@@ -105,21 +110,29 @@ final class SeccompFfi {
     return prctl(38, 1, 0, 0, 0);
   }
 
-  int _seccomp(int operation, int flags, Pointer<Void> arguments) {
+  int _seccomp(
+    int systemCall,
+    int operation,
+    int flags,
+    Pointer<Void> arguments,
+  ) {
     final syscall = _lib.lookupFunction<
         Int64 Function(Int64, Uint32, Uint32, Pointer<Void>),
         int Function(int, int, int, Pointer<Void>)>('syscall');
-    return syscall(_seccompSyscall, operation, flags, arguments);
+    return syscall(systemCall, operation, flags, arguments);
   }
 
-  bool get _arm64 => Abi.current() == Abi.linuxArm64;
+  SeccompArchitecture? get _architecture {
+    final abi = Abi.current();
+    if (abi == Abi.linuxX64) return SeccompArchitecture.linuxX64;
+    if (abi == Abi.linuxArm64) return SeccompArchitecture.linuxArm64;
+    return null;
+  }
 
-  List<int> get _blockedSyscalls => _arm64
-      ? const <int>[117, 198, 199, 203, 200, 157, 154, 97]
-      : const <int>[101, 41, 53, 42, 49, 112, 109, 272];
-
-  int get _auditArchitecture => _arm64 ? 0xc00000b7 : 0xc000003e;
-  int get _seccompSyscall => _arm64 ? 277 : 317;
+  bool get _hasExpectedFilterLayout =>
+      sizeOf<IntPtr>() == 8 &&
+      sizeOf<_SockFilter>() == 8 &&
+      sizeOf<_SockFprog>() == 16;
 
   DynamicLibrary get _lib => _library ??= DynamicLibrary.process();
 

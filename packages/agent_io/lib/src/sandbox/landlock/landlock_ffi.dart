@@ -117,7 +117,7 @@ final class LandlockFfi {
         }
       }
     }
-    if (policy.networkAllowlist.isNotEmpty) {
+    if (policy.networkAllowlist.any((endpoint) => !endpoint.isPortOnly)) {
       throw const HostCapabilityException(
         HostCapabilityError.networkDenied,
         'landlock-host-constraint-unrepresentable',

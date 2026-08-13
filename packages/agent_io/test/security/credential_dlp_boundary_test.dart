@@ -21,6 +21,10 @@ final Object _seatbeltSkip = Platform.isMacOS
     ? false
     : 'SKIP-MANIFEST credential boundary platform='
         '${Platform.operatingSystem} backend=seatbelt-required';
+final Object _dlpSeatbeltSkip = Platform.isMacOS
+    ? false
+    : 'SKIP-MANIFEST DLP-05 platform='
+        '${Platform.operatingSystem} backend=seatbelt-required';
 
 void main() {
   setUpAll(() async {
@@ -110,7 +114,7 @@ void main() {
     } finally {
       await root.delete(recursive: true);
     }
-  });
+  }, skip: _seatbeltSkip);
 
   test('P4-TM-CRED-02 crash before outcome persists no secret', () async {
     final temp = Directory.systemTemp.createTempSync('pigcode_cred_');
@@ -427,13 +431,14 @@ void main() {
   final linuxCapability = LandlockSeccompSandboxBackend().probe();
   final linuxCapabilityAvailable =
       Platform.isLinux && linuxCapability.productionReady;
-  test('P4-TM-DLP-03 Linux runtime probe declares UDP/DNS/unix gaps', () {
+  test('P4-TM-DLP-03 Linux runtime probe reports seccomp socket limits', () {
     final manifest = DlpCapabilityManifest.forSandbox(
       linuxCapability,
     );
-    expect(manifest.udp, DlpEnforcement.unsupported);
-    expect(manifest.dns, DlpEnforcement.unsupported);
-    expect(manifest.abstractUnixSocket, DlpEnforcement.unsupported);
+    expect(manifest.tcp, DlpEnforcement.restricted);
+    expect(manifest.udp, DlpEnforcement.restricted);
+    expect(manifest.dns, DlpEnforcement.restricted);
+    expect(manifest.abstractUnixSocket, DlpEnforcement.restricted);
   },
       skip: linuxCapabilityAvailable
           ? false
@@ -489,7 +494,7 @@ void main() {
     } finally {
       root.deleteSync(recursive: true);
     }
-  });
+  }, skip: _dlpSeatbeltSkip);
 }
 
 Future<SandboxedProcess> _launchProbe(

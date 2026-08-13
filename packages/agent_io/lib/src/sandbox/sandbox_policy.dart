@@ -19,7 +19,7 @@ final class SandboxPathRule {
 final class SandboxNetworkEndpoint {
   SandboxNetworkEndpoint({required this.host, required this.port}) {
     if (host.isEmpty ||
-        host.contains('*') ||
+        (host.contains('*') && host != '*') ||
         host.contains('/') ||
         host.contains(RegExp(r'\s')) ||
         port < 1 ||
@@ -33,6 +33,8 @@ final class SandboxNetworkEndpoint {
 
   final String host;
   final int port;
+
+  bool get isPortOnly => host == '*';
 
   String get authority => '$host:$port';
 }

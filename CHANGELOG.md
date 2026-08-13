@@ -14,6 +14,6 @@
   Seatbelt/Landlock containment, five scenario-level Journey paths with
   persistent Journal replay, a real ten-point SIGKILL
   matrix, an exhaustive facade state matrix, a real sandboxed Dart LSP journey,
-  169 independent manifest mutations, public-document consumption checks,
+  176 independent manifest mutations, public-document consumption checks,
   runnable examples, and an evidence-bounded Phase 4 manifest.
 - Keep all packages unpublished during the Foundation phase.

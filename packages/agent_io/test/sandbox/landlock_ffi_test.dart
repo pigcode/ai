@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:pigcode_ai_agent_io/pigcode_ai_agent_io.dart';
 import 'package:test/test.dart';
 
+import '../support/workspace_path.dart';
+
 void main() {
   test('Landlock ABI maps exactly to capability switches', () {
     for (var abi = 1; abi <= 6; abi += 1) {
@@ -204,20 +206,91 @@ void main() {
     );
   });
 
-  test('seccomp inventory blocks session escape and non-TCP channels', () {
+  test('Landlock accepts an explicit port-only TCP allowlist', () {
+    expect(
+      () => LandlockFfi.validatePolicyExpressibility(
+        SandboxPolicy(
+          roots: <SandboxPathRule>[
+            SandboxPathRule(
+              path: Directory.current.absolute.path,
+              access: SandboxPathAccess.readOnly,
+            ),
+          ],
+          networkAllowlist: <SandboxNetworkEndpoint>[
+            SandboxNetworkEndpoint(host: '*', port: 443),
+          ],
+        ),
+      ),
+      returnsNormally,
+    );
+  });
+
+  test('seccomp inventory reports parameter-level socket restrictions', () {
     expect(
       SeccompFfi.blockedCapabilityNames,
       containsAll(<String>{
+        'ptrace',
         'setsid',
         'setpgid',
         'unshare',
-        'socket',
-        'socketpair',
-        'connect',
-        'bind',
+        'socket(non-inet-or-non-stream)',
       }),
     );
+    for (final allowed in const <String>[
+      'socket',
+      'socketpair',
+      'connect',
+      'bind',
+    ]) {
+      expect(SeccompFfi.blockedCapabilityNames, isNot(contains(allowed)));
+    }
   });
+
+  test('Linux DLP report reflects seccomp non-TCP socket restrictions', () {
+    final report = SandboxCapabilityProbe(
+      platform: SandboxPlatform.linuxX64,
+      landlockAbi: () => 4,
+      seccompSupported: () => true,
+    ).probe();
+
+    final manifest = DlpCapabilityManifest.forSandbox(report);
+
+    expect(manifest.tcp, DlpEnforcement.restricted);
+    expect(manifest.udp, DlpEnforcement.restricted);
+    expect(manifest.dns, DlpEnforcement.restricted);
+    expect(manifest.abstractUnixSocket, DlpEnforcement.restricted);
+  });
+
+  final seccompSupported = Platform.isLinux && SeccompFfi().isSupported;
+  test(
+    'Linux kernel enforces runtime IPC and parameter-level socket policy',
+    () async {
+      final process = await Process.start(
+        Platform.resolvedExecutable,
+        <String>[
+          resolveTestWorkspacePath(
+            packageRelative: 'test/fixtures/seccomp_runtime_probe.dart',
+            workspaceRelative:
+                'packages/agent_io/test/fixtures/seccomp_runtime_probe.dart',
+          ),
+        ],
+        runInShell: false,
+      );
+      final output = utf8.decoder.bind(process.stdout).join();
+      final errors = utf8.decoder.bind(process.stderr).join();
+
+      expect(
+        await process.exitCode.timeout(const Duration(seconds: 8)),
+        0,
+        reason: await errors,
+      );
+      expect(await output, contains('SECCOMP_RUNTIME_IPC_REACHED'));
+    },
+    skip: seccompSupported
+        ? false
+        : 'SKIP-MANIFEST seccomp-kernel-enforcement '
+            'platform=${Platform.operatingSystem}',
+  );
 
   test('ABI below 4 fails closed before spawning a runner', () async {
     final backend = LandlockSeccompSandboxBackend(

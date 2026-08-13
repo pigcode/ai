@@ -324,8 +324,16 @@ void main() {
     'P4-TM-PTY-04 Landlock ABI5 kernel denies device ioctl',
     () async {
       final root = Directory.systemTemp.createTempSync('pigcode_ioctl_');
+      final hostData =
+          Directory.systemTemp.createTempSync('pigcode_ioctl_host_');
+      final launcher = SandboxedProcessLauncher(
+        LandlockSeccompSandboxBackend(),
+        hostDataDirectory: hostData.path,
+        sessionIdentity: 'pty-ioctl-abi5',
+      );
+      SandboxedProcess? process;
       try {
-        final process = await LandlockSeccompSandboxBackend().start(
+        process = await launcher.launch(
           SandboxPolicy(
             roots: <SandboxPathRule>[
               SandboxPathRule(
@@ -360,8 +368,19 @@ void main() {
           await process.exitCode.timeout(const Duration(seconds: 8)),
           0,
         );
+        expect((await launcher.cleanup(process)).confirmed, isTrue);
+        process = null;
       } finally {
+        final active = process;
+        if (active != null) {
+          try {
+            await launcher.cleanup(active).timeout(const Duration(seconds: 3));
+          } on Object {
+            Process.killPid(-active.processGroupId, ProcessSignal.sigkill);
+          }
+        }
         root.deleteSync(recursive: true);
+        hostData.deleteSync(recursive: true);
       }
     },
     skip: ioctlSupported

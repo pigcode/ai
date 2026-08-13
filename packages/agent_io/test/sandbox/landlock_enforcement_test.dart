@@ -184,6 +184,76 @@ void main() {
   );
 
   test(
+    'P4-TM-DLP-02 Linux Landlock permits only allowlisted TCP ports',
+    () async {
+      final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
+      final root = Directory('${temp.path}/root')..createSync();
+      final connectServer =
+          await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final bindProbe =
+          await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final bindPort = bindProbe.port;
+      await bindProbe.close();
+      try {
+        final policy = SandboxPolicy(
+          roots: <SandboxPathRule>[
+            SandboxPathRule(
+              path: root.path,
+              access: SandboxPathAccess.readWrite,
+            ),
+          ],
+          networkAllowlist: <SandboxNetworkEndpoint>[
+            SandboxNetworkEndpoint(host: '*', port: connectServer.port),
+            SandboxNetworkEndpoint(host: '*', port: bindPort),
+          ],
+        );
+        final backend =
+            LandlockSeccompSandboxBackend(unsafeStandaloneStart: true);
+
+        final connect = await _run(
+          backend,
+          policy,
+          HostCommand(
+            executable: '/usr/bin/nc',
+            arguments: <String>[
+              '-z',
+              InternetAddress.loopbackIPv4.address,
+              '${connectServer.port}',
+            ],
+          ),
+        );
+        final bind = await backend.start(
+          policy,
+          HostCommand(
+            executable: '/usr/bin/nc',
+            arguments: <String>[
+              '-l',
+              InternetAddress.loopbackIPv4.address,
+              '$bindPort',
+            ],
+          ),
+        );
+        bind.stdout.drain<void>();
+        bind.stderr.drain<void>();
+
+        expect(connect.exitCode, 0);
+        Socket? observer;
+        try {
+          observer = await _connectUntilListening(bindPort);
+        } finally {
+          observer?.destroy();
+          bind.kill(ProcessSignal.sigkill);
+          await bind.exitCode.timeout(const Duration(seconds: 2));
+        }
+      } finally {
+        await connectServer.close();
+        temp.deleteSync(recursive: true);
+      }
+    },
+    skip: skipReason,
+  );
+
+  test(
     'Linux Dart VM reaches main without widening procfs',
     () async {
       final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
@@ -293,4 +363,22 @@ Future<({int exitCode, String stdout})> _run(
     await process.exitCode;
     rethrow;
   }
+}
+
+Future<Socket> _connectUntilListening(int port) async {
+  final deadline = DateTime.now().add(const Duration(seconds: 2));
+  Object? lastError;
+  while (DateTime.now().isBefore(deadline)) {
+    try {
+      return await Socket.connect(
+        InternetAddress.loopbackIPv4,
+        port,
+        timeout: const Duration(milliseconds: 100),
+      );
+    } on SocketException catch (error) {
+      lastError = error;
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+  }
+  throw StateError('sandbox bind did not listen on port $port: $lastError');
 }

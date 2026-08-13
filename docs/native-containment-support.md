@@ -28,6 +28,33 @@ gate.
 - Windows, macOS x86_64, Linux below the kernel/ABI floor, and all other
   platforms fail closed.
 
+## Linux network composition
+
+The Linux backend composes two controls rather than treating every socket
+operation as equivalent:
+
+- classic BPF accepts only the x86_64 and arm64 `AUDIT_ARCH` layouts. It masks
+  `SOCK_CLOEXEC`/`SOCK_NONBLOCK` through `SOCK_TYPE_MASK` and permits
+  `socket(2)` only for `AF_INET`/`AF_INET6` plus `SOCK_STREAM`; datagram, raw,
+  Unix-domain, packet, and other socket creation returns `EPERM`. The x86_64
+  x32 syscall convention is killed rather than falling through.
+- `connect(2)` and `bind(2)` are not denied by seccomp. Landlock ABI 4
+  `LANDLOCK_ACCESS_NET_CONNECT_TCP`/`LANDLOCK_ACCESS_NET_BIND_TCP` enforce the
+  TCP port allowlist. Linux callers must use the explicit `*:<port>` form;
+  host-specific entries still fail closed because Landlock cannot represent an
+  address constraint.
+- `socketpair(2)` remains available for process-local runtime IPC. It creates
+  both connected endpoints in the calling process and cannot directly name or
+  connect to an external endpoint; external Unix-domain `socket(2)` creation
+  remains denied.
+
+A local Linux arm64 container probe observed Dart 3.12.2 initialize async I/O
+with `pipe2`, `epoll_create1`, and `timerfd_create`, then verified the installed
+filter allows local `socketpair` and flagged IPv4 stream creation while
+returning `EPERM` for UDP, Unix-domain `socket(2)`, and `ptrace`. This is useful
+implementation evidence but is not a Landlock production tuple, so the Linux
+claim remains implemented/CI-deferred.
+
 ## Final claim status
 
 The independent-review rating is 4 verified, 13 implemented, and 1
@@ -73,7 +100,7 @@ Machine-checked declarations:
 | `P4-DART-01` | verified | Dart 3.12.2 language-server initialize/open/hover/completion/shutdown runs under Seatbelt; unapproved applyEdit leaves the file unchanged. |
 | `P4-DART-02` | known-unsupported | Strict networking conflicts with dynamic DAP TCP/Unix/resolver channels (`KU-P4-DAP-POLICY`) (c). |
 | `P4-CROSS-01` | implemented | The local Chrome MIME/runner gate is deferred to CI (b). |
-| `P4-CROSS-02` | implemented | The 169-case mutation closure is contract evidence capped at implemented by §17. |
+| `P4-CROSS-02` | implemented | The 176-case mutation closure is contract evidence capped at implemented by §17. |
 | `P4-CROSS-03` | implemented | Documentation/example consumption is contract evidence capped at implemented by §17. |
 
 `P4-AGENT-02` has managed ordering, observed-only, unknown-outcome, and
@@ -121,9 +148,9 @@ known-unsupported rather than weakened to pass.
   already-`setsid` orphan cannot be rediscovered reliably from the original
   PGID ledger; live-parent cancellation cleanup remains covered.
 - `KU-P4-PTY-ABI4`: Landlock ABI 4 cannot restrict PTY ioctl/device control.
-- `KU-P4-DLP-NONTCP`: abstract Unix sockets and parts of UDP/DNS bypass
-  enforcement remain unsupported; measured paths are denied but not claimed
-  as complete protocol isolation.
+- `KU-P4-DLP-NONTCP`: direct UDP, raw, Unix-domain, and packet socket creation
+  is restricted on Linux, but inherited/pre-opened endpoints and alternate
+  kernel submission paths are not claimed as complete non-TCP isolation.
 - `KU-P4-MALICIOUS-HOST`: root, administrators, and a malicious Host are
   outside the sandbox trust boundary.
 - `KU-P4-EXTERNAL-HARNESS`: the exact external harness effect matrix belongs

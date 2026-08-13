@@ -26,13 +26,14 @@ final class DlpCapabilityManifest {
     }
     if (report.platform == SandboxPlatform.linuxX64 ||
         report.platform == SandboxPlatform.linuxArm64) {
+      final seccomp = report.seccompSupported == true;
+      final tcp = (report.landlockAbi ?? 0) >= 4 && seccomp;
       return DlpCapabilityManifest(
-        tcp: (report.landlockAbi ?? 0) >= 4
-            ? DlpEnforcement.restricted
-            : DlpEnforcement.unsupported,
-        udp: DlpEnforcement.unsupported,
-        dns: DlpEnforcement.unsupported,
-        abstractUnixSocket: DlpEnforcement.unsupported,
+        tcp: tcp ? DlpEnforcement.restricted : DlpEnforcement.unsupported,
+        udp: seccomp ? DlpEnforcement.restricted : DlpEnforcement.unsupported,
+        dns: tcp ? DlpEnforcement.restricted : DlpEnforcement.unsupported,
+        abstractUnixSocket:
+            seccomp ? DlpEnforcement.restricted : DlpEnforcement.unsupported,
       );
     }
     return const DlpCapabilityManifest(
