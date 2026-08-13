@@ -1,0 +1,20 @@
+name: pigcode_ai_agent
+description: Portable native development agent facade for Pigcode.
+version: 0.0.1
+publish_to: none
+repository: https://github.com/pigcode/ai
+issue_tracker: https://github.com/pigcode/ai/issues
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  pigcode_ai: ^0.0.1
+  pigcode_ai_agent_kernel: ^0.0.1
+
+dev_dependencies:
+  lints: ^5.0.0
+  pigcode_ai_agent_io: ^0.0.1
+  test: ^1.25.0

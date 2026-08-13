@@ -1397,14 +1397,14 @@
       "peer": {
         "name": "workspace contract test",
         "path": "tool/test/workspace_contract_test.dart",
-        "sha256": "6af1dd93d69ebb750b4614989dab700a3a8dc39deef195a71357a6e2e8cbde1d"
+        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
       },
       "dartSdkConstraint": "^3.6.0",
       "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace contract test",
         "path": "tool/test/workspace_contract_test.dart",
-        "sha256": "6af1dd93d69ebb750b4614989dab700a3a8dc39deef195a71357a6e2e8cbde1d"
+        "sha256": "b3830b9d8750fccd20ccf1572a41909d7eca03b28fdefc3f844df96ab991c721"
       },
       "verifiedAt": "2026-07-23T20:00:02Z",
       "result": {
@@ -1424,14 +1424,14 @@
       "peer": {
         "name": "protocol codegen test",
         "path": "tool/test/protocol_codegen_test.dart",
-        "sha256": "f5c0be7b0f66ac0ee718c0322afc141d94e1f5ec42ddc0f55912aaabcf929111"
+        "sha256": "93086b7c3152815dfd80abc2c5f19e595f1b506e0e83c37305062a760de53f1b"
       },
       "dartSdkConstraint": "^3.6.0",
       "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "protocol codegen test",
         "path": "tool/test/protocol_codegen_test.dart",
-        "sha256": "f5c0be7b0f66ac0ee718c0322afc141d94e1f5ec42ddc0f55912aaabcf929111"
+        "sha256": "93086b7c3152815dfd80abc2c5f19e595f1b506e0e83c37305062a760de53f1b"
       },
       "verifiedAt": "2026-07-23T20:00:02Z",
       "result": {
@@ -1505,14 +1505,14 @@
       "peer": {
         "name": "workspace CI workflow",
         "path": ".github/workflows/ci.yml",
-        "sha256": "6d777b2e155d6be58ffc553e23084dc2f378189543302065a022bdb3cf6a6056"
+        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
       },
       "dartSdkConstraint": "^3.6.0",
       "evidenceCommit": "b286630a5870830141394a415144c93c500598f1",
       "artifact": {
         "name": "workspace CI workflow",
         "path": ".github/workflows/ci.yml",
-        "sha256": "6d777b2e155d6be58ffc553e23084dc2f378189543302065a022bdb3cf6a6056"
+        "sha256": "b6e847f381e005baa3cb1d7486e40b90fe320d1334fe32d930a21ff6ab4e4974"
       },
       "verifiedAt": "2026-07-23T20:00:02Z",
       "result": {

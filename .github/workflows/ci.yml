@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -53,6 +55,13 @@ jobs:
           dart run tool/test/kernel_store_compatibility_manifest_test.dart
           dart run tool/test/kernel_store_fixture_coverage_test.dart
           dart run tool/check_kernel_store_compatibility.dart
+      - name: Test native containment compatibility evidence
+        run: |
+          dart run tool/test/native_containment_compatibility_manifest_test.dart
+          dart run tool/test/native_containment_manifest_mutation_test.dart
+          dart run tool/test/native_containment_documentation_test.dart
+          dart run tool/check_native_containment_compatibility.dart
+          dart run tool/check_native_containment_documentation.dart
       - name: Test fixed peer
         run: dart run tool/test/ai_core_peer_test.dart
       - name: Test cross-package scripted peer
@@ -104,7 +113,7 @@ jobs:
         shell: bash
         run: |
           portable_smoke_root=$(mktemp -d)
-          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp agent_kernel lsp dap dart; do
+          for package in provider provider_utils ai openai openai_compatible anthropic protocol_utils acp mcp agent agent_kernel lsp dap dart; do
             (
               cd "packages/$package"
               dart test --platform chrome test/barrel_test.dart
@@ -126,8 +135,67 @@ jobs:
         run: dart test packages/mcp/test/io_barrel_test.dart
       - name: Verify Agent Store IO entrypoint
         run: dart test packages/agent_io/test/barrel_test.dart
+      - name: Verify Dart agent composition entrypoint
+        run: dart test packages/agent_dart/test/barrel_test.dart
       - name: Test
         run: dart run melos test
+
+  linux-containment:
+    name: Linux containment capability smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.12.2
+      - name: Resolve workspace
+        run: dart pub get
+      - name: Record Linux containment environment
+        run: uname -a
+      - name: Test Linux containment probe contract
+        run: >-
+          dart test
+          packages/agent_io/test/sandbox/capability_probe_test.dart
+      - name: Record Landlock ABI and run Linux enforcement
+        run: |
+          dart test packages/agent_io/test/sandbox/landlock_ffi_test.dart
+          dart test packages/agent_io/test/sandbox/landlock_enforcement_test.dart
+      - name: Verify process containment
+        run: dart test packages/agent_io/test/exec
+      - name: Verify Linux capability boundaries
+        run: dart test packages/agent_io/test/security
+      - name: Verify agent sandbox crash matrix
+        run: dart run tool/run_agent_sandbox_crash_matrix.dart --suite all
+      - name: Verify native agent journeys
+        run: |
+          dart test packages/agent/test/journey/native_journey_test.dart
+          dart run tool/test/native_journey_crash_restart_test.dart
+
+  macos-containment:
+    name: macOS Seatbelt containment
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.12.2
+      - name: Resolve workspace
+        run: dart pub get
+      - name: Record macOS containment environment
+        run: uname -a
+      - name: Verify Seatbelt and process containment
+        run: |
+          dart test packages/agent_io/test/sandbox/seatbelt_enforcement_test.dart
+          dart test packages/agent_io/test/exec
+          dart test packages/agent_io/test/security
+      - name: Verify agent sandbox crash matrix
+        run: dart run tool/run_agent_sandbox_crash_matrix.dart --suite all
+      - name: Verify native agent journeys
+        run: |
+          dart test packages/agent/test/journey/native_journey_test.dart
+          dart run tool/test/native_journey_crash_restart_test.dart
 
   minimum-sdk:
     name: Dart 3.6.0 workspace

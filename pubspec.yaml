@@ -14,8 +14,10 @@ workspace:
   - packages/protocol_utils
   - packages/acp
   - packages/mcp
+  - packages/agent
   - packages/agent_kernel
   - packages/agent_io
+  - packages/agent_dart
   - packages/lsp
   - packages/dap
   - packages/dart

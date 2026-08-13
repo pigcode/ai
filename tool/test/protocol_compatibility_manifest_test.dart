@@ -108,6 +108,10 @@ void main() {
       validateProtocolCompatibilityManifest(root: root, manifest: changed),
       'evidence_commit_mismatch',
     );
+    _expectViolation(
+      validateProtocolCompatibilityManifest(root: root, manifest: changed),
+      'evidence_commit_unreachable',
+    );
   });
 
   stdout.writeln('PASS Phase 2a protocol compatibility manifest');

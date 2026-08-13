@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:yaml/yaml.dart';
+
 import '../src/workspace_contract.dart';
 
 typedef _TestBody = void Function();
@@ -14,11 +16,31 @@ const _packageNames = <String, String>{
   'protocol_utils': 'pigcode_ai_protocol_utils',
   'acp': 'pigcode_ai_acp',
   'mcp': 'pigcode_ai_mcp',
+  'agent': 'pigcode_ai_agent',
   'agent_kernel': 'pigcode_ai_agent_kernel',
   'agent_io': 'pigcode_ai_agent_io',
+  'agent_dart': 'pigcode_ai_agent_dart',
   'lsp': 'pigcode_ai_lsp',
   'dap': 'pigcode_ai_dap',
   'dart': 'pigcode_ai_dart',
+};
+
+const _commitRelativeCompatibilityCheckers = <String>{
+  'tool/check_compatibility.dart',
+  'tool/check_protocol_compatibility.dart',
+  'tool/check_dart_tooling_compatibility.dart',
+  'tool/check_kernel_store_compatibility.dart',
+  'tool/check_native_containment_compatibility.dart',
+};
+
+const _phase4PublicWorkspacePaths = <String>{
+  'tool/fixtures/agent_sandbox_effect_worker.dart',
+  'tool/test/run_workspace_tests_test.dart',
+};
+
+const _phase4InternalNotes = <String>{
+  'PHASE4_DEVIATIONS.md',
+  'PHASE4_REMEDIATION.md',
 };
 
 const _phase2bProtocolPaths = <String>[
@@ -273,6 +295,61 @@ void main() {
         );
       });
     },
+    'requires full history for every compatibility checker job': () {
+      final workflowFile = File('.github/workflows/ci.yml');
+      final workflow = loadYaml(workflowFile.readAsStringSync());
+      _expect(workflow is YamlMap, '${workflowFile.path} must be a YAML map.');
+      final jobs = (workflow as YamlMap)['jobs'];
+      _expect(jobs is YamlMap, '${workflowFile.path} must define jobs.');
+
+      final coveredCheckers = <String>{};
+      for (final jobEntry in (jobs as YamlMap).entries) {
+        final job = jobEntry.value;
+        if (job is! YamlMap) continue;
+        final steps = job['steps'];
+        if (steps is! YamlList) continue;
+
+        final checkerPaths = <String>{};
+        final checkoutSteps = <YamlMap>[];
+        for (final step in steps) {
+          if (step is! YamlMap) continue;
+          final run = step['run'];
+          if (run is String) {
+            checkerPaths.addAll(
+              _commitRelativeCompatibilityCheckers.where(run.contains),
+            );
+          }
+          final uses = step['uses'];
+          if (uses is String && uses.startsWith('actions/checkout@')) {
+            checkoutSteps.add(step);
+          }
+        }
+        if (checkerPaths.isEmpty) continue;
+
+        coveredCheckers.addAll(checkerPaths);
+        _expect(
+          checkoutSteps.length == 1,
+          'CI job ${jobEntry.key} runs ${checkerPaths.join(', ')} and must '
+          'have exactly one checkout step.',
+        );
+        final checkoutConfiguration = checkoutSteps.single['with'];
+        final fetchDepth = checkoutConfiguration is YamlMap
+            ? checkoutConfiguration['fetch-depth']
+            : null;
+        _expect(
+          fetchDepth == 0,
+          'CI job ${jobEntry.key} runs ${checkerPaths.join(', ')} but its '
+          'checkout fetch-depth is ${fetchDepth ?? 'shallow default'}.',
+        );
+      }
+
+      final missingCheckers =
+          _commitRelativeCompatibilityCheckers.difference(coveredCheckers);
+      _expect(
+        missingCheckers.isEmpty,
+        'CI does not run compatibility checkers: ${missingCheckers.join(', ')}',
+      );
+    },
     'rejects an unexpected tracked root path': () {
       _withFixture((fixture) {
         fixture.writeTracked('notes.txt', 'private notes\n');
@@ -315,6 +392,61 @@ void main() {
           code: 'missing_required_path',
           messageFragment: 'tool/run_agent_store_crash_matrix.dart',
         );
+      });
+    },
+    'requires the Phase 4 sandbox crash matrix': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('tool/run_agent_sandbox_crash_matrix.dart');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_required_path',
+          messageFragment: 'tool/run_agent_sandbox_crash_matrix.dart',
+        );
+      });
+    },
+    'requires the Phase 4 public workspace test assets': () {
+      for (final path in _phase4PublicWorkspacePaths) {
+        _withFixture((fixture) {
+          fixture.removeTracked(path);
+
+          _expectViolation(
+            validateWorkspace(fixture.root, fixture.trackedPaths),
+            code: 'missing_required_path',
+            messageFragment: path,
+          );
+        });
+      }
+    },
+    'keeps Phase 4 internal notes outside the public workspace': () {
+      _withFixture((fixture) {
+        final withoutNotes = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final path in _phase4InternalNotes) {
+          _expect(
+            !withoutNotes.any(
+              (violation) =>
+                  violation.code == 'missing_required_path' &&
+                  violation.message.contains(path),
+            ),
+            'Expected $path not to be required, got ${_describe(withoutNotes)}',
+          );
+          fixture.writeTracked(path, '# Internal Phase 4 note\n');
+        }
+
+        final withTrackedNotes = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final path in _phase4InternalNotes) {
+          _expectViolation(
+            withTrackedNotes,
+            code: 'unexpected_tracked_path',
+            messageFragment: path,
+          );
+        }
       });
     },
     'requires the Phase 3 security and secret gates': () {
@@ -611,6 +743,28 @@ dependencies:
         );
       });
     },
+    'requires Agent README after Phase 4 documentation closeout': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('packages/agent/README.md');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_package_readme',
+          messageFragment: 'packages/agent/README.md',
+        );
+      });
+    },
+    'requires Agent Dart changelog after Phase 4 documentation closeout': () {
+      _withFixture((fixture) {
+        fixture.removeTracked('packages/agent_dart/CHANGELOG.md');
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'missing_package_changelog',
+          messageFragment: 'packages/agent_dart/CHANGELOG.md',
+        );
+      });
+    },
     'reports a missing package barrel': () {
       _withFixture((fixture) {
         fixture.removeTracked(
@@ -756,6 +910,60 @@ dependencies:
         );
       });
     },
+    'allows portable agent dependencies only on AI and agent kernel': () {
+      _withFixture((fixture) {
+        for (final dependency in const <String>[
+          'pigcode_ai_protocol_utils',
+          'pigcode_ai_agent_io',
+        ]) {
+          fixture.replaceIn(
+            'packages/agent/pubspec.yaml',
+            '  pigcode_ai: ^0.0.1\n',
+            '  pigcode_ai: ^0.0.1\n  $dependency: ^0.0.1\n',
+          );
+          _expectViolation(
+            validateWorkspace(fixture.root, fixture.trackedPaths),
+            code: 'forbidden_internal_dependency',
+            messageFragment: 'pigcode_ai_agent -> $dependency',
+          );
+          fixture.replaceIn(
+            'packages/agent/pubspec.yaml',
+            '  $dependency: ^0.0.1\n',
+            '',
+          );
+        }
+      });
+    },
+    'rejects Flutter dependency from the portable agent': () {
+      _withFixture((fixture) {
+        fixture.replaceIn(
+          'packages/agent/pubspec.yaml',
+          '  pigcode_ai: ^0.0.1\n',
+          '  pigcode_ai: ^0.0.1\n  flutter: any\n',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_dependency',
+          messageFragment: 'pigcode_ai_agent -> flutter',
+        );
+      });
+    },
+    'rejects MCP reverse dependency from Dart agent composition': () {
+      _withFixture((fixture) {
+        fixture.replaceIn(
+          'packages/agent_dart/pubspec.yaml',
+          '  pigcode_ai_agent: ^0.0.1\n',
+          '  pigcode_ai_agent: ^0.0.1\n  pigcode_ai_mcp: ^0.0.1\n',
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'forbidden_internal_dependency',
+          messageFragment: 'pigcode_ai_agent_dart -> pigcode_ai_mcp',
+        );
+      });
+    },
     'allows tooling packages to depend only on protocol utilities': () {
       _withFixture((fixture) {
         for (final package in const <String>['lsp', 'dap', 'dart']) {
@@ -792,6 +1000,20 @@ dependencies:
           code: 'portable_barrel_io_dependency',
           messageFragment:
               'packages/agent_kernel/lib/pigcode_ai_agent_kernel.dart',
+        );
+      });
+    },
+    'rejects dart:io in the portable agent barrel': () {
+      _withFixture((fixture) {
+        fixture.appendTo(
+          'packages/agent/lib/pigcode_ai_agent.dart',
+          "export 'dart:io';\n",
+        );
+
+        _expectViolation(
+          validateWorkspace(fixture.root, fixture.trackedPaths),
+          code: 'portable_barrel_io_dependency',
+          messageFragment: 'packages/agent/lib/pigcode_ai_agent.dart',
         );
       });
     },
@@ -1112,6 +1334,10 @@ final class _WorkspaceFixture {
         'docs/kernel-store-support.md',
         '# Kernel and Store support\n',
       )
+      ..writeTracked(
+        'docs/native-containment-support.md',
+        '# Native containment support\n',
+      )
       ..writeTracked('third_party/licenses/Apache-2.0.txt', 'Apache 2.0\n')
       ..writeTracked(
         'tool/check_compatibility.dart',
@@ -1126,8 +1352,64 @@ final class _WorkspaceFixture {
         '// Agent Kernel and Store compatibility CLI fixture\n',
       )
       ..writeTracked(
+        'tool/check_native_containment_compatibility.dart',
+        '// Native containment compatibility CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/check_native_containment_documentation.dart',
+        '// Native containment documentation CLI fixture\n',
+      )
+      ..writeTracked(
         'tool/run_agent_store_crash_matrix.dart',
         '// Agent Store crash matrix CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/run_agent_sandbox_crash_matrix.dart',
+        '// Agent sandbox crash matrix CLI fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_sandbox_crash_child.dart',
+        '// Agent sandbox crash child fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_sandbox_effect_worker.dart',
+        '// Agent sandbox effect worker fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/native_journey_child.dart',
+        '// Native journey child fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/agent_sandbox_crash_harness.dart',
+        '// Agent sandbox crash harness fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/agent_sandbox_crash_matrix_test.dart',
+        '// Agent sandbox crash matrix test fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/native_containment_compatibility_manifest.dart',
+        '// Native containment manifest validator fixture\n',
+      )
+      ..writeTracked(
+        'tool/src/native_containment_documentation.dart',
+        '// Native containment documentation validator fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/native_containment_compatibility_manifest_test.dart',
+        '// Native containment manifest test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/native_containment_manifest_mutation_test.dart',
+        '// Native containment mutation test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/native_containment_documentation_test.dart',
+        '// Native containment documentation test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/native_journey_crash_restart_test.dart',
+        '// Native journey crash/restart fixture\n',
       )
       ..writeTracked(
         'tool/check_protocol_compatibility.dart',
@@ -1322,6 +1604,10 @@ final class _WorkspaceFixture {
         '// Test fixture\n',
       )
       ..writeTracked(
+        'tool/test/run_workspace_tests_test.dart',
+        '// Workspace test runner regression fixture\n',
+      )
+      ..writeTracked(
         'tool/upstream/protocols/acp/LICENSE',
         'Apache 2.0\n',
       )
@@ -1386,6 +1672,14 @@ final class _WorkspaceFixture {
         '{}\n',
       )
       ..writeTracked(
+        'compatibility/phase-4-native-containment.json',
+        '{}\n',
+      )
+      ..writeTracked(
+        'compatibility/schema/native-containment-compatibility.schema.json',
+        '{}\n',
+      )
+      ..writeTracked(
         'tool/fixtures/agent_kernel/schema/valid-event.json',
         '{}\n',
       )
@@ -1446,12 +1740,32 @@ final class _WorkspaceFixture {
         '// Agent Kernel example fixture\n',
       )
       ..writeTracked(
+        'packages/agent/example/native_agent.dart',
+        '// Native Agent example fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent/test/example_compile_test.dart',
+        '// Native Agent example test fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_dart/example/dart_tooling_agent.dart',
+        '// Dart tooling Agent example fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_dart/test/example_compile_test.dart',
+        '// Dart tooling Agent example test fixture\n',
+      )
+      ..writeTracked(
         'packages/agent_kernel/test/example_compile_test.dart',
         '// Agent Kernel example test fixture\n',
       )
       ..writeTracked(
         'packages/agent_io/example/durable_store.dart',
         '// Agent Store example fixture\n',
+      )
+      ..writeTracked(
+        'packages/agent_io/example/sandboxed_process.dart',
+        '// Agent sandbox example fixture\n',
       )
       ..writeTracked(
         'packages/agent_io/test/example_compile_test.dart',
@@ -1532,6 +1846,17 @@ final class _WorkspaceFixture {
             dependencies: switch (entry.key) {
               'agent_io' => const <String, String>{
                   'pigcode_ai_agent_kernel': '^0.0.1',
+                },
+              'agent' => const <String, String>{
+                  'pigcode_ai_agent_kernel': '^0.0.1',
+                  'pigcode_ai': '^0.0.1',
+                },
+              'agent_dart' => const <String, String>{
+                  'pigcode_ai_agent': '^0.0.1',
+                  'pigcode_ai_lsp': '^0.0.1',
+                  'pigcode_ai_dap': '^0.0.1',
+                  'pigcode_ai_dart': '^0.0.1',
+                  'pigcode_ai_agent_io': '^0.0.1',
                 },
               'lsp' || 'dap' || 'dart' => const <String, String>{
                   'pigcode_ai_protocol_utils': '^0.0.1',
@@ -1642,8 +1967,10 @@ workspace:
   - packages/protocol_utils
   - packages/acp
   - packages/mcp
+  - packages/agent
   - packages/agent_kernel
   - packages/agent_io
+  - packages/agent_dart
   - packages/lsp
   - packages/dap
   - packages/dart

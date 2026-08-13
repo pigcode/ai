@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pigcode/ai/compatibility/schema/native-containment-compatibility.schema.json",
+  "title": "Pigcode Phase 4 native containment compatibility manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "formatVersion", "phase", "implementationCommit", "dartSdkConstraint", "sources", "claims", "evidence", "knownUnsupported"],
+  "properties": {
+    "$schema": {"const": "./schema/native-containment-compatibility.schema.json"},
+    "formatVersion": {"const": 1},
+    "phase": {"const": "phase-4-native-containment"},
+    "implementationCommit": {"const": "pending-main-merge"},
+    "dartSdkConstraint": {"const": "^3.6.0"},
+    "sources": {
+      "type": "array",
+      "minItems": 4,
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"$ref": "#/$defs/claim"}
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"$ref": "#/$defs/evidence"}
+    },
+    "knownUnsupported": {
+      "type": "array",
+      "minItems": 16,
+      "maxItems": 16,
+      "items": {"$ref": "#/$defs/knownUnsupported"}
+    }
+  },
+  "$defs": {
+    "pathDigest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "source": {
+      "allOf": [
+        {"$ref": "#/$defs/pathDigest"},
+        {
+          "type": "object",
+          "required": ["id", "kind"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "kind": {"enum": ["schema", "source", "contract", "threat-model"]}
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "level", "summary", "sourceRefs", "evidenceRef", "knownUnsupportedRefs"],
+      "properties": {
+        "id": {"pattern": "^P4-(HOST|AGENT|DART|CROSS)-[0-9]{2}$"},
+        "component": {"enum": ["host", "agent", "dart-composition", "cross-package"]},
+        "level": {"enum": ["implemented", "verified", "known-unsupported"]},
+        "summary": {"type": "string", "minLength": 1},
+        "sourceRefs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "evidenceRef": {"pattern": "^EV-P4-(HOST|AGENT|DART|CROSS)-[0-9]{2}$"},
+        "knownUnsupportedRefs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "platformTuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executed", "osVersion", "kernelVersion", "arch", "sandboxBackend", "landlockAbi"],
+      "properties": {
+        "executed": {"type": "boolean"},
+        "osVersion": {"type": ["string", "null"]},
+        "kernelVersion": {"type": ["string", "null"]},
+        "arch": {"type": ["string", "null"]},
+        "sandboxBackend": {"type": ["string", "null"]},
+        "landlockAbi": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "claimId", "claimLevel", "kind", "capabilityProfile", "platform", "platformTuple", "evidenceCommit", "scenario", "threatModelRefs", "injectionScenarios", "artifacts", "result"],
+      "properties": {
+        "id": {"pattern": "^EV-P4-(HOST|AGENT|DART|CROSS)-[0-9]{2}$"},
+        "claimId": {"pattern": "^P4-(HOST|AGENT|DART|CROSS)-[0-9]{2}$"},
+        "claimLevel": {"enum": ["implemented", "verified", "known-unsupported"]},
+        "kind": {"type": "string", "minLength": 1},
+        "capabilityProfile": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "platformTuple": {"$ref": "#/$defs/platformTuple"},
+        "evidenceCommit": {"const": "pending-main-merge"},
+        "scenario": {"type": "string", "minLength": 1},
+        "threatModelRefs": {"type": "array", "uniqueItems": true, "items": {"pattern": "^P4-TM-(PATH|PROC|PTY|GIT|CRED|DLP)-[0-9]{2}$"}},
+        "injectionScenarios": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "artifacts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/pathDigest"}},
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "assertions"],
+          "properties": {
+            "status": {"enum": ["passed", "ci-deferred", "known-unsupported"]},
+            "assertions": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "knownUnsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "summary"],
+      "properties": {
+        "id": {"pattern": "^KU-P4-[A-Z0-9-]+$"},
+        "scope": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

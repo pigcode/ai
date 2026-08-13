@@ -19,8 +19,10 @@ provider integrations.
 | `packages/protocol_utils` | `pigcode_ai_protocol_utils` | Portable JSON-RPC, framing, cancellation, diagnostics, and caller-owned transport primitives. |
 | `packages/acp` | `pigcode_ai_acp` | Stable ACP v1 client/agent protocol pinned to `schema-v1.20.0`, with portable core APIs and caller-owned process adapters. |
 | `packages/mcp` | `pigcode_ai_mcp` | MCP `2025-11-25` client/server APIs, portable Streamable HTTP, VM-only IO adapters, OAuth, tasks, and Pigcode AI mappings. |
+| `packages/agent` | `pigcode_ai_agent` | Portable explicit-Session development Agent facade, Native driver mapping, and Host capability ports. |
 | `packages/agent_kernel` | `pigcode_ai_agent_kernel` | Portable event-sourced Agent domain, command, policy, reducer, stream, and Store contracts. |
-| `packages/agent_io` | `pigcode_ai_agent_io` | VM-only immutable-generation `FileAgentStore` with process-crash recovery, exact registries, snapshots, and explicit retention. |
+| `packages/agent_io` | `pigcode_ai_agent_io` | VM-only Agent Store and fail-closed Seatbelt/Landlock Host containment implementation. |
+| `packages/agent_dart` | `pigcode_ai_agent_dart` | VM-only Dart tooling composition with sandboxed process launch and proposal-only reverse requests. |
 | `packages/lsp` | `pigcode_ai_lsp` | Portable LSP stable APIs, explicit proposed opt-in, lifecycle, capabilities, document state, proposals, and codecs. |
 | `packages/dap` | `pigcode_ai_dap` | Portable DAP schema, lifecycle, debug state, proposals, references, and codecs. |
 | `packages/dart` | `pigcode_ai_dart` | Portable Analysis Server, DTD, and VM Service protocol APIs with fixed source and runtime profiles. |
@@ -42,6 +44,7 @@ dart run tool/check_protocol_compatibility.dart
 dart run tool/check_dart_tooling_compatibility.dart
 dart run tool/check_agent_kernel_schema.dart
 dart run tool/check_kernel_store_compatibility.dart
+dart run tool/check_native_containment_compatibility.dart
 dart run melos format
 dart run melos analyze
 dart run melos test
@@ -82,6 +85,37 @@ known unsupported capabilities are recorded in
 and summarized in [Kernel and Store support](docs/kernel-store-support.md).
 `processCrashFlush` means a complete artifact was flushed before its receipt;
 it is process/SIGKILL evidence, not raw-device power-loss durability.
+
+Phase 4 adds the portable Native Agent facade and VM-only containment. Its 18
+bounded claims, 27 threat-model references, ten-point crash matrix, actual
+macOS evidence, CI-deferred Linux implementation, and known unsupported scope
+are recorded in
+[`compatibility/phase-4-native-containment.json`](compatibility/phase-4-native-containment.json)
+and summarized in
+[Native containment support](docs/native-containment-support.md). Unsupported
+production containment fails closed; `unsafe/dev-only` is never production
+evidence.
+
+### Phase 4 machine-checked claims
+
+- `P4-HOST-01`: `implemented`
+- `P4-HOST-02`: `verified`
+- `P4-HOST-03`: `implemented`
+- `P4-HOST-04`: `implemented`
+- `P4-HOST-05`: `implemented`
+- `P4-HOST-06`: `implemented`
+- `P4-HOST-07`: `verified`
+- `P4-HOST-08`: `implemented`
+- `P4-HOST-09`: `verified`
+- `P4-HOST-10`: `implemented`
+- `P4-AGENT-01`: `implemented`
+- `P4-AGENT-02`: `implemented`
+- `P4-AGENT-03`: `implemented`
+- `P4-DART-01`: `verified`
+- `P4-DART-02`: `known-unsupported`
+- `P4-CROSS-01`: `implemented`
+- `P4-CROSS-02`: `implemented`
+- `P4-CROSS-03`: `implemented`
 
 Phase 2b adds 41 bounded Dart tooling claims across LSP, DAP, Analysis Server,
 DTD, VM Service, and cross-package portability. Exact source revisions, peer

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import '../example/durable_store.dart' as example;
+import '../example/sandboxed_process.dart' as sandbox_example;
 
 void main() {
   test(
@@ -21,10 +22,16 @@ void main() {
         root.deleteSync(recursive: true);
       }
     },
-    skip: Platform.isWindows,
+    skip: Platform.isWindows
+        ? 'SKIP-MANIFEST store-permissions platform=windows chmod=unsupported'
+        : false,
   );
 
   test('durable Store example writes, snapshots, and reopens', () async {
     await example.main();
+  });
+
+  test('sandbox example probes, executes, and confirms cleanup', () async {
+    await sandbox_example.main();
   });
 }
