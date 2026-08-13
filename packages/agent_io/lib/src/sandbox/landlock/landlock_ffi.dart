@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import '../sandbox_errors.dart';
 import '../sandbox_policy.dart';
 
+enum LandlockPathType { file, directory }
+
 final class LandlockFeatures {
   const LandlockFeatures({
     required this.abi,
@@ -225,6 +227,7 @@ final class LandlockFfi {
   static const _createRulesetVersion = 1;
   static const _rulePathBeneath = 1;
   static const _ruleNetPort = 2;
+  static const _readFileAccess = 1 << 2;
   static const _readOnlyAccess = (1 << 0) | (1 << 2) | (1 << 3);
   static const _readWriteAccess = _readOnlyAccess |
       (1 << 1) |
@@ -239,10 +242,40 @@ final class LandlockFfi {
       (1 << 12) |
       (1 << 13) |
       (1 << 14);
+  static const _fileAccess =
+      (1 << 0) | (1 << 1) | _readFileAccess | (1 << 14) | (1 << 15);
+  static const _directoryOnlyAccess = (1 << 3) |
+      (1 << 4) |
+      (1 << 5) |
+      (1 << 6) |
+      (1 << 7) |
+      (1 << 8) |
+      (1 << 9) |
+      (1 << 10) |
+      (1 << 11) |
+      (1 << 12) |
+      (1 << 13);
   static const _networkAccess = (1 << 0) | (1 << 1);
   static const _deviceIoctlAccess = 1 << 15;
   static const _oPath = 0x200000;
   static const _oCloexec = 0x80000;
+  static const _atEmptyPath = 0x1000;
+  static const _statxType = 0x1;
+  static const _fileTypeMask = 0xf000;
+  static const _directoryType = 0x4000;
+
+  static int get readOnlyAccessMask => _readOnlyAccess;
+  static int get readWriteAccessMask => _readWriteAccess;
+  static int get directoryOnlyAccessMask => _directoryOnlyAccess;
+  static const runtimeFileAccessMask = _readFileAccess;
+
+  static int allowedAccessForPathType(
+    int requestedAccess,
+    LandlockPathType pathType,
+  ) =>
+      pathType == LandlockPathType.directory
+          ? requestedAccess
+          : requestedAccess & _fileAccess;
 
   DynamicLibrary? _library;
 
@@ -299,17 +332,21 @@ final class LandlockFfi {
               : _readWriteAccess,
         );
       }
-      for (final path in const <String>[
-        '/bin',
-        '/usr/bin',
-        '/lib',
-        '/lib64',
-        '/etc/ld.so.cache',
-        '/dev/null',
-      ]) {
-        if (FileSystemEntity.typeSync(path) != FileSystemEntityType.notFound) {
-          _addPathRule(rulesetFd, path, _readOnlyAccess);
-        }
+      for (final dependency in const <String, int>{
+        '/bin': _readOnlyAccess,
+        '/usr/bin': _readOnlyAccess,
+        '/lib': _readOnlyAccess,
+        '/lib64': _readOnlyAccess,
+        '/etc/ld.so.cache': runtimeFileAccessMask,
+        '/dev/null': runtimeFileAccessMask,
+      }.entries) {
+        _addPathRule(
+          rulesetFd,
+          dependency.key,
+          dependency.value,
+          runtimeDependency: true,
+          allowMissing: true,
+        );
       }
       for (final endpoint in policy.networkAllowlist) {
         _addNetworkRule(rulesetFd, endpoint.port);
@@ -321,26 +358,105 @@ final class LandlockFfi {
     }
   }
 
-  void _addPathRule(int rulesetFd, String path, int access) {
+  void _addPathRule(
+    int rulesetFd,
+    String path,
+    int access, {
+    bool runtimeDependency = false,
+    bool allowMissing = false,
+  }) {
     final pathPointer = _nativeString(path);
     final parentFd = _open(pathPointer, _oPath | _oCloexec);
+    final openErrno = parentFd < 0 ? _errno : 0;
     _free(pathPointer);
-    if (parentFd < 0) _throwErrno('open-root');
-    final attribute = _callocStruct<_LandlockPathBeneathAttr>(
-      sizeOf<_LandlockPathBeneathAttr>(),
-    );
-    attribute.ref
-      ..allowedAccess = access
-      ..parentFd = parentFd;
-    final result = _addRule(
-      rulesetFd,
-      _rulePathBeneath,
-      attribute.cast<Void>(),
-      0,
-    );
-    _free(attribute);
-    _close(parentFd);
-    if (result != 0) _throwErrno('add-path-rule');
+    if (parentFd < 0) {
+      if (allowMissing && openErrno == 2) return;
+      throw LandlockFailure.fromErrno(
+        openErrno,
+        operation:
+            runtimeDependency ? 'open-runtime-dependency' : 'open-policy-root',
+      );
+    }
+    try {
+      final pathType = _pathTypeForFd(
+        parentFd,
+        runtimeDependency: runtimeDependency,
+      );
+      final attribute = _callocStruct<_LandlockPathBeneathAttr>(
+        sizeOf<_LandlockPathBeneathAttr>(),
+      );
+      try {
+        attribute.ref
+          ..allowedAccess = allowedAccessForPathType(access, pathType)
+          ..parentFd = parentFd;
+        final result = _addRule(
+          rulesetFd,
+          _rulePathBeneath,
+          attribute.cast<Void>(),
+          0,
+        );
+        if (result != 0) {
+          final errno = _errno;
+          final category =
+              runtimeDependency ? 'runtime-dependency' : pathType.name;
+          throw LandlockFailure.fromErrno(
+            errno,
+            operation: 'add-$category-rule',
+          );
+        }
+      } finally {
+        _free(attribute);
+      }
+    } finally {
+      _close(parentFd);
+    }
+  }
+
+  LandlockPathType _pathTypeForFd(
+    int fd, {
+    required bool runtimeDependency,
+  }) {
+    validateLinuxStatxLayout();
+    final emptyPath = _nativeString('');
+    final stat = _callocStruct<_LinuxStatx>(sizeOf<_LinuxStatx>());
+    final failureRule = runtimeDependency
+        ? 'landlock-path-type-runtime-dependency-unavailable'
+        : 'landlock-path-type-policy-root-unavailable';
+    try {
+      final statx = _lib.lookupFunction<
+          Int32 Function(
+            Int32,
+            Pointer<Uint8>,
+            Int32,
+            Uint32,
+            Pointer<_LinuxStatx>,
+          ),
+          int Function(
+            int,
+            Pointer<Uint8>,
+            int,
+            int,
+            Pointer<_LinuxStatx>,
+          )>('statx');
+      if (statx(fd, emptyPath, _atEmptyPath, _statxType, stat) != 0 ||
+          stat.ref.mask & _statxType == 0) {
+        throw HostCapabilityException(
+          HostCapabilityError.pathDenied,
+          failureRule,
+        );
+      }
+      return (stat.ref.mode & _fileTypeMask) == _directoryType
+          ? LandlockPathType.directory
+          : LandlockPathType.file;
+    } on ArgumentError {
+      throw HostCapabilityException(
+        HostCapabilityError.pathDenied,
+        failureRule,
+      );
+    } finally {
+      _free(emptyPath);
+      _free(stat);
+    }
   }
 
   void _addNetworkRule(int rulesetFd, int port) {

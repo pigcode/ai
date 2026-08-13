@@ -20,6 +20,18 @@ void main() {
     expect(error.code, HostCapabilityError.sandboxUnavailable);
     expect(error.rule, 'landlock-create-ruleset-errno-95');
     expect(error.toString(), isNot(contains('secret')));
+    for (final category in const <String>[
+      'directory',
+      'file',
+      'runtime-dependency',
+    ]) {
+      final categorized = LandlockFailure.fromErrno(
+        22,
+        operation: 'add-$category-rule',
+      );
+      expect(categorized.rule, 'landlock-add-$category-rule-errno-22');
+      expect(categorized.rule, isNot(contains('/')));
+    }
   });
 
   test('Linux statx ABI layout stays at exactly 256 bytes', () {

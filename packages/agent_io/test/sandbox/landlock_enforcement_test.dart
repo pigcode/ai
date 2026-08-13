@@ -8,6 +8,41 @@ import 'package:test/test.dart';
 import '../support/workspace_path.dart';
 
 void main() {
+  test('regular-file masks remove every directory-only Landlock right', () {
+    final readOnly = LandlockFfi.allowedAccessForPathType(
+      LandlockFfi.readOnlyAccessMask,
+      LandlockPathType.file,
+    );
+    final readWrite = LandlockFfi.allowedAccessForPathType(
+      LandlockFfi.readWriteAccessMask,
+      LandlockPathType.file,
+    );
+
+    expect(readOnly & LandlockFfi.directoryOnlyAccessMask, 0);
+    expect(readWrite & LandlockFfi.directoryOnlyAccessMask, 0);
+    expect(readOnly, (1 << 0) | (1 << 2));
+    expect(readWrite, (1 << 0) | (1 << 1) | (1 << 2) | (1 << 14));
+    expect(LandlockFfi.runtimeFileAccessMask, 1 << 2);
+    expect(
+      LandlockFfi.runtimeFileAccessMask & ((1 << 1) | (1 << 15)),
+      0,
+      reason: '/dev/null needs neither WRITE_FILE nor IOCTL_DEV',
+    );
+  });
+
+  test('directory masks retain complete hierarchy rights', () {
+    final allowed = LandlockFfi.allowedAccessForPathType(
+      LandlockFfi.readWriteAccessMask,
+      LandlockPathType.directory,
+    );
+
+    expect(allowed, LandlockFfi.readWriteAccessMask);
+    expect(
+      allowed & LandlockFfi.directoryOnlyAccessMask,
+      LandlockFfi.directoryOnlyAccessMask,
+    );
+  });
+
   final ffi = LandlockFfi();
   final abi = ffi.probeAbi();
   final supported =
