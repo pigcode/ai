@@ -3,6 +3,9 @@ import 'dart:io';
 
 void main() {
   const rndGetEntropyCount = 0x80045200;
+  // Landlock denies device ioctl commands outside the granted
+  // LANDLOCK_ACCESS_FS_IOCTL_DEV right with EACCES, not EPERM.
+  const eacces = 13;
   final library = DynamicLibrary.process();
   final open = library.lookupFunction<Int32 Function(Pointer<Uint8>, Int32),
       int Function(Pointer<Uint8>, int)>('open');
@@ -31,7 +34,7 @@ void main() {
   final errno = errnoLocation().value;
   free(output);
   close(fd);
-  if (result == -1 && errno == 1) {
+  if (result == -1 && errno == eacces) {
     stdout.writeln('LANDLOCK_IOCTL_DENIED');
     exitCode = 0;
   } else if (result == 0) {
