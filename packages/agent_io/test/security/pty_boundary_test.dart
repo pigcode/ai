@@ -344,6 +344,17 @@ void main() {
           outputDirectory: fixtureRoot,
           outputName: 'ioctl_probe',
         );
+        final control = await Process.run(
+          probe.path,
+          const <String>[],
+          runInShell: false,
+        ).timeout(const Duration(seconds: 8));
+        expect(
+          control.exitCode,
+          78,
+          reason: 'stdout:\n${control.stdout}\nstderr:\n${control.stderr}',
+        );
+        expect(control.stdout, contains('CONTROL_IOCTL_ALLOWED'));
         process = await launcher.launch(
           SandboxPolicy(
             roots: <SandboxPathRule>[
@@ -353,6 +364,10 @@ void main() {
               ),
               SandboxPathRule(
                 path: fixtureRoot.path,
+                access: SandboxPathAccess.readOnly,
+              ),
+              SandboxPathRule(
+                path: '/dev/urandom',
                 access: SandboxPathAccess.readOnly,
               ),
             ],
@@ -367,6 +382,7 @@ void main() {
           0,
           reason: 'stdout:\n${await output}\nstderr:\n${await errors}',
         );
+        expect(await output, contains('LANDLOCK_IOCTL_DENIED'));
         expect((await launcher.cleanup(process)).confirmed, isTrue);
         process = null;
       } finally {
