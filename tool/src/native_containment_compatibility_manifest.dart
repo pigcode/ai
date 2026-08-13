@@ -7,7 +7,7 @@ const nativeContainmentCompatibilityManifestPath =
     'compatibility/phase-4-native-containment.json';
 const nativeContainmentCompatibilitySchemaPath =
     'compatibility/schema/native-containment-compatibility.schema.json';
-const phase4EvidenceCommit = 'pending-main-merge';
+const phase4EvidenceCommit = '435f307643ff0c2bd8c8c5b8a8cd5ed408999649';
 
 const phase4ClaimIds = <String>{
   'P4-HOST-01',
@@ -445,7 +445,7 @@ void _validateEvidence(
     violations.add(
       NativeContainmentCompatibilityViolation(
         'evidence_commit_mismatch',
-        '$claimId evidence is not bound to pending-main-merge.',
+        '$claimId evidence is not bound to $phase4EvidenceCommit.',
       ),
     );
   }
