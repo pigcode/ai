@@ -7,7 +7,7 @@ const nativeContainmentCompatibilityManifestPath =
     'compatibility/phase-4-native-containment.json';
 const nativeContainmentCompatibilitySchemaPath =
     'compatibility/schema/native-containment-compatibility.schema.json';
-const phase4EvidenceCommit = 'pending-main-merge';
+const phase4EvidenceCommit = '435f307643ff0c2bd8c8c5b8a8cd5ed408999649';
 
 const phase4ClaimIds = <String>{
   'P4-HOST-01',
@@ -445,7 +445,7 @@ void _validateEvidence(
     violations.add(
       NativeContainmentCompatibilityViolation(
         'evidence_commit_mismatch',
-        '$claimId evidence is not bound to pending-main-merge.',
+        '$claimId evidence is not bound to $phase4EvidenceCommit.',
       ),
     );
   }
@@ -577,6 +577,10 @@ void _validateEvidence(
       path,
       artifact['sha256'],
       violations,
+      evidenceCommit: _string(
+        evidence['evidenceCommit'],
+        '$claimId.evidenceCommit',
+      ),
     );
     artifactContents.writeln(_containedFile(root, path).readAsStringSync());
   }
@@ -610,10 +614,37 @@ void _validateDigest(
   Directory root,
   String path,
   Object? expected,
-  List<NativeContainmentCompatibilityViolation> violations,
-) {
+  List<NativeContainmentCompatibilityViolation> violations, {
+  String? evidenceCommit,
+}) {
   final file = _containedFile(root, path);
-  final actual = sha256.convert(file.readAsBytesSync()).toString();
+  // Evidence digests bind to the artifact bytes at the declared evidence
+  // commit so consumers resolving that commit verify the same bytes; before
+  // the main merge binds a real commit the current checkout is authoritative.
+  final committed =
+      evidenceCommit == null || evidenceCommit == 'pending-main-merge'
+          ? _CommittedArtifact(file.readAsBytesSync())
+          : _readCommittedArtifact(root, evidenceCommit, path);
+  if (committed.unreachable) {
+    violations.add(
+      NativeContainmentCompatibilityViolation(
+        'evidence_commit_unreachable',
+        '$path cannot be read from commit $evidenceCommit.',
+      ),
+    );
+    return;
+  }
+  final bytes = committed.bytes;
+  if (bytes == null) {
+    violations.add(
+      NativeContainmentCompatibilityViolation(
+        'missing_evidence_artifact',
+        '$path is missing at commit $evidenceCommit.',
+      ),
+    );
+    return;
+  }
+  final actual = sha256.convert(bytes).toString();
   if (expected != actual) {
     violations.add(
       NativeContainmentCompatibilityViolation(
@@ -622,6 +653,51 @@ void _validateDigest(
       ),
     );
   }
+}
+
+_CommittedArtifact _readCommittedArtifact(
+  Directory root,
+  String commit,
+  String path,
+) =>
+    _committedArtifactCache.putIfAbsent(
+      '${root.path}\u0000$commit\u0000$path',
+      () {
+        final commitKey = '${root.path}\u0000$commit';
+        final reachable = _commitReachabilityCache.putIfAbsent(commitKey, () {
+          final probe = Process.runSync(
+            'git',
+            <String>['cat-file', '-e', '$commit^{commit}'],
+            workingDirectory: root.path,
+            stdoutEncoding: null,
+            stderrEncoding: null,
+          );
+          return probe.exitCode == 0;
+        });
+        if (!reachable) return const _CommittedArtifact.unreachable();
+        final result = Process.runSync(
+          'git',
+          <String>['show', '$commit:$path'],
+          workingDirectory: root.path,
+          stdoutEncoding: null,
+          stderrEncoding: null,
+        );
+        if (result.exitCode != 0) return const _CommittedArtifact(null);
+        return _CommittedArtifact(result.stdout! as List<int>);
+      },
+    );
+
+final _committedArtifactCache = <String, _CommittedArtifact>{};
+final _commitReachabilityCache = <String, bool>{};
+
+final class _CommittedArtifact {
+  const _CommittedArtifact(this.bytes) : unreachable = false;
+  const _CommittedArtifact.unreachable()
+      : bytes = null,
+        unreachable = true;
+
+  final List<int>? bytes;
+  final bool unreachable;
 }
 
 bool _kernelAtLeast67(String value) {
