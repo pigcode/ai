@@ -137,22 +137,30 @@ final class LandlockFfi {
     }
     final normalized = _lexicalNormalize(value);
     final type = FileSystemEntity.typeSync(normalized, followLinks: true);
-    if (type == FileSystemEntityType.notFound) {
-      throw const HostCapabilityException(
-        HostCapabilityError.pathDenied,
-        'landlock-policy-path-must-exist',
-      );
-    }
     String canonical;
-    try {
-      canonical = type == FileSystemEntityType.directory
-          ? Directory(normalized).resolveSymbolicLinksSync()
-          : File(normalized).resolveSymbolicLinksSync();
-    } on FileSystemException {
-      throw const HostCapabilityException(
-        HostCapabilityError.pathDenied,
-        'landlock-path-identity-unavailable',
-      );
+    if (type == FileSystemEntityType.notFound) {
+      // typeSync reports special files (for example character devices such
+      // as /dev/urandom) as notFound, so existence is re-probed through
+      // realpath, which fails only for genuinely unresolvable paths.
+      try {
+        canonical = File(normalized).resolveSymbolicLinksSync();
+      } on FileSystemException {
+        throw const HostCapabilityException(
+          HostCapabilityError.pathDenied,
+          'landlock-policy-path-must-exist',
+        );
+      }
+    } else {
+      try {
+        canonical = type == FileSystemEntityType.directory
+            ? Directory(normalized).resolveSymbolicLinksSync()
+            : File(normalized).resolveSymbolicLinksSync();
+      } on FileSystemException {
+        throw const HostCapabilityException(
+          HostCapabilityError.pathDenied,
+          'landlock-path-identity-unavailable',
+        );
+      }
     }
     return _PolicyPath(
       canonical: _lexicalNormalize(canonical),
