@@ -33,6 +33,16 @@ const _commitRelativeCompatibilityCheckers = <String>{
   'tool/check_native_containment_compatibility.dart',
 };
 
+const _phase4PublicWorkspacePaths = <String>{
+  'tool/fixtures/agent_sandbox_effect_worker.dart',
+  'tool/test/run_workspace_tests_test.dart',
+};
+
+const _phase4InternalNotes = <String>{
+  'PHASE4_DEVIATIONS.md',
+  'PHASE4_REMEDIATION.md',
+};
+
 const _phase2bProtocolPaths = <String>[
   'analysis_options.yaml',
   'compatibility/phase-2b-dart-tooling.json',
@@ -393,6 +403,50 @@ void main() {
           code: 'missing_required_path',
           messageFragment: 'tool/run_agent_sandbox_crash_matrix.dart',
         );
+      });
+    },
+    'requires the Phase 4 public workspace test assets': () {
+      for (final path in _phase4PublicWorkspacePaths) {
+        _withFixture((fixture) {
+          fixture.removeTracked(path);
+
+          _expectViolation(
+            validateWorkspace(fixture.root, fixture.trackedPaths),
+            code: 'missing_required_path',
+            messageFragment: path,
+          );
+        });
+      }
+    },
+    'keeps Phase 4 internal notes outside the public workspace': () {
+      _withFixture((fixture) {
+        final withoutNotes = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final path in _phase4InternalNotes) {
+          _expect(
+            !withoutNotes.any(
+              (violation) =>
+                  violation.code == 'missing_required_path' &&
+                  violation.message.contains(path),
+            ),
+            'Expected $path not to be required, got ${_describe(withoutNotes)}',
+          );
+          fixture.writeTracked(path, '# Internal Phase 4 note\n');
+        }
+
+        final withTrackedNotes = validateWorkspace(
+          fixture.root,
+          fixture.trackedPaths,
+        );
+        for (final path in _phase4InternalNotes) {
+          _expectViolation(
+            withTrackedNotes,
+            code: 'unexpected_tracked_path',
+            messageFragment: path,
+          );
+        }
       });
     },
     'requires the Phase 3 security and secret gates': () {
@@ -1252,7 +1306,6 @@ final class _WorkspaceFixture {
       ..writeTracked('.gitignore', '.dart_tool/\n')
       ..writeTracked('CHANGELOG.md', '# Changelog\n')
       ..writeTracked('LICENSE', 'License text\n')
-      ..writeTracked('PHASE4_DEVIATIONS.md', '# Phase 4 deviations\n')
       ..writeTracked('README.md', '# Pigcode AI\n')
       ..writeTracked('THIRD_PARTY_NOTICES.md', '# Third-party notices\n')
       ..writeTracked(
@@ -1317,6 +1370,10 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/fixtures/agent_sandbox_crash_child.dart',
         '// Agent sandbox crash child fixture\n',
+      )
+      ..writeTracked(
+        'tool/fixtures/agent_sandbox_effect_worker.dart',
+        '// Agent sandbox effect worker fixture\n',
       )
       ..writeTracked(
         'tool/fixtures/native_journey_child.dart',
@@ -1545,6 +1602,10 @@ final class _WorkspaceFixture {
       ..writeTracked(
         'tool/test/workspace_contract_test.dart',
         '// Test fixture\n',
+      )
+      ..writeTracked(
+        'tool/test/run_workspace_tests_test.dart',
+        '// Workspace test runner regression fixture\n',
       )
       ..writeTracked(
         'tool/upstream/protocols/acp/LICENSE',
