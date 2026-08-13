@@ -40,7 +40,7 @@ Future<void> main(List<String> arguments) async {
     }
     if (!groupPersisted) {
       final processId = getProcessId();
-      RunnerControl.report('group-ready', <String, Object?>{
+      await RunnerControl.report('group-ready', <String, Object?>{
         'identity': ProcessGroup.captureIdentity(processId),
         'pgid': processId,
       });
@@ -48,17 +48,17 @@ Future<void> main(List<String> arguments) async {
     }
     LandlockFfi().apply(policy);
     SeccompFfi().apply();
-    RunnerControl.report('sandbox-ready');
+    await RunnerControl.report('sandbox-ready');
     RunnerControl.waitForAck('sandbox-ready');
     exitCode = await RunnerControl.runTarget(executable, commandArguments);
   } on HostCapabilityException catch (error) {
-    RunnerControl.report('error', <String, Object?>{
+    await RunnerControl.report('error', <String, Object?>{
       'code': error.code.name,
       'rule': error.rule,
     });
     exitCode = 70;
   } on Object {
-    RunnerControl.report('error', const <String, Object?>{
+    await RunnerControl.report('error', const <String, Object?>{
       'code': 'sandboxUnavailable',
       'rule': 'landlock-runner-unexpected-failure',
     });

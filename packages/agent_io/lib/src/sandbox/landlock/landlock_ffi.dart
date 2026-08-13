@@ -3,8 +3,6 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:path/path.dart' as path;
-
 import '../sandbox_errors.dart';
 import '../sandbox_policy.dart';
 
@@ -66,9 +64,10 @@ final class LandlockFfi {
           rightIndex < paths.length;
           rightIndex += 1) {
         if (_overlaps(
-          paths[leftIndex].canonical,
-          paths[rightIndex].canonical,
-        )) {
+              paths[leftIndex].canonical,
+              paths[rightIndex].canonical,
+            ) ||
+            paths[leftIndex].identity == paths[rightIndex].identity) {
           throw const HostCapabilityException(
             HostCapabilityError.pathDenied,
             'landlock-path-overlap-or-identity-alias',
@@ -109,13 +108,13 @@ final class LandlockFfi {
     String value, {
     SandboxPathAccess? access,
   }) {
-    if (!path.posix.isAbsolute(value)) {
+    if (!value.startsWith('/')) {
       throw const HostCapabilityException(
         HostCapabilityError.pathDenied,
         'landlock-path-must-be-absolute',
       );
     }
-    final normalized = path.posix.normalize(value);
+    final normalized = _lexicalNormalize(value);
     final type = FileSystemEntity.typeSync(normalized, followLinks: true);
     if (type == FileSystemEntityType.notFound) {
       throw const HostCapabilityException(
@@ -135,13 +134,73 @@ final class LandlockFfi {
       );
     }
     return _PolicyPath(
-      canonical: path.posix.normalize(canonical),
+      canonical: _lexicalNormalize(canonical),
+      identity: Platform.isLinux
+          ? LandlockFfi()._pathIdentity(canonical)
+          : _lexicalNormalize(canonical),
       access: access,
     );
   }
 
+  static String _lexicalNormalize(String value) {
+    final segments = <String>[];
+    for (final segment in value.split('/')) {
+      if (segment.isEmpty || segment == '.') continue;
+      if (segment == '..') {
+        if (segments.isEmpty) {
+          throw const HostCapabilityException(
+            HostCapabilityError.pathDenied,
+            'landlock-path-traverses-root',
+          );
+        }
+        segments.removeLast();
+      } else {
+        segments.add(segment);
+      }
+    }
+    return segments.isEmpty ? '/' : '/${segments.join('/')}';
+  }
+
   static bool _overlaps(String left, String right) =>
       left == right || left.startsWith('$right/') || right.startsWith('$left/');
+
+  String _pathIdentity(String value) {
+    final native = _nativeString(value);
+    final stat = _callocStruct<_LinuxStatx>(sizeOf<_LinuxStatx>());
+    try {
+      final statx = _lib.lookupFunction<
+          Int32 Function(
+            Int32,
+            Pointer<Uint8>,
+            Int32,
+            Uint32,
+            Pointer<_LinuxStatx>,
+          ),
+          int Function(
+            int,
+            Pointer<Uint8>,
+            int,
+            int,
+            Pointer<_LinuxStatx>,
+          )>('statx');
+      if (statx(-100, native, 0, 0x100, stat) != 0) {
+        throw const HostCapabilityException(
+          HostCapabilityError.pathDenied,
+          'landlock-path-identity-unavailable',
+        );
+      }
+      return '${stat.ref.deviceMajor}:${stat.ref.deviceMinor}:'
+          '${stat.ref.inode}';
+    } on ArgumentError {
+      throw const HostCapabilityException(
+        HostCapabilityError.pathDenied,
+        'landlock-statx-unavailable',
+      );
+    } finally {
+      _free(native);
+      _free(stat);
+    }
+  }
 
   static const _createRulesetVersion = 1;
   static const _rulePathBeneath = 1;
@@ -403,12 +462,66 @@ final class _LandlockNetPortAttr extends Struct {
   external int port;
 }
 
+final class _LinuxStatxTimestamp extends Struct {
+  @Int64()
+  external int seconds;
+
+  @Uint32()
+  external int nanoseconds;
+
+  @Int32()
+  external int reserved;
+}
+
+final class _LinuxStatx extends Struct {
+  @Uint32()
+  external int mask;
+  @Uint32()
+  external int blockSize;
+  @Uint64()
+  external int attributes;
+  @Uint32()
+  external int linkCount;
+  @Uint32()
+  external int userId;
+  @Uint32()
+  external int groupId;
+  @Uint16()
+  external int mode;
+  @Uint16()
+  external int spare;
+  @Uint64()
+  external int inode;
+  @Uint64()
+  external int size;
+  @Uint64()
+  external int blocks;
+  @Uint64()
+  external int attributesMask;
+  external _LinuxStatxTimestamp accessTime;
+  external _LinuxStatxTimestamp birthTime;
+  external _LinuxStatxTimestamp changeTime;
+  external _LinuxStatxTimestamp modificationTime;
+  @Uint32()
+  external int deviceSpecialMajor;
+  @Uint32()
+  external int deviceSpecialMinor;
+  @Uint32()
+  external int deviceMajor;
+  @Uint32()
+  external int deviceMinor;
+  @Array(12)
+  external Array<Uint64> tail;
+}
+
 final class _PolicyPath {
   const _PolicyPath({
     required this.canonical,
+    required this.identity,
     required this.access,
   });
 
   final String canonical;
+  final String identity;
   final SandboxPathAccess? access;
 }

@@ -11,18 +11,23 @@ Future<void> main(List<String> arguments) async {
       .lookupFunction<Int32 Function(Int32, Int32), int Function(int, int)>(
     'setpgid',
   );
-  if (setProcessGroup(0, 0) != 0) exit(70);
+  final getProcessGroup = DynamicLibrary.process()
+      .lookupFunction<Int32 Function(), int Function()>('getpgrp');
+  if (setProcessGroup(0, 0) != 0 && getProcessGroup() != pid) exit(70);
   stdout.writeln(
     'PIGCODE_CONTROL ${jsonEncode(<String, Object?>{
           'type': 'group-ready',
-          'identity': ProcessGroup.captureIdentity(pid),
+          'identity': mode == 'identity-mismatch'
+              ? 'fixture-invalid-identity'
+              : ProcessGroup.captureIdentity(pid),
           'pgid': pid,
         })}',
   );
+  await stdout.flush();
   final lines = StreamIterator<String>(
     stdin.transform(utf8.decoder).transform(const LineSplitter()),
   );
-  if (!await lines.moveNext().timeout(const Duration(seconds: 3)) ||
+  if (!await lines.moveNext().timeout(const Duration(seconds: 10)) ||
       lines.current != 'PIGCODE_ACK group-ready') {
     exit(71);
   }
@@ -35,27 +40,26 @@ Future<void> main(List<String> arguments) async {
             'rule': 'fixture-sandbox-apply-failed',
           })}',
     );
+    await stdout.flush();
     exit(73);
   }
-  await Future<void>.delayed(const Duration(milliseconds: 300));
   stdout.writeln(
     'PIGCODE_CONTROL ${jsonEncode(<String, Object?>{
           'type': 'sandbox-ready',
         })}',
   );
-  if (!await lines.moveNext().timeout(const Duration(seconds: 3)) ||
+  await stdout.flush();
+  if (!await lines.moveNext().timeout(const Duration(seconds: 10)) ||
       lines.current != 'PIGCODE_ACK sandbox-ready') {
     exit(74);
   }
-  if (mode == 'ack-consumed-no-exec') {
-    await Future<void>.delayed(const Duration(seconds: 5));
-    exit(75);
-  }
+  if (mode == 'ack-consumed-no-exec') exit(75);
   stdout.writeln(
     'PIGCODE_CONTROL ${jsonEncode(<String, Object?>{
           'type': 'exec-ready',
           'pid': pid,
         })}',
   );
+  await stdout.flush();
   await lines.cancel();
 }

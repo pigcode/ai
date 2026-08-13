@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
@@ -94,6 +95,7 @@ final class ProcessCleanupLedger {
         );
         return guard;
       } on FileSystemException {
+        if (await _removeAbandonedGuard(guard)) continue;
         if (DateTime.now().isAfter(deadline)) {
           throw const FileSystemException(
             'cleanup ledger transaction lock timeout',
@@ -104,6 +106,25 @@ final class ProcessCleanupLedger {
         );
       }
     }
+  }
+
+  Future<bool> _removeAbandonedGuard(File guard) async {
+    try {
+      final contents = await guard.readAsString();
+      final owner = int.tryParse(contents.split(' ').first);
+      if (owner == null || _processExists(owner)) return false;
+      await guard.delete();
+      return true;
+    } on FileSystemException {
+      return false;
+    }
+  }
+
+  bool _processExists(int processId) {
+    final kill = DynamicLibrary.process()
+        .lookupFunction<Int32 Function(Int32, Int32), int Function(int, int)>(
+            'kill');
+    return kill(processId, 0) == 0;
   }
 
   Future<void> _lockExclusive(RandomAccessFile lock) async {

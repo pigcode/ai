@@ -92,7 +92,10 @@ final class LandlockSeccompSandboxBackend implements PreparedSandboxBackend {
   ) async {
     probe().requireProductionReady();
     if (unsafeStandaloneStart) {
-      final launcher = SandboxedProcessLauncher.unsafeDev(this);
+      final launcher = SandboxedProcessLauncher.unsafeDev(
+        this,
+        allowShellSyntaxForTests: true,
+      );
       final process = await launcher.launch(policy, command);
       process.exitCode.then((_) => launcher.cleanup(process));
       return process;

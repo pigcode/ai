@@ -33,8 +33,8 @@ Future<void> main(List<String> arguments) async {
       requiresPty: true,
     ),
     HostCommand(
-      executable: '/bin/sleep',
-      arguments: const <String>['30'],
+      executable: '/usr/bin/touch',
+      arguments: <String>['${arguments[1]}/released'],
       workingDirectory: arguments[1],
     ),
   );

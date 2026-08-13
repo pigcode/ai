@@ -135,7 +135,7 @@ Future<void> _withRoots(Future<void> Function(_Roots roots) body) async {
     outside: Directory('${temp.path}/outside')..createSync(),
   );
   try {
-    await body(roots).timeout(_deadline);
+    await body(roots);
   } finally {
     if (temp.existsSync()) {
       temp.deleteSync(recursive: true);

@@ -63,6 +63,19 @@ final class ProcessRecoveryCoordinator {
     return '${ledgerDirectory.path}/$digest.cleanup.json';
   }
 
+  Future<void> registerSession(String sessionIdentity) async {
+    final marker = File(_sessionMarkerPath(sessionIdentity));
+    if (!await marker.exists()) {
+      await _writeSessionMarker(sessionIdentity, pending: false);
+    }
+  }
+
+  Future<void> markPending(ProcessCleanupRecord record) =>
+      _writeSessionMarker(record.sessionIdentity, pending: true);
+
+  Future<void> markRecovered(ProcessCleanupRecord record) =>
+      _writeSessionMarker(record.sessionIdentity, pending: false);
+
   Future<ProcessRecoveryReport> recoverPending() async {
     if (!await ledgerDirectory.exists()) {
       return const ProcessRecoveryReport(<ProcessRecoveryResult>[]);
@@ -74,6 +87,24 @@ final class ProcessRecoveryCoordinator {
         )
         .cast<File>()
         .toList();
+    final markers = await ledgerDirectory
+        .list(followLinks: false)
+        .where(
+          (entry) => entry is File && entry.path.endsWith('.session.json'),
+        )
+        .cast<File>()
+        .toList();
+    for (final marker in markers) {
+      final json =
+          jsonDecode(await marker.readAsString()) as Map<String, Object?>;
+      if (json['pending'] == true &&
+          !await File(json['ledgerPath']! as String).exists()) {
+        throw const HostCapabilityException(
+          HostCapabilityError.processCleanupFailed,
+          'registered-cleanup-ledger-missing',
+        );
+      }
+    }
     files.sort((left, right) => left.path.compareTo(right.path));
     final results = <ProcessRecoveryResult>[];
     for (final file in files) {
@@ -81,6 +112,7 @@ final class ProcessRecoveryCoordinator {
       for (final record in await ledger.all()) {
         final current = ProcessGroup.captureIdentity(record.processGroupId);
         if (current == null) {
+          await markRecovered(record);
           await ledger.confirm(record);
           results.add(
             ProcessRecoveryResult(
@@ -101,6 +133,7 @@ final class ProcessRecoveryCoordinator {
         }
         final cleanup = await ProcessGroup(record.processGroupId).cleanup();
         if (cleanup.confirmed) {
+          await markRecovered(record);
           await ledger.confirm(record);
         }
         results.add(
@@ -114,6 +147,37 @@ final class ProcessRecoveryCoordinator {
       }
     }
     return ProcessRecoveryReport(
-        List<ProcessRecoveryResult>.unmodifiable(results));
+      List<ProcessRecoveryResult>.unmodifiable(results),
+    );
+  }
+
+  String _sessionMarkerPath(String sessionIdentity) =>
+      ledgerPathFor(sessionIdentity).replaceFirst(
+        '.cleanup.json',
+        '.session.json',
+      );
+
+  Future<void> _writeSessionMarker(
+    String sessionIdentity, {
+    required bool pending,
+  }) async {
+    await ledgerDirectory.create(recursive: true);
+    final marker = File(_sessionMarkerPath(sessionIdentity));
+    final temporary = File(
+      '${marker.path}.tmp.$pid.${DateTime.now().microsecondsSinceEpoch}',
+    );
+    try {
+      await temporary.writeAsString(
+        jsonEncode(<String, Object?>{
+          'ledgerPath': ledgerPathFor(sessionIdentity),
+          'pending': pending,
+          'sessionIdentity': sessionIdentity,
+        }),
+        flush: true,
+      );
+      await temporary.rename(marker.path);
+    } finally {
+      if (await temporary.exists()) await temporary.delete();
+    }
   }
 }

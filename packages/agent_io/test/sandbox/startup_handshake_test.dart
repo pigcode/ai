@@ -12,23 +12,51 @@ void main() {
   test('start remains pending until sandbox-ready ACK completes', () async {
     final root = await Directory.systemTemp.createTemp('handshake-ready-');
     final ledger = ProcessCleanupLedger('${root.path}/ledger.json');
-    final process = await _startFixture('delayed-ready');
+    final process = await _startFixture('ready');
+    final sandboxReadyBeforeAck = Completer<void>();
+    final releaseSandboxReadyAck = Completer<void>();
     var completed = false;
     final startup = awaitSandboxStartup(
       process,
+      observer: (phase, evidence) async {
+        if (phase != SandboxStartupPhase.sandboxAppliedBeforeExecAck) return;
+        expect(evidence['type'], 'sandbox-ready');
+        sandboxReadyBeforeAck.complete();
+        await releaseSandboxReadyAck.future;
+      },
       persistProcessGroup: (processGroupId) async {
         final record = _record(processGroupId, 'ses-ready');
         await ledger.record(record);
         return record;
       },
     ).whenComplete(() => completed = true);
+    unawaited(
+      startup.then<void>(
+        (_) {
+          if (!sandboxReadyBeforeAck.isCompleted) {
+            sandboxReadyBeforeAck.completeError(
+              StateError('startup completed before sandbox-ready barrier'),
+            );
+          }
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          if (!sandboxReadyBeforeAck.isCompleted) {
+            sandboxReadyBeforeAck.completeError(error, stackTrace);
+          }
+        },
+      ),
+    );
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await sandboxReadyBeforeAck.future;
       expect(completed, isFalse);
+      releaseSandboxReadyAck.complete();
       await startup.timeout(const Duration(seconds: 3));
       expect(completed, isTrue);
       expect(await process.exitCode.timeout(const Duration(seconds: 3)), 0);
     } finally {
+      if (!releaseSandboxReadyAck.isCompleted) {
+        releaseSandboxReadyAck.complete();
+      }
       if (await _running(process.pid)) process.kill(ProcessSignal.sigkill);
       await root.delete(recursive: true);
     }
@@ -73,6 +101,41 @@ void main() {
     }
   });
 
+  test('group identity mismatch fails before write-ahead ACK', () async {
+    final root = await Directory.systemTemp.createTemp('handshake-identity-');
+    final ledger = ProcessCleanupLedger('${root.path}/ledger.json');
+    final process = await _startFixture('identity-mismatch');
+    try {
+      await expectLater(
+        awaitSandboxStartup(
+          process,
+          persistProcessGroup: (processGroupId) async {
+            final record = _record(processGroupId, 'ses-identity');
+            await ledger.record(record);
+            return record;
+          },
+        ),
+        throwsA(
+          isA<HostCapabilityException>()
+              .having(
+                (error) => error.code,
+                'code',
+                HostCapabilityError.processCleanupFailed,
+              )
+              .having(
+                (error) => error.rule,
+                'rule',
+                'sandbox-group-handshake-invalid',
+              ),
+        ),
+      );
+      expect(await ledger.pending('ses-identity'), isEmpty);
+    } finally {
+      if (await _running(process.pid)) process.kill(ProcessSignal.sigkill);
+      await root.delete(recursive: true);
+    }
+  });
+
   test('sandbox establishment error is surfaced as typed start failure',
       () async {
     final root = await Directory.systemTemp.createTemp('handshake-error-');
@@ -108,7 +171,7 @@ void main() {
     }
   });
 
-  test('sandbox ACK consumption without exec confirmation times out', () async {
+  test('sandbox ACK consumption without exec confirmation is typed', () async {
     final root = await Directory.systemTemp.createTemp('handshake-exec-');
     final ledger = ProcessCleanupLedger('${root.path}/ledger.json');
     final process = await _startFixture('ack-consumed-no-exec');
@@ -116,7 +179,6 @@ void main() {
       await expectLater(
         awaitSandboxStartup(
           process,
-          timeout: const Duration(milliseconds: 700),
           persistProcessGroup: (processGroupId) async {
             final record = _record(processGroupId, 'ses-no-exec');
             await ledger.record(record);
@@ -127,7 +189,7 @@ void main() {
           isA<HostCapabilityException>().having(
             (error) => error.rule,
             'rule',
-            'sandbox-handshake-timeout',
+            'sandbox-exited-before-exec-ready',
           ),
         ),
       );

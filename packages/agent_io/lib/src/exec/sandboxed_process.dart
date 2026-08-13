@@ -26,9 +26,10 @@ final class SandboxedProcessLauncher {
     final stable = hostDataDirectory != null &&
         sessionIdentity != null &&
         cleanupLedgerPath == null;
+    final coordinator =
+        stable ? ProcessRecoveryCoordinator(hostDataDirectory) : null;
     final ledgerPath = stable
-        ? ProcessRecoveryCoordinator(hostDataDirectory)
-            .ledgerPathFor(sessionIdentity)
+        ? coordinator!.ledgerPathFor(sessionIdentity)
         : cleanupLedgerPath ?? _ephemeralLedgerPath();
     return SandboxedProcessLauncher._(
       backend,
@@ -37,6 +38,8 @@ final class SandboxedProcessLauncher {
       ledgerPath: ledgerPath,
       productionConfigured: stable,
       startupObserver: startupObserver,
+      recoveryCoordinator: coordinator,
+      allowShellSyntaxForTests: false,
     );
   }
 
@@ -46,6 +49,7 @@ final class SandboxedProcessLauncher {
     String? cleanupLedgerPath,
     String? sessionIdentity,
     SandboxStartupObserver? startupObserver,
+    bool allowShellSyntaxForTests = false,
   }) =>
       SandboxedProcessLauncher._(
         backend,
@@ -55,6 +59,8 @@ final class SandboxedProcessLauncher {
         ledgerPath: cleanupLedgerPath ?? _ephemeralLedgerPath(),
         productionConfigured: true,
         startupObserver: startupObserver,
+        recoveryCoordinator: null,
+        allowShellSyntaxForTests: allowShellSyntaxForTests,
       );
 
   SandboxedProcessLauncher._(
@@ -64,11 +70,15 @@ final class SandboxedProcessLauncher {
     required String ledgerPath,
     required bool productionConfigured,
     required SandboxStartupObserver? startupObserver,
+    required ProcessRecoveryCoordinator? recoveryCoordinator,
+    required bool allowShellSyntaxForTests,
   })  : _runnerPath = runnerPath,
         _sessionIdentity = sessionIdentity,
         _ledger = ProcessCleanupLedger(ledgerPath),
         _productionConfigured = productionConfigured,
-        _startupObserver = startupObserver;
+        _startupObserver = startupObserver,
+        _recoveryCoordinator = recoveryCoordinator,
+        _allowShellSyntaxForTests = allowShellSyntaxForTests;
 
   static Future<SandboxedProcessLauncher> recoverProduction(
     SandboxBackend backend, {
@@ -98,6 +108,8 @@ final class SandboxedProcessLauncher {
   final ProcessCleanupLedger _ledger;
   final bool _productionConfigured;
   final SandboxStartupObserver? _startupObserver;
+  final ProcessRecoveryCoordinator? _recoveryCoordinator;
+  final bool _allowShellSyntaxForTests;
   final Map<int, ProcessGroup> _groups = <int, ProcessGroup>{};
   final Map<int, ProcessCleanupRecord> _records = <int, ProcessCleanupRecord>{};
   Future<void> _operation = Future<void>.value();
@@ -151,7 +163,7 @@ final class SandboxedProcessLauncher {
                       processGroupId: processGroupId,
                       processIdentity: identity,
                     );
-                    await _ledger.record(record);
+                    await _recordCleanup(record);
                     startupRecord = record;
                     return record;
                   },
@@ -176,7 +188,7 @@ final class SandboxedProcessLauncher {
               processGroupId: process.pid,
               processIdentity: _requireProcessIdentity(process.pid),
             );
-        if (startupRecord == null) await _ledger.record(record);
+        if (startupRecord == null) await _recordCleanup(record);
         _groups[process.pid] = group;
         _records[process.pid] = record;
         return process;
@@ -184,15 +196,24 @@ final class SandboxedProcessLauncher {
 
   Future<SandboxedProcess> launchBroker(
     HostCommand command,
-    SandboxCapabilityReport capability,
-  ) =>
+    SandboxCapabilityReport capability, {
+    Duration startupBudget = const Duration(seconds: 5),
+  }) =>
       _serialized(() async {
         await _guardLaunch();
         _rejectShellSyntax(command);
         ProcessCleanupRecord? startupRecord;
+        final writeAhead = base64Url.encode(
+          utf8.encode(
+            jsonEncode(<String, Object?>{
+              'ledgerPath': _ledger.path,
+              'sessionIdentity': _sessionIdentity,
+            }),
+          ),
+        );
         final process = await Process.start(
           command.executable,
-          command.arguments,
+          <String>[...command.arguments, writeAhead],
           workingDirectory: command.workingDirectory,
           environment: command.environment,
           runInShell: false,
@@ -201,13 +222,42 @@ final class SandboxedProcessLauncher {
           final output = await awaitSandboxStartup(
             process,
             observer: _startupObserver,
+            requireParentWriteAhead: true,
+            timeout: startupBudget,
             persistProcessGroup: (processGroupId) async {
-              final record = ProcessCleanupRecord(
-                sessionIdentity: _sessionIdentity,
-                processGroupId: processGroupId,
-                processIdentity: _requireProcessIdentity(processGroupId),
-              );
-              await _ledger.record(record);
+              final records = (await _ledger.pending(_sessionIdentity))
+                  .where(
+                    (record) => record.processGroupId == processGroupId,
+                  )
+                  .toList(growable: false);
+              if (records.isEmpty) {
+                final emergency = ProcessCleanupRecord(
+                  sessionIdentity: _sessionIdentity,
+                  processGroupId: processGroupId,
+                  processIdentity: _requireProcessIdentity(processGroupId),
+                );
+                await _recordCleanup(emergency);
+                startupRecord = emergency;
+                throw const HostCapabilityException(
+                  HostCapabilityError.processCleanupFailed,
+                  'pty-parent-write-ahead-missing',
+                );
+              }
+              if (records.length != 1) {
+                throw const HostCapabilityException(
+                  HostCapabilityError.processCleanupFailed,
+                  'pty-parent-write-ahead-ambiguous',
+                );
+              }
+              final record = records.single;
+              if (record.processIdentity !=
+                  _requireProcessIdentity(processGroupId)) {
+                throw const HostCapabilityException(
+                  HostCapabilityError.processCleanupFailed,
+                  'pty-parent-write-ahead-identity-mismatch',
+                );
+              }
+              await _recoveryCoordinator?.markPending(record);
               startupRecord = record;
               return record;
             },
@@ -243,12 +293,20 @@ final class SandboxedProcessLauncher {
 
   Future<ProcessTreeCleanupReport> cleanup(SandboxedProcess process) =>
       _serialized(() async {
-        final group = _groups[process.pid] ?? ProcessGroup(process.pid);
+        final group =
+            _groups[process.pid] ?? ProcessGroup(process.processGroupId);
         final record = _records[process.pid] ??
             (await _ledger.pending(_sessionIdentity))
                 .where((entry) => entry.processGroupId == process.pid)
                 .firstOrNull;
         if (record == null) {
+          if (ProcessGroup.captureIdentity(process.processGroupId) == null) {
+            return ProcessTreeCleanupReport(
+              processGroupId: process.processGroupId,
+              confirmed: true,
+              forced: false,
+            );
+          }
           throw const HostCapabilityException(
             HostCapabilityError.processCleanupFailed,
             'recorded-process-identity-missing',
@@ -283,7 +341,7 @@ final class SandboxedProcessLauncher {
   }) async {
     final currentIdentity = ProcessGroup.captureIdentity(record.processGroupId);
     if (currentIdentity == null) {
-      await _ledger.confirm(record);
+      await _confirmCleanup(record);
       return ProcessTreeCleanupReport(
         processGroupId: record.processGroupId,
         confirmed: true,
@@ -298,8 +356,18 @@ final class SandboxedProcessLauncher {
     }
     final report =
         await (group ?? ProcessGroup(record.processGroupId)).cleanup();
-    if (report.confirmed) await _ledger.confirm(record);
+    if (report.confirmed) await _confirmCleanup(record);
     return report;
+  }
+
+  Future<void> _recordCleanup(ProcessCleanupRecord record) async {
+    await _ledger.record(record);
+    await _recoveryCoordinator?.markPending(record);
+  }
+
+  Future<void> _confirmCleanup(ProcessCleanupRecord record) async {
+    await _recoveryCoordinator?.markRecovered(record);
+    await _ledger.confirm(record);
   }
 
   Future<void> _guardLaunch() async {
@@ -309,6 +377,7 @@ final class SandboxedProcessLauncher {
         'stable-host-data-and-session-required',
       );
     }
+    await _recoveryCoordinator?.registerSession(_sessionIdentity);
     if ((await _ledger.pending(_sessionIdentity)).isNotEmpty) {
       throw const HostCapabilityException(
         HostCapabilityError.processCleanupFailed,
@@ -336,6 +405,7 @@ final class SandboxedProcessLauncher {
   }
 
   void _rejectShellSyntax(HostCommand command) {
+    if (_allowShellSyntaxForTests) return;
     final shellSyntax = RegExp(r'''[;&|`$<>]''');
     if (shellSyntax.hasMatch(command.executable) ||
         command.arguments.any(shellSyntax.hasMatch)) {

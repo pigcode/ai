@@ -22,7 +22,7 @@ Future<void> main() async {
       ...documents,
       'packages/agent/README.md': documents['packages/agent/README.md']!
           .replaceFirst(
-              'P4-AGENT-01`: `verified', 'P4-AGENT-01`: `implemented'),
+              'P4-AGENT-01`: `implemented', 'P4-AGENT-01`: `verified'),
     },
     'documentation_claim_level_mismatch',
   );

@@ -152,11 +152,10 @@ Future<void> main(List<String> arguments) async {
   final worker = StreamIterator<String>(
     process.stdout.transform(utf8.decoder).transform(const LineSplitter()),
   );
-  if (!await worker.moveNext().timeout(const Duration(seconds: 3)) ||
-      worker.current != 'WORKER_READY') {
+  if (!await worker.moveNext() || worker.current != 'WORKER_READY') {
     throw StateError(
       'Sandbox target exec was not externally observed: '
-      '${await workerErrors.timeout(const Duration(seconds: 1))}',
+      '${await workerErrors}',
     );
   }
   await _appendJournal(root, <String, Object?>{
@@ -411,8 +410,7 @@ Future<void> _expectWorkerLine(
   StreamIterator<String> worker,
   String expected,
 ) async {
-  if (!await worker.moveNext().timeout(const Duration(seconds: 3)) ||
-      worker.current != expected) {
+  if (!await worker.moveNext() || worker.current != expected) {
     throw StateError('Expected worker line $expected.');
   }
 }

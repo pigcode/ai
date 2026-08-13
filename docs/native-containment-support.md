@@ -60,15 +60,15 @@ Machine-checked declarations:
 | `P4-HOST-01` | implemented | Capability contracts fail closed; a real Linux production probe/start tuple is still required (a). |
 | `P4-HOST-02` | verified | Real Seatbelt children prove apply-before-exec FS/network denial. |
 | `P4-HOST-03` | implemented | Landlock/seccomp requires a real Linux CI enforcement run (a). |
-| `P4-HOST-04` | implemented | PATH-01/03/05 are mainly Host evidence; Linux normalization and identity overlap need hardening. |
+| `P4-HOST-04` | implemented | Lexical and device/inode alias hardening is implemented; PATH-01/03/05 remain mainly Host evidence pending independent verification. |
 | `P4-HOST-05` | implemented | macOS cannot rediscover an already-detached orphan after a parent-first crash (`KU-P4-MACOS-DETACHED-CRASH-CLEANUP`) (c). |
 | `P4-HOST-06` | implemented | PTY-01 and identity cleanup are real; PTY-02 is Host buffering, ABI4 ioctl is unsupported, and ABI>=5 enforcement needs Linux CI (a/c). |
 | `P4-HOST-07` | verified | Git FS/network/credential/process boundaries run under Seatbelt. |
 | `P4-HOST-08` | implemented | CRED-04 lacks a real persistent-grant restart and reintersection journey. |
 | `P4-HOST-09` | verified | Exact TCP success, adjacent-port/non-allowlisted-IP controls and denial, macOS UDP/DNS/Unix denial, roots denial, and boundary redaction pass. |
-| `P4-HOST-10` | implemented | Recovery is still substantially fixture-orchestrated rather than production-coordinator evidence. |
+| `P4-HOST-10` | implemented | The crash matrix consumes production recovery-coordinator results; independent verification has not re-rated the evidence. |
 | `P4-AGENT-01` | implemented | Complete facade contract evidence is capped at implemented by architecture §17. |
-| `P4-AGENT-02` | implemented | Public construction still permits self-reported effect and sandbox state. |
+| `P4-AGENT-02` | implemented | A closed effect registry is bound to manifest identity and trusted probe digest; independent verification has not re-rated the evidence. |
 | `P4-AGENT-03` | implemented | The five paths lack one product entry and crash/restart is manually composed. |
 | `P4-DART-01` | verified | Dart 3.12.2 language-server initialize/open/hover/completion/shutdown runs under Seatbelt; unapproved applyEdit leaves the file unchanged. |
 | `P4-DART-02` | known-unsupported | Strict networking conflicts with dynamic DAP TCP/Unix/resolver channels (`KU-P4-DAP-POLICY`) (c). |

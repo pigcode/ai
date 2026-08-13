@@ -62,6 +62,16 @@ void main() {
         expect(identity, isNotNull);
 
         final coordinator = ProcessRecoveryCoordinator(dataRoot.path);
+        // Simulate a Host crash after the durable ledger write but before the
+        // session marker can be changed to pending. Ledger enumeration must
+        // still discover and clean the group.
+        await coordinator.markRecovered(
+          ProcessCleanupRecord(
+            sessionIdentity: session,
+            processGroupId: process.processGroupId,
+            processIdentity: identity!,
+          ),
+        );
         final report = await coordinator
             .recoverPending()
             .timeout(const Duration(seconds: 10));
@@ -113,6 +123,42 @@ void main() {
     } finally {
       process.kill(ProcessSignal.sigkill);
       await process.exitCode.timeout(const Duration(seconds: 5));
+      await dataRoot.delete(recursive: true);
+    }
+  });
+
+  test('production recovery rejects deleted or damaged registered ledgers',
+      () async {
+    final dataRoot =
+        await Directory.systemTemp.createTemp('recovery-mutation-');
+    final coordinator = ProcessRecoveryCoordinator(dataRoot.path);
+    const session = 'recovery-path-mutation';
+    final record = ProcessCleanupRecord(
+      sessionIdentity: session,
+      processGroupId: 999999,
+      processIdentity: 'mutation',
+    );
+    try {
+      await coordinator.registerSession(session);
+      await coordinator.markPending(record);
+      await expectLater(
+        coordinator.recoverPending(),
+        throwsA(
+          isA<HostCapabilityException>().having(
+            (error) => error.rule,
+            'rule',
+            'registered-cleanup-ledger-missing',
+          ),
+        ),
+      );
+
+      await File(coordinator.ledgerPathFor(session))
+          .writeAsString('{damaged-ledger', flush: true);
+      await expectLater(
+        coordinator.recoverPending(),
+        throwsA(isA<FormatException>()),
+      );
+    } finally {
       await dataRoot.delete(recursive: true);
     }
   });

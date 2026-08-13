@@ -21,6 +21,42 @@ const _packageDirectories = <String>[
   'dart',
 ];
 
+const _packageInactivityBudget = Duration(minutes: 2);
+const _watchdogInterval = Duration(seconds: 1);
+
+final class WorkspaceTestActivity {
+  WorkspaceTestActivity({DateTime Function()? now})
+      : _now = now ?? DateTime.now,
+        _lastProgressAt = (now ?? DateTime.now)();
+
+  final DateTime Function() _now;
+  DateTime _lastProgressAt;
+
+  void recordProgress() {
+    _lastProgressAt = _now();
+  }
+
+  bool hasExpired(Duration budget) {
+    return _now().difference(_lastProgressAt) >= budget;
+  }
+}
+
+Map<String, Object?>? decodeWorkspaceTestEvent(
+  String line,
+  List<String> diagnostics,
+) {
+  try {
+    final decoded = jsonDecode(line);
+    if (decoded is Map<String, Object?>) {
+      return decoded;
+    }
+  } on FormatException {
+    // `dart test` emits a plain-text status while handling termination.
+  }
+  diagnostics.add(line);
+  return null;
+}
+
 Future<void> main() async {
   final root = Directory.current.absolute;
   final packageResults = <Map<String, Object?>>[];
@@ -40,10 +76,15 @@ Future<void> main() async {
     stdout.writeln('==> packages/$package');
     final process = await Process.start(
       Platform.resolvedExecutable,
-      const <String>['test', '--reporter=json'],
+      const <String>['test', '--reporter=json', '--concurrency=1'],
       workingDirectory: directory.path,
     );
     final stderrOutput = process.stderr.transform(utf8.decoder).join();
+    final activity = WorkspaceTestActivity();
+    final diagnostics = <String>[];
+    final testNames = <int, String>{};
+    final activeTests = <int>{};
+    final testErrors = <String>[];
     var passed = 0;
     var skipped = 0;
     var failed = 0;
@@ -53,14 +94,27 @@ Future<void> main() async {
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .forEach((line) {
-      final event = jsonDecode(line) as Map<String, Object?>;
+      final event = decodeWorkspaceTestEvent(line, diagnostics);
+      if (event == null) {
+        return;
+      }
+      activity.recordProgress();
       if (event['type'] == 'testStart') {
         final test = event['test']! as Map<String, Object?>;
+        final testId = test['id']! as int;
+        testNames[testId] = test['name']! as String;
+        activeTests.add(testId);
         final metadata = test['metadata']! as Map<String, Object?>;
         final reason = metadata['skipReason'];
         if (reason is String) {
-          skipReasonByTest[test['id']! as int] = reason;
+          skipReasonByTest[testId] = reason;
         }
+      }
+      if (event['type'] == 'error' && event['testID'] is int) {
+        final testId = event['testID']! as int;
+        testErrors.add(
+          '${testNames[testId] ?? 'test $testId'}: ${event['error']}',
+        );
       }
       if (event['type'] == 'print' &&
           event['messageType'] == 'skip' &&
@@ -68,6 +122,9 @@ Future<void> main() async {
           event['message'] is String) {
         skipReasonByTest[event['testID']! as int] =
             (event['message']! as String).replaceFirst('Skip: ', '');
+      }
+      if (event['type'] == 'testDone') {
+        activeTests.remove(event['testID']);
       }
       if (event['type'] == 'testDone' && event['hidden'] != true) {
         if (event['skipped'] == true) {
@@ -83,9 +140,26 @@ Future<void> main() async {
         }
       }
     });
+    final inactivityTimeout = Completer<void>();
+    final watchdog = Timer.periodic(_watchdogInterval, (_) {
+      if (!inactivityTimeout.isCompleted &&
+          activity.hasExpired(_packageInactivityBudget)) {
+        inactivityTimeout.completeError(
+          TimeoutException(
+            'no structured test progress for $_packageInactivityBudget',
+          ),
+        );
+      }
+    });
     int result;
     try {
-      result = await process.exitCode.timeout(const Duration(minutes: 2));
+      result = await Future.any<int>(<Future<int>>[
+        process.exitCode,
+        inactivityTimeout.future.then<int>(
+          (_) =>
+              throw StateError('inactivity watchdog completed without error'),
+        ),
+      ]);
     } on TimeoutException {
       process.kill();
       try {
@@ -94,14 +168,40 @@ Future<void> main() async {
         process.kill(ProcessSignal.sigkill);
         await process.exitCode;
       }
-      stderr.writeln('Workspace test timed out: packages/$package.');
+      await outputDone;
+      final errors = await stderrOutput;
+      if (errors.isNotEmpty) {
+        stderr.write(errors);
+      }
+      for (final error in testErrors) {
+        stderr.writeln(error);
+      }
+      for (final line in diagnostics) {
+        stderr.writeln(line);
+      }
+      final active = activeTests
+          .map((testId) => testNames[testId] ?? 'test $testId')
+          .join(', ');
+      stderr.writeln(
+        'Workspace test made no structured progress for '
+        '$_packageInactivityBudget: packages/$package'
+        '${active.isEmpty ? '.' : ' (active: $active).'}',
+      );
       exitCode = 1;
       return;
+    } finally {
+      watchdog.cancel();
     }
     await outputDone;
     final errors = await stderrOutput;
     if (result != 0) {
       stderr.write(errors);
+      for (final error in testErrors) {
+        stderr.writeln(error);
+      }
+      for (final line in diagnostics) {
+        stderr.writeln(line);
+      }
       stderr.writeln(
         'Workspace test failed: packages/$package (exit $result).',
       );

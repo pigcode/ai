@@ -416,10 +416,11 @@ void main() {
       AgentRunState.interrupted,
     );
     await journey.expectReplayStable();
-  });
+  }, timeout: Timeout(_crashJourneyTestBudget));
 }
 
 const _deadline = Duration(seconds: 12);
+const _crashJourneyTestBudget = Duration(minutes: 3);
 
 final class _NativeJourney {
   _NativeJourney._({

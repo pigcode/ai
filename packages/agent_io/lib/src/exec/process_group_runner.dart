@@ -24,7 +24,7 @@ Future<void> main(List<String> arguments) async {
   final handshake = command['handshake'] == true;
   try {
     if (handshake) {
-      RunnerControl.report('group-ready', <String, Object?>{
+      await RunnerControl.report('group-ready', <String, Object?>{
         'identity': ProcessGroup.captureIdentity(pid),
         'pgid': pid,
       });
@@ -43,7 +43,7 @@ Future<void> main(List<String> arguments) async {
     exitCode = result;
   } on HostCapabilityException catch (error) {
     if (handshake) {
-      RunnerControl.report('error', <String, Object?>{
+      await RunnerControl.report('error', <String, Object?>{
         'code': error.code.name,
         'rule': error.rule,
       });
@@ -51,7 +51,7 @@ Future<void> main(List<String> arguments) async {
     exitCode = 70;
   } on ProcessException {
     if (handshake) {
-      RunnerControl.report('error', const <String, Object?>{
+      await RunnerControl.report('error', const <String, Object?>{
         'code': 'sandboxUnavailable',
         'rule': 'sandbox-wrapper-start-failed',
       });

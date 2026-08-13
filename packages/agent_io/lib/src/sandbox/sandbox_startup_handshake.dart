@@ -12,6 +12,7 @@ const sandboxAckPrefix = 'PIGCODE_ACK ';
 
 enum SandboxStartupPhase {
   sandboxSetupPreparedBeforeApply,
+  parentProcessWriteAheadReported,
   processGroupPersistedBeforeAck,
   sandboxAppliedBeforeExecAck,
   targetExecConfirmed,
@@ -26,16 +27,20 @@ Future<Stream<List<int>>> awaitSandboxStartup(
   Process process, {
   required PersistProcessGroup persistProcessGroup,
   SandboxStartupObserver? observer,
-  Duration timeout = const Duration(seconds: 5),
+  bool requireParentWriteAhead = false,
+  Duration timeout = const Duration(seconds: 30),
 }) async {
   final output = StreamController<List<int>>();
   final ready = Completer<void>();
   final stdoutClosed = Completer<void>();
   final lineBytes = <int>[];
+  Future<void>? stderrDrained;
   var groupReady = false;
   var sandboxReady = false;
   var execReady = false;
   late StreamSubscription<List<int>> subscription;
+
+  Future<void> drainStderr() => stderrDrained ??= process.stderr.drain<void>();
 
   Future<void> fail(HostCapabilityException error) async {
     if (ready.isCompleted) return;
@@ -44,6 +49,15 @@ Future<Stream<List<int>>> awaitSandboxStartup(
   }
 
   Future<void> consumeLine(String line) async {
+    final trimmed = line.trim();
+    if ((groupReady &&
+            !sandboxReady &&
+            trimmed == '${sandboxAckPrefix}group-ready') ||
+        (sandboxReady &&
+            !execReady &&
+            trimmed == '${sandboxAckPrefix}sandbox-ready')) {
+      return;
+    }
     if (!line.startsWith(sandboxControlPrefix)) {
       await fail(
         const HostCapabilityException(
@@ -65,7 +79,9 @@ Future<Stream<List<int>>> awaitSandboxStartup(
         if (groupReady ||
             processGroupId is! int ||
             reportedIdentity is! String ||
-            currentIdentity != reportedIdentity) {
+            currentIdentity != reportedIdentity ||
+            (requireParentWriteAhead &&
+                message['source'] != 'posix-spawn-parent')) {
           await fail(
             const HostCapabilityException(
               HostCapabilityError.processCleanupFailed,
@@ -74,7 +90,23 @@ Future<Stream<List<int>>> awaitSandboxStartup(
           );
           return;
         }
-        await persistProcessGroup(processGroupId);
+        if (requireParentWriteAhead) {
+          await observer?.call(
+            SandboxStartupPhase.parentProcessWriteAheadReported,
+            Map<String, Object?>.unmodifiable(message),
+          );
+        }
+        final record = await persistProcessGroup(processGroupId);
+        if (record.processGroupId != processGroupId ||
+            record.processIdentity != reportedIdentity) {
+          await fail(
+            const HostCapabilityException(
+              HostCapabilityError.processCleanupFailed,
+              'sandbox-group-record-mismatch',
+            ),
+          );
+          return;
+        }
         await observer?.call(
           SandboxStartupPhase.processGroupPersistedBeforeAck,
           Map<String, Object?>.unmodifiable(message),
@@ -195,8 +227,7 @@ Future<Stream<List<int>>> awaitSandboxStartup(
         );
       }
       if (!ready.isCompleted) {
-        final startupError = await process.stderr.transform(utf8.decoder).join();
-        if (startupError.isNotEmpty) stderr.writeln(startupError);
+        await drainStderr();
         ready.completeError(
           HostCapabilityException(
             HostCapabilityError.sandboxUnavailable,
@@ -215,8 +246,7 @@ Future<Stream<List<int>>> awaitSandboxStartup(
     await ready.future.timeout(timeout);
   } on TimeoutException {
     process.kill(ProcessSignal.sigkill);
-    final startupError = await process.stderr.transform(utf8.decoder).join();
-    if (startupError.isNotEmpty) stderr.writeln(startupError);
+    await drainStderr();
     throw const HostCapabilityException(
       HostCapabilityError.sandboxUnavailable,
       'sandbox-handshake-timeout',

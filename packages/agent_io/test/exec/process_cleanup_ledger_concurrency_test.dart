@@ -73,13 +73,31 @@ void main() {
       await root.delete(recursive: true);
     }
   });
+
+  test('cleanup ledger recovers an abandoned transaction guard', () async {
+    final root = await Directory.systemTemp.createTemp('ledger-stale-guard-');
+    final path = '${root.path}/ledger.json';
+    final guard = File('$path.lock.guard');
+    try {
+      await guard.writeAsString('999999 0', flush: true);
+      await ProcessCleanupLedger(path).record(
+        const ProcessCleanupRecord(
+          sessionIdentity: 'guard-recovery',
+          processGroupId: 1,
+          processIdentity: 'identity',
+        ),
+      );
+      expect(await ProcessCleanupLedger(path).all(), hasLength(1));
+      expect(await guard.exists(), isFalse);
+    } finally {
+      await root.delete(recursive: true);
+    }
+  });
 }
 
-Future<List<FileSystemEntity>> _temporaryFiles(Directory root) async =>
-    root
-        .list()
-        .where(
-          (entry) =>
-              entry.path.contains('.tmp.') || entry.path.endsWith('.guard'),
-        )
-        .toList();
+Future<List<FileSystemEntity>> _temporaryFiles(Directory root) async => root
+    .list()
+    .where(
+      (entry) => entry.path.contains('.tmp.') || entry.path.endsWith('.guard'),
+    )
+    .toList();

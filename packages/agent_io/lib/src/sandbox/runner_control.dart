@@ -7,13 +7,17 @@ import 'sandbox_errors.dart';
 import 'sandbox_startup_handshake.dart';
 
 abstract final class RunnerControl {
-  static void report(String type, [Map<String, Object?> fields = const {}]) {
+  static Future<void> report(
+    String type, [
+    Map<String, Object?> fields = const {},
+  ]) async {
     stdout.writeln(
       '$sandboxControlPrefix${jsonEncode(<String, Object?>{
             'type': type,
             ...fields,
           })}',
     );
+    await stdout.flush();
   }
 
   static void waitForAck(String phase) {
@@ -55,7 +59,7 @@ abstract final class RunnerControl {
         arguments,
         runInShell: false,
       );
-      report('exec-ready', <String, Object?>{'pid': process.pid});
+      await report('exec-ready', <String, Object?>{'pid': process.pid});
       final output = process.stdout.pipe(stdout);
       final errors = process.stderr.pipe(stderr);
       unawaited(stdin.pipe(process.stdin).catchError((_) {}));
@@ -63,7 +67,7 @@ abstract final class RunnerControl {
       await Future.wait<void>(<Future<void>>[output, errors]);
       return result;
     } on ProcessException {
-      report('error', const <String, Object?>{
+      await report('error', const <String, Object?>{
         'code': 'sandboxUnavailable',
         'rule': 'sandbox-target-exec-failed',
       });

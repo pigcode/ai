@@ -48,18 +48,23 @@ final class HostPtySession {
   HostPtySession(
     this.launcher, {
     this.maxOutputBytes = 64 * 1024,
+    this.startupBudget = const Duration(seconds: 30),
     String? runnerPath,
   }) : _runnerPath = runnerPath {
     if (maxOutputBytes < 1) {
       throw ArgumentError.value(maxOutputBytes, 'maxOutputBytes');
     }
+    if (startupBudget <= Duration.zero) {
+      throw ArgumentError.value(startupBudget, 'startupBudget');
+    }
   }
 
   final SandboxedProcessLauncher launcher;
   final int maxOutputBytes;
+  final Duration startupBudget;
   final String? _runnerPath;
 
-  static const String platformBroker = 'forkpty';
+  static const String platformBroker = 'openpty+posix_spawn';
   static const bool usesShell = false;
 
   Future<SandboxedProcess> start(
@@ -100,6 +105,7 @@ final class HostPtySession {
         environment: prepared.environment,
       ),
       launcher.backend.probe(),
+      startupBudget: startupBudget,
     );
   }
 
