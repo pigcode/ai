@@ -8,7 +8,13 @@ import 'package:test/test.dart';
 const _deadline = Duration(seconds: 8);
 
 void main() {
-  final skip = !Platform.isMacOS || !File('/usr/bin/sandbox-exec').existsSync();
+  final supported =
+      Platform.isMacOS && File('/usr/bin/sandbox-exec').existsSync();
+  final skip = supported
+      ? false
+      : 'SKIP-MANIFEST Seatbelt enforcement '
+          'platform=${Platform.operatingSystem} '
+          'sandbox-exec=${File('/usr/bin/sandbox-exec').existsSync()}';
 
   test(
     'P4-TM-PATH-01 Seatbelt rejects a real read outside declared roots',
