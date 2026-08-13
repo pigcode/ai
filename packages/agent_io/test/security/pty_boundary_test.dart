@@ -146,6 +146,45 @@ void main() {
   );
 
   test(
+    'PTY run confirms cleanup after a successful exit',
+    () async {
+      final temp = Directory.systemTemp.createTempSync('pigcode_pty_');
+      try {
+        final launcher =
+            SandboxedProcessLauncher.unsafeDev(SeatbeltSandboxBackend());
+        final session = HostPtySession(launcher);
+        final first = await session.run(
+          _ptyPolicy(temp),
+          HostCommand(
+            executable: '/bin/echo',
+            arguments: <String>['first-run'],
+          ),
+        );
+        expect(first.exitCode, 0);
+        expect(first.timedOut, isFalse);
+
+        // A successful run must confirm its write-ahead cleanup record so
+        // the launcher stays usable without an external cleanup call.
+        final second = await session.run(
+          _ptyPolicy(temp),
+          HostCommand(
+            executable: '/bin/echo',
+            arguments: <String>['second-run'],
+          ),
+        );
+        expect(second.exitCode, 0);
+        expect(second.output, contains('second-run'));
+      } finally {
+        temp.deleteSync(recursive: true);
+      }
+    },
+    skip: supported
+        ? false
+        : 'SKIP-MANIFEST PTY run cleanup platform=${Platform.operatingSystem} '
+            'sandbox-exec=${File('/usr/bin/sandbox-exec').existsSync()}',
+  );
+
+  test(
     'P4-TM-PTY-02 Host buffer bounds sandboxed and control PTY floods',
     () async {
       const outputLimit = 4096;
@@ -515,8 +554,8 @@ Future<PtyRunResult> _runBoundedPtyOutput(
     if (groupId == null || identity == null) {
       throw StateError('missing bounded PTY process identity');
     }
-    final cleanup = await launcher.cleanupRecorded(groupId);
-    expect(cleanup.confirmed, isTrue);
+    // A successful run confirms its own cleanup record; the group must be
+    // gone without any external cleanupRecorded call.
     await _expectIdentityGone(groupId, identity);
     return result;
   } finally {

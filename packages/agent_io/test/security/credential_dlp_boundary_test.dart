@@ -116,6 +116,49 @@ void main() {
     }
   }, skip: _seatbeltSkip);
 
+  test('P4-TM-CRED-01 sandbox child does not inherit the host environment',
+      () async {
+    // HOME is guaranteed on macOS hosts and CI runners and is never part of
+    // the sandbox launch baseline, so it proves host-environment leakage.
+    expect(
+      Platform.environment.containsKey('HOME'),
+      isTrue,
+      reason: 'the host control environment must contain HOME',
+    );
+    final process = await _launchProbe(
+      const <SandboxNetworkEndpoint>[],
+      const <String>['env-keys'],
+      environment: const <String, String>{
+        'PIGCODE_SANDBOX_ENV_PROBE': 'visible',
+      },
+    );
+    final output = utf8.decoder.bind(process.stdout).join();
+    final errors = utf8.decoder.bind(process.stderr).join();
+    expect(await _boundedExit(process), 0, reason: await errors);
+    final keys =
+        ((jsonDecode((await output).trim()) as List<Object?>).cast<String>())
+            .toSet();
+    expect(keys, contains('PIGCODE_SANDBOX_ENV_PROBE'));
+    expect(keys, isNot(contains('HOME')));
+    const launchBaseline = <String>{
+      'LANG',
+      'LC_ALL',
+      'PATH',
+      'TERM',
+      'TMPDIR',
+      'TZ',
+      'PIGCODE_SANDBOX_ENV_PROBE',
+      // macOS CoreFoundation injects the user-id/text-encoding pair into
+      // every spawned process; it is not host-environment passthrough.
+      '__CF_USER_TEXT_ENCODING',
+    };
+    expect(
+      keys.difference(launchBaseline),
+      isEmpty,
+      reason: 'sandbox children must only see the explicit launch environment',
+    );
+  }, skip: _seatbeltSkip);
+
   test('P4-TM-CRED-02 crash before outcome persists no secret', () async {
     final temp = Directory.systemTemp.createTempSync('pigcode_cred_');
     Process? host;
@@ -502,6 +545,7 @@ Future<SandboxedProcess> _launchProbe(
   List<String> arguments, {
   List<SandboxPathRule>? roots,
   String? workingDirectory,
+  Map<String, String>? environment,
 }) {
   return SeatbeltSandboxBackend(unsafeStandaloneStart: true).start(
     SandboxPolicy(
@@ -518,6 +562,7 @@ Future<SandboxedProcess> _launchProbe(
       executable: _probeExecutable.path,
       arguments: arguments,
       workingDirectory: workingDirectory,
+      environment: environment,
     ),
   );
 }

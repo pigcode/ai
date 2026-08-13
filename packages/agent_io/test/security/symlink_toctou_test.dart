@@ -36,6 +36,39 @@ void main() {
     }
   });
 
+  test('P4-TM-PATH-02 hardlink alias is rejected before truncation', () {
+    final temp = Directory.systemTemp.createTempSync('pigcode_link_');
+    try {
+      final root = Directory('${temp.path}/root')..createSync();
+      final outside = File('${temp.path}/outside')
+        ..writeAsStringSync('linked-secret');
+      _createHardLink(outside.path, '${root.path}/alias');
+      final fs = HostWorkspaceFileSystem(<HostWorkspaceRoot>[
+        HostWorkspaceRoot(
+          name: 'workspace',
+          path: root.path,
+          access: SandboxPathAccess.readWrite,
+        ),
+      ]);
+
+      expect(
+        () => fs.writeText('workspace', 'alias', 'overwritten'),
+        throwsA(
+          isA<HostCapabilityException>().having(
+            (error) => error.rule,
+            'rule',
+            'hardlink-denied',
+          ),
+        ),
+      );
+      // The denial must happen before any destructive open: the linked
+      // inode outside the workspace keeps its original content.
+      expect(outside.readAsStringSync(), 'linked-secret');
+    } finally {
+      temp.deleteSync(recursive: true);
+    }
+  });
+
   test('P4-TM-PATH-03 openat/no-follow defeats check-then-swap', () async {
     final temp = Directory.systemTemp.createTempSync('pigcode_swap_');
     ReceivePort? events;

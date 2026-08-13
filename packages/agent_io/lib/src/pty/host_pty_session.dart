@@ -128,6 +128,9 @@ final class HostPtySession {
       exitCode = await process.exitCode.timeout(const Duration(seconds: 2));
     }
     await Future.wait<void>(<Future<void>>[stdoutDone, stderrDone]);
+    // Successful runs must also confirm the write-ahead cleanup record;
+    // otherwise the launcher stays blocked by previous-cleanup-unconfirmed.
+    if (!timedOut) await launcher.cleanup(process);
     return PtyRunResult(
       exitCode: exitCode,
       output: output.text,

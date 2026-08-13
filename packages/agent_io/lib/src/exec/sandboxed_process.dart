@@ -215,7 +215,8 @@ final class SandboxedProcessLauncher {
           command.executable,
           <String>[...command.arguments, writeAhead],
           workingDirectory: command.workingDirectory,
-          environment: command.environment,
+          environment: sandboxLaunchEnvironment(command.environment),
+          includeParentEnvironment: false,
           runInShell: false,
         );
         try {
@@ -340,20 +341,16 @@ final class SandboxedProcessLauncher {
     ProcessGroup? group,
   }) async {
     final currentIdentity = ProcessGroup.captureIdentity(record.processGroupId);
-    if (currentIdentity == null) {
-      await _confirmCleanup(record);
-      return ProcessTreeCleanupReport(
-        processGroupId: record.processGroupId,
-        confirmed: true,
-        forced: false,
-      );
-    }
-    if (currentIdentity != record.processIdentity) {
+    if (currentIdentity != null && currentIdentity != record.processIdentity) {
       throw const HostCapabilityException(
         HostCapabilityError.processCleanupFailed,
         'recorded-process-identity-mismatch',
       );
     }
+    // A missing identity only proves the group leader exited; survivors may
+    // remain in the group. While any member is alive the kernel cannot reuse
+    // the PGID, so group-wide cleanup stays safe and must still be confirmed
+    // against kill(-pgid) before the durable record is released.
     final report =
         await (group ?? ProcessGroup(record.processGroupId)).cleanup();
     if (report.confirmed) await _confirmCleanup(record);

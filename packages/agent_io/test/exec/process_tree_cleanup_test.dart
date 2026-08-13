@@ -105,6 +105,75 @@ void main() {
       }
     });
 
+    test('P4-TM-PROC-01 cleanup kills group survivors after the leader exits',
+        () async {
+      final launcher =
+          SandboxedProcessLauncher.unsafeDev(SeatbeltSandboxBackend());
+      final process = await launcher.launch(
+        SandboxPolicy(
+          roots: <SandboxPathRule>[
+            SandboxPathRule(
+              path: Directory.current.path,
+              access: SandboxPathAccess.readOnly,
+            ),
+          ],
+        ),
+        HostCommand(
+          executable: Platform.resolvedExecutable,
+          arguments: <String>[
+            resolveTestWorkspacePath(
+              packageRelative: 'test/fixtures/process_tree_fixture.dart',
+              workspaceRelative:
+                  'packages/agent_io/test/fixtures/process_tree_fixture.dart',
+            ),
+          ],
+        ),
+      );
+      final lines = StreamIterator<String>(
+        process.stdout.transform(utf8.decoder).transform(const LineSplitter()),
+      );
+      var childPid = -1;
+      try {
+        expect(
+            await lines.moveNext().timeout(const Duration(seconds: 5)), isTrue);
+        expect(lines.current, startsWith('READY '));
+        process.stdin.writeln('spawn-exit');
+        expect(
+            await lines.moveNext().timeout(const Duration(seconds: 5)), isTrue);
+        childPid = int.parse(lines.current.split(' ').last);
+        expect(ProcessGroup.captureIdentity(childPid), isNotNull);
+
+        // The target and its wrapper exit while the lingering child stays
+        // alive inside the original process group.
+        await process.exitCode.timeout(const Duration(seconds: 5));
+        expect(
+          await _waitUntilGone(process.pid, const Duration(seconds: 2)),
+          isTrue,
+        );
+        expect(ProcessGroup.captureIdentity(childPid), isNotNull);
+
+        final report =
+            await launcher.cleanup(process).timeout(const Duration(seconds: 5));
+
+        expect(report.confirmed, isTrue);
+        // Confirming cleanup requires the surviving group member to be gone,
+        // not merely the exited group leader.
+        expect(
+          await _waitUntilGone(childPid, const Duration(seconds: 2)),
+          isTrue,
+        );
+        expect(ProcessGroup.captureIdentity(childPid), isNull);
+      } finally {
+        await lines.cancel();
+        if (childPid > 0 && await _stillRunning(childPid)) {
+          Process.killPid(childPid, ProcessSignal.sigkill);
+        }
+        if (await _stillRunning(process.pid)) {
+          process.kill(ProcessSignal.sigkill);
+        }
+      }
+    });
+
     test('durable cleanup ledger blocks restarted launchers and PTY brokers',
         () async {
       final root = await Directory.systemTemp.createTemp('cleanup-ledger-');

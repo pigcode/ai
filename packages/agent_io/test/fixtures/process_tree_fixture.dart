@@ -23,6 +23,18 @@ Future<void> main(List<String> arguments) async {
       child.stdout.drain<void>();
       child.stderr.drain<void>();
       stdout.writeln('CHILD ${child.pid}');
+    } else if (line == 'spawn-exit') {
+      final child = await Process.start(
+        Platform.resolvedExecutable,
+        <String>[Platform.script.toFilePath(), '--linger'],
+      );
+      child.stdout.drain<void>();
+      child.stderr.drain<void>();
+      stdout.writeln('CHILD ${child.pid}');
+      await stdout.flush();
+      // Leave the lingering child inside the inherited process group while
+      // the fixture (and therefore the group leader chain) exits normally.
+      exit(0);
     } else if (line == 'spawn-detached') {
       final child = await Process.start(
         Platform.resolvedExecutable,

@@ -111,18 +111,7 @@ final class ProcessRecoveryCoordinator {
       final ledger = ProcessCleanupLedger(file.path);
       for (final record in await ledger.all()) {
         final current = ProcessGroup.captureIdentity(record.processGroupId);
-        if (current == null) {
-          await markRecovered(record);
-          await ledger.confirm(record);
-          results.add(
-            ProcessRecoveryResult(
-              record: record,
-              status: ProcessRecoveryStatus.alreadyExited,
-            ),
-          );
-          continue;
-        }
-        if (current != record.processIdentity) {
+        if (current != null && current != record.processIdentity) {
           results.add(
             ProcessRecoveryResult(
               record: record,
@@ -131,6 +120,9 @@ final class ProcessRecoveryCoordinator {
           );
           continue;
         }
+        // A missing identity only proves the group leader exited; survivors
+        // may remain in the group, so recovery must still confirm group-wide
+        // cleanup before releasing the durable record.
         final cleanup = await ProcessGroup(record.processGroupId).cleanup();
         if (cleanup.confirmed) {
           await markRecovered(record);
@@ -139,9 +131,11 @@ final class ProcessRecoveryCoordinator {
         results.add(
           ProcessRecoveryResult(
             record: record,
-            status: cleanup.confirmed
-                ? ProcessRecoveryStatus.cleaned
-                : ProcessRecoveryStatus.cleanupUnconfirmed,
+            status: !cleanup.confirmed
+                ? ProcessRecoveryStatus.cleanupUnconfirmed
+                : current == null && !cleanup.forced
+                    ? ProcessRecoveryStatus.alreadyExited
+                    : ProcessRecoveryStatus.cleaned,
           ),
         );
       }

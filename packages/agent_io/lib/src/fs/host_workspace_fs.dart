@@ -125,9 +125,12 @@ final class _NativeWorkspaceIo {
   }
 
   void write(String root, List<String> segments, List<int> bytes) {
+    // The final component is opened without O_TRUNC so the hard-link check
+    // runs before any destructive change to the underlying inode.
     final opened = _openPath(root, segments, write: true);
     try {
       _rejectHardLink(opened);
+      if (_ftruncate(opened, 0) != 0) _deny('native-truncate-failed');
       final buffer = _calloc(bytes.length);
       buffer.asTypedList(bytes.length).setAll(0, bytes);
       try {
@@ -186,10 +189,20 @@ final class _NativeWorkspaceIo {
     }
   }
 
-  int get _directory => Platform.isMacOS ? 0x100000 : 0x10000;
-  int get _noFollow => Platform.isMacOS ? 0x100 : 0x20000;
-  int get _writeFlags =>
-      1 | _noFollow | (Platform.isMacOS ? 0x200 | 0x400 : 0x40 | 0x200);
+  // Linux open flags differ per architecture: x86_64 swaps the asm-generic
+  // O_DIRECTORY/O_NOFOLLOW values used by arm64/aarch64 and riscv.
+  bool get _linuxGenericAbi {
+    final version = Platform.version.toLowerCase();
+    return version.contains('arm64') ||
+        version.contains('aarch64') ||
+        version.contains('riscv');
+  }
+
+  int get _directory =>
+      Platform.isMacOS ? 0x100000 : (_linuxGenericAbi ? 0x4000 : 0x10000);
+  int get _noFollow =>
+      Platform.isMacOS ? 0x100 : (_linuxGenericAbi ? 0x8000 : 0x20000);
+  int get _writeFlags => 1 | _noFollow | (Platform.isMacOS ? 0x200 : 0x40);
   int get _atFdcwd => Platform.isLinux ? -100 : -2;
 
   int _openNative(String path, int flags, int mode) {
@@ -224,6 +237,12 @@ final class _NativeWorkspaceIo {
     final fstat = _lib.lookupFunction<Int32 Function(Int32, Pointer<Uint8>),
         int Function(int, Pointer<Uint8>)>('fstat');
     return fstat(fd, stat);
+  }
+
+  int _ftruncate(int fd, int length) {
+    final ftruncate = _lib.lookupFunction<Int32 Function(Int32, Int64),
+        int Function(int, int)>('ftruncate');
+    return ftruncate(fd, length);
   }
 
   void _close(int fd) {

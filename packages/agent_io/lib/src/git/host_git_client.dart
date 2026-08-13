@@ -35,16 +35,21 @@ final class HostGitClient {
     List<String> arguments, {
     List<String> additionalDenyReadPaths = const <String>[],
   }) {
+    final home = Platform.environment['HOME'];
     return launcher.launch(
       _policy(additionalDenyReadPaths),
       HostCommand(
         executable: '/usr/bin/git',
         arguments: arguments,
         workingDirectory: workspace.path,
-        environment: const <String, String>{
+        environment: <String, String>{
           'GIT_CONFIG_NOSYSTEM': '1',
           'GIT_TERMINAL_PROMPT': '0',
           'GIT_ASKPASS': '/usr/bin/false',
+          // Sandbox launches no longer inherit the host environment, so git
+          // must be told explicitly where the policy-permitted global config
+          // lives; the sandbox policy still bounds what it may read there.
+          if (home != null) 'HOME': home,
         },
       ),
     );

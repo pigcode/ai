@@ -166,7 +166,8 @@ final class SeatbeltSandboxBackend implements PreparedSandboxBackend {
           groupedCommand,
         ],
         workingDirectory: prepared.workingDirectory,
-        environment: prepared.environment,
+        environment: sandboxLaunchEnvironment(prepared.environment),
+        includeParentEnvironment: false,
         runInShell: false,
       );
       final output = await awaitSandboxStartup(

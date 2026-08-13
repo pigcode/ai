@@ -47,6 +47,11 @@ Future<void> main(List<String> arguments) async {
           environmentLeak || workspaceLeak ? 'SECRET_VISIBLE' : 'SECRET_ABSENT',
         );
         exit(environmentLeak || workspaceLeak ? 78 : 0);
+      case 'env-keys':
+        final keys = Platform.environment.keys.toList()..sort();
+        stdout.writeln(jsonEncode(keys));
+        await stdout.flush();
+        exit(0);
       case 'udp':
         final socket = await RawDatagramSocket.bind(
           InternetAddress.loopbackIPv4,
