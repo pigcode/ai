@@ -20,6 +20,15 @@ void main() {
     expect(error.code, HostCapabilityError.sandboxUnavailable);
     expect(error.rule, 'landlock-create-ruleset-errno-95');
     expect(error.toString(), isNot(contains('secret')));
+    final missingRuntime = LandlockFailure.fromErrno(
+      2,
+      operation: 'open-runtime-dependency',
+    );
+    expect(missingRuntime.code, HostCapabilityError.sandboxUnavailable);
+    expect(
+      missingRuntime.rule,
+      'landlock-open-runtime-dependency-errno-2',
+    );
     for (final category in const <String>[
       'directory',
       'file',

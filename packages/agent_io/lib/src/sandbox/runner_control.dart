@@ -75,6 +75,76 @@ abstract final class RunnerControl {
     }
   }
 
+  static Future<int> replaceWithTarget(
+    String executable,
+    List<String> arguments,
+  ) async {
+    if (executable.contains('\u0000') ||
+        arguments.any((argument) => argument.contains('\u0000'))) {
+      await _reportExecFailure();
+      return 70;
+    }
+    final nativeArguments = <Pointer<Uint8>>[
+      _nativeString(executable),
+      for (final argument in arguments) _nativeString(argument),
+    ];
+    final argumentVector =
+        _calloc((nativeArguments.length + 1) * sizeOf<Pointer<Uint8>>())
+            .cast<Pointer<Uint8>>();
+    for (var index = 0; index < nativeArguments.length; index += 1) {
+      argumentVector[index] = nativeArguments[index];
+    }
+    try {
+      if (executable.contains('/') && _access(nativeArguments.first, 1) != 0) {
+        await _reportExecFailure();
+        return 70;
+      }
+      await report('exec-ready', <String, Object?>{'pid': _getProcessId()});
+      _execvp(nativeArguments.first, argumentVector);
+      await _reportExecFailure();
+      return 70;
+    } finally {
+      _free(argumentVector);
+      for (final argument in nativeArguments) {
+        _free(argument);
+      }
+    }
+  }
+
+  static Future<void> _reportExecFailure() => report(
+        'error',
+        const <String, Object?>{
+          'code': 'sandboxUnavailable',
+          'rule': 'sandbox-target-exec-failed',
+        },
+      );
+
+  static int _access(Pointer<Uint8> path, int mode) =>
+      DynamicLibrary.process().lookupFunction<
+          Int32 Function(Pointer<Uint8>, Int32),
+          int Function(Pointer<Uint8>, int)>('access')(path, mode);
+
+  static int _execvp(
+    Pointer<Uint8> executable,
+    Pointer<Pointer<Uint8>> arguments,
+  ) =>
+      DynamicLibrary.process().lookupFunction<
+          Int32 Function(Pointer<Uint8>, Pointer<Pointer<Uint8>>),
+          int Function(
+            Pointer<Uint8>,
+            Pointer<Pointer<Uint8>>,
+          )>('execvp')(executable, arguments);
+
+  static int _getProcessId() => DynamicLibrary.process()
+      .lookupFunction<Int32 Function(), int Function()>('getpid')();
+
+  static Pointer<Uint8> _nativeString(String value) {
+    final bytes = utf8.encode(value);
+    final pointer = _calloc(bytes.length + 1).cast<Uint8>();
+    pointer.asTypedList(bytes.length + 1).setAll(0, <int>[...bytes, 0]);
+    return pointer;
+  }
+
   static Pointer<Void> _calloc(int bytes) {
     final calloc = DynamicLibrary.process().lookupFunction<
         Pointer<Void> Function(Uint64, Uint64),

@@ -50,7 +50,8 @@ Future<void> main(List<String> arguments) async {
     SeccompFfi().apply();
     await RunnerControl.report('sandbox-ready');
     RunnerControl.waitForAck('sandbox-ready');
-    exitCode = await RunnerControl.runTarget(executable, commandArguments);
+    exitCode =
+        await RunnerControl.replaceWithTarget(executable, commandArguments);
   } on HostCapabilityException catch (error) {
     await RunnerControl.report('error', <String, Object?>{
       'code': error.code.name,

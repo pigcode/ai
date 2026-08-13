@@ -268,6 +268,24 @@ final class LandlockFfi {
   static int get readWriteAccessMask => _readWriteAccess;
   static int get directoryOnlyAccessMask => _directoryOnlyAccess;
   static const runtimeFileAccessMask = _readFileAccess;
+  static const _runtimeDirectoryDependencyPaths = <String>{
+    '/bin',
+    '/usr/bin',
+    '/lib',
+    '/lib64',
+  };
+  static const _runtimeFileDependencyPaths = <String>{
+    '/etc/ld.so.cache',
+    '/dev/null',
+    '/proc/self/maps',
+  };
+  static const runtimeDependencyPaths = <String>{
+    ..._runtimeDirectoryDependencyPaths,
+    ..._runtimeFileDependencyPaths,
+  };
+  static const requiredRuntimeDependencyPaths = <String>{
+    '/proc/self/maps',
+  };
 
   static int allowedAccessForPathType(
     int requestedAccess,
@@ -332,20 +350,15 @@ final class LandlockFfi {
               : _readWriteAccess,
         );
       }
-      for (final dependency in const <String, int>{
-        '/bin': _readOnlyAccess,
-        '/usr/bin': _readOnlyAccess,
-        '/lib': _readOnlyAccess,
-        '/lib64': _readOnlyAccess,
-        '/etc/ld.so.cache': runtimeFileAccessMask,
-        '/dev/null': runtimeFileAccessMask,
-      }.entries) {
+      for (final dependency in runtimeDependencyPaths) {
         _addPathRule(
           rulesetFd,
-          dependency.key,
-          dependency.value,
+          dependency,
+          _runtimeDirectoryDependencyPaths.contains(dependency)
+              ? _readOnlyAccess
+              : runtimeFileAccessMask,
           runtimeDependency: true,
-          allowMissing: true,
+          allowMissing: !requiredRuntimeDependencyPaths.contains(dependency),
         );
       }
       for (final endpoint in policy.networkAllowlist) {

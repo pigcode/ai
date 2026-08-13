@@ -43,6 +43,19 @@ void main() {
     );
   });
 
+  test('Dart runtime dependency is the exact required procfs file', () {
+    expect(
+      LandlockFfi.runtimeDependencyPaths,
+      contains('/proc/self/maps'),
+    );
+    expect(LandlockFfi.runtimeDependencyPaths, isNot(contains('/proc')));
+    expect(LandlockFfi.runtimeDependencyPaths, isNot(contains('/proc/self')));
+    expect(
+      LandlockFfi.requiredRuntimeDependencyPaths,
+      contains('/proc/self/maps'),
+    );
+  });
+
   final ffi = LandlockFfi();
   final abi = ffi.probeAbi();
   final supported =
@@ -171,7 +184,54 @@ void main() {
   );
 
   test(
-    'Linux seccomp rejects ptrace before target execution',
+    'Linux Dart VM reaches main without widening procfs',
+    () async {
+      final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
+      final root = Directory('${temp.path}/root')..createSync();
+      try {
+        final result = await _run(
+          LandlockSeccompSandboxBackend(unsafeStandaloneStart: true),
+          SandboxPolicy(
+            roots: <SandboxPathRule>[
+              SandboxPathRule(
+                path: root.path,
+                access: SandboxPathAccess.readWrite,
+              ),
+              SandboxPathRule(
+                path: Directory.current.absolute.path,
+                access: SandboxPathAccess.readOnly,
+              ),
+              SandboxPathRule(
+                path: File(Platform.resolvedExecutable).parent.parent.path,
+                access: SandboxPathAccess.readOnly,
+              ),
+            ],
+          ),
+          HostCommand(
+            executable: Platform.resolvedExecutable,
+            arguments: <String>[
+              resolveTestWorkspacePath(
+                packageRelative:
+                    'test/fixtures/dart_runtime_dependency_probe.dart',
+                workspaceRelative: 'packages/agent_io/test/fixtures/'
+                    'dart_runtime_dependency_probe.dart',
+              ),
+            ],
+          ),
+        );
+
+        expect(result.exitCode, 0);
+        expect(result.stdout, contains('DART_MAIN_REACHED'));
+        expect(result.stdout, contains('NON_REQUIRED_PROCFS_DENIED'));
+      } finally {
+        temp.deleteSync(recursive: true);
+      }
+    },
+    skip: skipReason,
+  );
+
+  test(
+    'Linux Dart target reaches main and seccomp returns EPERM for ptrace',
     () async {
       final temp = Directory.systemTemp.createTempSync('pigcode_landlock_');
       final root = Directory('${temp.path}/root')..createSync();
@@ -206,6 +266,7 @@ void main() {
           ),
         );
         expect(result.exitCode, 77);
+        expect(result.stdout, contains('PTRACE_RESULT=-1 ERRNO=1'));
       } finally {
         temp.deleteSync(recursive: true);
       }
