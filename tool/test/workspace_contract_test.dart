@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:yaml/yaml.dart';
+
 import '../src/workspace_contract.dart';
 
 typedef _TestBody = void Function();
@@ -21,6 +23,14 @@ const _packageNames = <String, String>{
   'lsp': 'pigcode_ai_lsp',
   'dap': 'pigcode_ai_dap',
   'dart': 'pigcode_ai_dart',
+};
+
+const _commitRelativeCompatibilityCheckers = <String>{
+  'tool/check_compatibility.dart',
+  'tool/check_protocol_compatibility.dart',
+  'tool/check_dart_tooling_compatibility.dart',
+  'tool/check_kernel_store_compatibility.dart',
+  'tool/check_native_containment_compatibility.dart',
 };
 
 const _phase2bProtocolPaths = <String>[
@@ -274,6 +284,61 @@ void main() {
           'Expected no violations, got ${_describe(violations)}',
         );
       });
+    },
+    'requires full history for every compatibility checker job': () {
+      final workflowFile = File('.github/workflows/ci.yml');
+      final workflow = loadYaml(workflowFile.readAsStringSync());
+      _expect(workflow is YamlMap, '${workflowFile.path} must be a YAML map.');
+      final jobs = (workflow as YamlMap)['jobs'];
+      _expect(jobs is YamlMap, '${workflowFile.path} must define jobs.');
+
+      final coveredCheckers = <String>{};
+      for (final jobEntry in (jobs as YamlMap).entries) {
+        final job = jobEntry.value;
+        if (job is! YamlMap) continue;
+        final steps = job['steps'];
+        if (steps is! YamlList) continue;
+
+        final checkerPaths = <String>{};
+        final checkoutSteps = <YamlMap>[];
+        for (final step in steps) {
+          if (step is! YamlMap) continue;
+          final run = step['run'];
+          if (run is String) {
+            checkerPaths.addAll(
+              _commitRelativeCompatibilityCheckers.where(run.contains),
+            );
+          }
+          final uses = step['uses'];
+          if (uses is String && uses.startsWith('actions/checkout@')) {
+            checkoutSteps.add(step);
+          }
+        }
+        if (checkerPaths.isEmpty) continue;
+
+        coveredCheckers.addAll(checkerPaths);
+        _expect(
+          checkoutSteps.length == 1,
+          'CI job ${jobEntry.key} runs ${checkerPaths.join(', ')} and must '
+          'have exactly one checkout step.',
+        );
+        final checkoutConfiguration = checkoutSteps.single['with'];
+        final fetchDepth = checkoutConfiguration is YamlMap
+            ? checkoutConfiguration['fetch-depth']
+            : null;
+        _expect(
+          fetchDepth == 0,
+          'CI job ${jobEntry.key} runs ${checkerPaths.join(', ')} but its '
+          'checkout fetch-depth is ${fetchDepth ?? 'shallow default'}.',
+        );
+      }
+
+      final missingCheckers =
+          _commitRelativeCompatibilityCheckers.difference(coveredCheckers);
+      _expect(
+        missingCheckers.isEmpty,
+        'CI does not run compatibility checkers: ${missingCheckers.join(', ')}',
+      );
     },
     'rejects an unexpected tracked root path': () {
       _withFixture((fixture) {

@@ -22,6 +22,35 @@ void main() {
     expect(error.toString(), isNot(contains('secret')));
   });
 
+  test('Linux statx ABI layout stays at exactly 256 bytes', () {
+    final actualSize = LandlockFfi.linuxStatxStructSize;
+    if (actualSize == LandlockFfi.linuxStatxExpectedSize) {
+      expect(LandlockFfi.validateLinuxStatxLayout, returnsNormally);
+    } else {
+      expect(
+        LandlockFfi.validateLinuxStatxLayout,
+        throwsA(
+          isA<HostCapabilityException>()
+              .having(
+                (error) => error.code,
+                'code',
+                HostCapabilityError.pathDenied,
+              )
+              .having(
+                (error) => error.rule,
+                'rule',
+                'landlock-statx-layout-invalid',
+              ),
+        ),
+      );
+    }
+
+    expect(actualSize, 256);
+    expect(LandlockFfi.linuxStatxTailOffset, 144);
+    expect(LandlockFfi.linuxStatxTailWordCount, 14);
+    expect(LandlockFfi.linuxStatxTailEnd, 256);
+  });
+
   test('native Landlock ABI probe is absent off Linux', () {
     final abi = LandlockFfi().probeAbi();
     if (SandboxPlatform.current == SandboxPlatform.linuxX64 ||

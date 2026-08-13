@@ -39,6 +39,25 @@ abstract final class LandlockFailure {
 }
 
 final class LandlockFfi {
+  static const linuxStatxExpectedSize = 256;
+  static const linuxStatxTailOffset = 144;
+  static const linuxStatxTailWordCount = 14;
+
+  static int get linuxStatxStructSize => sizeOf<_LinuxStatx>();
+
+  static int get linuxStatxTailEnd =>
+      linuxStatxTailOffset + linuxStatxTailWordCount * sizeOf<Uint64>();
+
+  static void validateLinuxStatxLayout() {
+    if (linuxStatxStructSize != linuxStatxExpectedSize ||
+        linuxStatxTailEnd != linuxStatxExpectedSize) {
+      throw const HostCapabilityException(
+        HostCapabilityError.pathDenied,
+        'landlock-statx-layout-invalid',
+      );
+    }
+  }
+
   static Uint8List encodeNativePath(String value) {
     if (value.contains('\u0000')) {
       throw const HostCapabilityException(
@@ -165,6 +184,7 @@ final class LandlockFfi {
       left == right || left.startsWith('$right/') || right.startsWith('$left/');
 
   String _pathIdentity(String value) {
+    validateLinuxStatxLayout();
     final native = _nativeString(value);
     final stat = _callocStruct<_LinuxStatx>(sizeOf<_LinuxStatx>());
     try {
@@ -510,7 +530,7 @@ final class _LinuxStatx extends Struct {
   external int deviceMajor;
   @Uint32()
   external int deviceMinor;
-  @Array(12)
+  @Array(LandlockFfi.linuxStatxTailWordCount)
   external Array<Uint64> tail;
 }
 
